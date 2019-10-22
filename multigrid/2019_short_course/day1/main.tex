@@ -1,0 +1,175 @@
+\documentclass[18pt,xcolor=table]{beamer}
+
+\input{./pres_style.tex}
+
+%%%%%%%%%%%%%%%%%%%%%%%
+% user-defined commands
+%%%%%%%%%%%%%%%%%%%%%%%
+\input{./macros.tex}%added macro definitions here
+
+\usepackage{tikz}
+\usepackage{tabularx}
+\usetikzlibrary{decorations.markings}
+\usetikzlibrary{arrows,positioning} 
+
+\usepackage{cancel}
+\usepackage{hyperref}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage[]{algorithm}
+\usepackage{algpseudocode}
+\captionsetup{compatibility=false}
+
+
+\title[Multigrid]{Introduction to Multigrid Methods}
+\subtitle{Day 1: Motivation and Basic Iterative Methods}
+\author[Mitchell]{Wayne Mitchell}
+\institute{\pgfuseimage{logo}\\Universit\"at Heidelberg\\Institut f\"ur Technische Informatik}
+\date[]{\alert{}}
+
+
+\begin{document}
+\input{./slide_style.tex}
+
+\DeclareRobustCommand{\Chi}{\raisebox{2pt}{$\chi$}}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}
+\frametitle{\bf Outline:}
+\framesubtitle{~~}
+\tableofcontents
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Motivation and model problems}
+
+% Slide
+\begin{frame}{Motivation and model problems}
+\begin{block}{In this section}
+\begin{itemize}
+\item General scientific computing a simulation and where large sparse linear systems come from
+\item Model Poisson problem
+\item Properties of matrix coming from Poisson (i.e. SPD... anything else?) and assumptions (for now) on the matrices we'll be using in general
+\item Methods for solving linear systems: direct vs. iterative, optimal complexity, the need for efficient solvers
+\end{itemize}
+\end{block}
+
+\end{frame}
+
+\begin{frame}{Motivation and model problems}
+\begin{block}{Scientific computing}
+\begin{itemize}
+\item The three pillars of science: theory, experiments, and \emph{simulation}
+\item Computation can allow study of physical phenomena that are difficult, expensive, or infeasible to study with experiments
+\item More computational power and more sophisticated algorithms enable more complicated simulations with better accuracy
+\end{itemize}
+\end{block}
+
+\end{frame}
+
+\begin{frame}{Motivation and model problems}
+\begin{block}{Simulation pipeline}
+\begin{itemize}
+\item Physical phenomenon (potential field)
+\item Continuous equations (Poisson's equation)
+\item Discrete problem formulation (finite difference method)
+\item Form discrete system of equations (meshing)
+\item Solve the discrete system (linear/non-linear solvers)
+\end{itemize}
+\end{block}
+
+\end{frame}
+
+\begin{frame}{Motivation and model problems}
+\begin{block}{Large, sparse linear systems}
+\begin{itemize}
+\item Resulting linear systems tend to be large and sparse
+\item Size (and conditioning) of the system 
+\item Solving these linear systems is often a computational bottleneck
+\end{itemize}
+\end{block}
+
+\end{frame}
+
+\begin{frame}{Motivation and model problems}
+\begin{block}{Efficient solution methods}
+\begin{itemize}
+\item
+\end{itemize}
+\end{block}
+\begin{block}{Numerical accuracy}
+\begin{itemize}
+\item Discretization accuracy
+\item Accuracy of the algebraic solve
+\end{itemize}
+\end{block}
+
+\end{frame}
+
+\begin{frame}{Motivation and model problems}
+\begin{block}{Model problem: Poisson}
+\begin{align*}
+\Delta u &= f, & \Omega \\
+u &= 0, & \partial \Omega
+\end{align*}
+\begin{itemize}
+\item Discretizing with finite differences yields:
+\end{itemize}
+\begin{itemize}
+\item Applying this discretization on a regular 1D mesh yields:
+\end{itemize}
+\end{block}
+
+\end{frame}
+
+\begin{frame}{Motivation and model problems}
+\begin{block}{Solving Poisson with Gaussian elimination}
+\begin{itemize}
+\item 
+\end{itemize}
+\end{block}
+
+\end{frame}
+
+\begin{frame}{Motivation and model problems}
+\begin{block}{The slide where you show how long it takes to solve the same problem with a bunch of different methods of increasing efficiency}
+\begin{itemize}
+\item 
+\end{itemize}
+\end{block}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Basic iterative methods}
+
+\begin{frame}{Basic iterative methods}
+\begin{block}{In this section}
+\begin{itemize}
+\item Matrix splittings, fixed point methods
+\item Basic convergence of splitting methods
+\item Jacobi and Gauss-Seidel
+\item Application of convergence theory to Jacobi
+\item Drawbacks: n dependent convergence that gets very slow as n gets large
+\end{itemize}
+\end{block}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Krylov subspace methods}
+
+\begin{frame}{Basic iterative methods}
+\begin{block}{In this section}
+\begin{itemize}
+\item 
+\end{itemize}
+\end{block}
+
+\end{frame}
+
+\end{document}
+
