@@ -42,101 +42,206 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+\section{Course introduction}
+
+% Slide
+\begin{frame}{Course introduction}
+\begin{block}{Goals}
+\bit
+\item Basics of scientific computing and motivations for multigrid
+\item Understanding of basic multigrid principles
+\item Overview of various multigrid algorithms
+\item Mention some current research topics
+\eit
+\end{block}
+\begin{block}{Acknowledgements}
+\bit
+\item These slides are based on previous tutorials by Steve McCormick, Van Henson, Rob Falgout, Irad Yavneh, David Moulton.
+\eit
+\end{block}
+
+\end{frame}
+
+% Slide
+\begin{frame}{Course introduction}
+
+\end{frame}
+
+% Slide
+\begin{frame}{Course introduction}
+\begin{block}{Resources}
+\bit
+\item 
+\eit
+\end{block}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 \section{Motivation and model problems}
 
 % Slide
 \begin{frame}{Motivation and model problems}
 \begin{block}{In this section}
-\begin{itemize}
+\bit
 \item General scientific computing a simulation and where large sparse linear systems come from
 \item Model Poisson problem
 \item Properties of matrix coming from Poisson (i.e. SPD... anything else?) and assumptions (for now) on the matrices we'll be using in general
 \item Methods for solving linear systems: direct vs. iterative, optimal complexity, the need for efficient solvers
-\end{itemize}
+\eit
 \end{block}
 
 \end{frame}
 
 \begin{frame}{Motivation and model problems}
 \begin{block}{Scientific computing}
-\begin{itemize}
+\bit
 \item The three pillars of science: theory, experiments, and \emph{simulation}
 \item Computation can allow study of physical phenomena that are difficult, expensive, or infeasible to study with experiments
 \item More computational power and more sophisticated algorithms enable more complicated simulations with better accuracy
-\end{itemize}
+\eit
 \end{block}
 
 \end{frame}
 
 \begin{frame}{Motivation and model problems}
 \begin{block}{Simulation pipeline}
-\begin{itemize}
+\bit
 \item Physical phenomenon (potential field)
 \item Continuous equations (Poisson's equation)
 \item Discrete problem formulation (finite difference method)
 \item Form discrete system of equations (meshing)
-\item Solve the discrete system (linear/non-linear solvers)
-\end{itemize}
+\only<1>{\item Solve the discrete system (linear/non-linear solvers)}
+\only<2>{\item \textbf{Solve the discrete system (linear/non-linear solvers)}}
+\eit
 \end{block}
 
 \end{frame}
 
 \begin{frame}{Motivation and model problems}
 \begin{block}{Large, sparse linear systems}
-\begin{itemize}
+\bit
 \item Resulting linear systems tend to be large and sparse
-\item Size (and conditioning) of the system 
+\item Size (and conditioning) of the system depends on mesh resolution
 \item Solving these linear systems is often a computational bottleneck
-\end{itemize}
+\item Want solvers to be:
+\bit
+\item Efficient (as problem grows, execution time does not suffer)
+\item Robust (as conditioning gets worse, convergence does not suffer)
+\eit
+\eit
 \end{block}
 
 \end{frame}
 
+
 \begin{frame}{Motivation and model problems}
-\begin{block}{Efficient solution methods}
-\begin{itemize}
-\item
-\end{itemize}
-\end{block}
-\begin{block}{Numerical accuracy}
-\begin{itemize}
-\item Discretization accuracy
-\item Accuracy of the algebraic solve
-\end{itemize}
+\begin{block}{Model problem: Poisson}
+\bit
+\item Classic model problem is a simple Poisson problem with zero Dirichlet boundary conditions:
+\eq{
+\Delta u &= f, & \Omega \\
+u &= 0, & \partial \Omega
+}
+\item Discretizing with finite differences on a regular 1D mesh:
+\eit
+\eq{
+&\frac{-u_{i-1} + 2u_i - u_{i+1}}{h^2} = f_i, & i = 1,2,..., N\\
+&u_0 = u_{N+1} = 0
+}
 \end{block}
 
 \end{frame}
 
 \begin{frame}{Motivation and model problems}
 \begin{block}{Model problem: Poisson}
-\begin{align*}
-\Delta u &= f, & \Omega \\
-u &= 0, & \partial \Omega
-\end{align*}
-\begin{itemize}
-\item Discretizing with finite differences yields:
-\end{itemize}
-\begin{itemize}
-\item Applying this discretization on a regular 1D mesh yields:
-\end{itemize}
+\begin{center}
+\includegraphics[width=0.7\textwidth]{../figures/1DFDPoisson}
+\end{center}
+\eq{
+\frac{1}{h^2}\begin{bmatrix}
+2 & -1 & & & & & & \\
+-1 & 2 & -1 & & & & & \\
+& -1 & 2 & - 1 & & & & \\
+&  & \ddots & \ddots & \ddots & & & \\
+& & & & & & & \\
+& & & & & -1 & 2 & -1 \\
+& & & & & & -1 & 2 \\
+\end{bmatrix}
+\begin{bmatrix}
+u_1 \\
+u_2 \\
+\\
+\vdots \\
+\\
+\\
+u_N \\
+\end{bmatrix}
+=
+\begin{bmatrix}
+f_1 \\
+f_2 \\
+\\
+\vdots \\
+\\
+\\
+f_N \\
+\end{bmatrix}
+}
+\end{block}
+
+\end{frame}
+
+\begin{frame}{Motivation and model problems}
+\begin{block}{Options for solving the linear system}
+\bit
+\item Direct methods:
+\bit
+\item LU decomposition (Gaussian elimination)
+\item 
+\eit
+\eit
 \end{block}
 
 \end{frame}
 
 \begin{frame}{Motivation and model problems}
 \begin{block}{Solving Poisson with Gaussian elimination}
-\begin{itemize}
+\bit
 \item 
-\end{itemize}
+\eit
 \end{block}
 
 \end{frame}
 
+
+
+
+
+
+
+
 \begin{frame}{Motivation and model problems}
 \begin{block}{The slide where you show how long it takes to solve the same problem with a bunch of different methods of increasing efficiency}
-\begin{itemize}
+\bit
 \item 
-\end{itemize}
+\eit
+\end{block}
+
+\end{frame}
+
+
+
+
+
+
+\begin{frame}{Motivation and model problems}
+\begin{block}{Numerical accuracy}
+\bit
+\item Discretization accuracy
+\item Accuracy of the algebraic solve
+\eit
 \end{block}
 
 \end{frame}
@@ -147,13 +252,13 @@ u &= 0, & \partial \Omega
 
 \begin{frame}{Basic iterative methods}
 \begin{block}{In this section}
-\begin{itemize}
+\bit
 \item Matrix splittings, fixed point methods
 \item Basic convergence of splitting methods
 \item Jacobi and Gauss-Seidel
 \item Application of convergence theory to Jacobi
 \item Drawbacks: n dependent convergence that gets very slow as n gets large
-\end{itemize}
+\eit
 \end{block}
 
 \end{frame}
@@ -164,9 +269,9 @@ u &= 0, & \partial \Omega
 
 \begin{frame}{Basic iterative methods}
 \begin{block}{In this section}
-\begin{itemize}
+\bit
 \item 
-\end{itemize}
+\eit
 \end{block}
 
 \end{frame}
