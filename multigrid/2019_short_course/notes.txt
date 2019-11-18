@@ -1,0 +1,37 @@
+Lectures:
+2x 90 min. 
+Each block, say 30 slides max.
+
+Exercises:
+1.5 hours... ish
+
+
+
+Day 1: Motivation and basic iterative methods
+Session 1: Motivation and basic iterative methods
+Session 2: Krylov methods and preconditioning
+Exercises: 
+
+
+Day 2: Basics of multigrid
+Session 1: motivations, basics of smoothing, coarsening, correction
+Session 2: present geometric multigrid all together and give some examples
+Exercises:
+
+
+Day 3: Algebraic Multigrid
+Session 1: motivation for algebraic methods, algebraic smoothness
+Session 2: the A norm and optimality of the correction, RS AMG, SA?
+Exercises:
+
+
+Day 4: Extensions and special topics
+Session 1: AMG for non-pde problems (graphs), nonsymmetric MG
+Session 2: nonlinear MG, FAS, Newton MG
+Exercises:
+
+
+Day 5: Parallel multigrid and future directions
+Session 1: the hypre story
+Session 2: GPUs and motivation, AMG-DD
+Exercises:
