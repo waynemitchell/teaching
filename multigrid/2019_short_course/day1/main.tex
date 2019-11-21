@@ -59,7 +59,6 @@
 \item These slides are based on previous tutorials by Steve McCormick, Van Henson, Rob Falgout, Irad Yavneh, David Moulton.
 \eit
 \end{block}
-
 \end{frame}
 
 % Slide
@@ -69,15 +68,14 @@
 \item 
 \eit
 \end{block}
-
 \end{frame}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\section{Motivation and model problems}
+\section{Motivation}
 
 % Slide
-\begin{frame}{Motivation and model problems}
+\begin{frame}{Motivation}
 \begin{block}{In this section}
 \bit
 \item General scientific computing a simulation and where large sparse linear systems come from
@@ -86,10 +84,9 @@
 \item Methods for solving linear systems: direct vs. iterative, optimal complexity, the need for efficient solvers
 \eit
 \end{block}
-
 \end{frame}
 
-\begin{frame}{Motivation and model problems}
+\begin{frame}{Motivation}
 \begin{block}{Scientific computing}
 \bit
 \item The three pillars of science: theory, experiments, and \emph{simulation}
@@ -97,10 +94,9 @@
 \item More computational power and more sophisticated algorithms enable more complicated simulations with better accuracy
 \eit
 \end{block}
-
 \end{frame}
 
-\begin{frame}{Motivation and model problems}
+\begin{frame}{Motivation}
 \begin{block}{Simulation pipeline}
 \bit
 \item Physical phenomenon (potential field)
@@ -111,10 +107,9 @@
 \only<2>{\item \textbf{Solve the discrete system (linear/non-linear solvers)}}
 \eit
 \end{block}
-
 \end{frame}
 
-\begin{frame}{Motivation and model problems}
+\begin{frame}{Motivation}
 \begin{block}{Large, sparse linear systems}
 \bit
 \item Resulting linear systems tend to be large and sparse
@@ -127,51 +122,62 @@
 \eit
 \eit
 \end{block}
-
 \end{frame}
 
-
-\begin{frame}{Motivation and model problems}
-\begin{block}{Options for solving the linear system}
+\begin{frame}{Motivation}
+\begin{block}{Direct methods}
 \bit
-\item Direct methods:
+\item General purpose direct methods:
 \bit
-\item LU decomposition (Gaussian elimination)
-\item 
+\item Matrix factorizations: Cholesky or LU (Gaussian elimination), QR, SVD 
+\item Not generally scalable: $O(N^3)$ computational cost
+\eit
+\item Problem specific direct methods:
+\bit
+\item Fast Fourier transfrom, cyclic reduction, fast multipole
+\item More scalabe: $O(N\log N)$ or even $O(N)$ computational cost
 \eit
 \eit
 \end{block}
-
 \end{frame}
 
-
-
-
-
-
-
-\begin{frame}{Motivation and model problems}
-\begin{block}{The slide where you show how long it takes to solve the same problem with a bunch of different methods of increasing efficiency}
+\begin{frame}{Motivation}
+\begin{block}{Iterative methods}
 \bit
-\item 
+\item Basic iterative methods:
+\bit
+\item Jacobi, Gauss-Seidel
+\item Cheap to apply, $O(N)$, but generally poor convergence
+\eit
+\item Krylov methods:
+\bit
+\item Conjugate gradient, GMRES, BiCGSTAB
+\item Also $O(N)$ with much better convergence, but usually requires preconditioning
+\eit
+\item Multilevel methods:
+\bit
+\item $O(N)$ solvers and preconditioners with robust convergence 
+\eit
 \eit
 \end{block}
-
 \end{frame}
 
-
-
-
-
-
-\begin{frame}{Motivation and model problems}
+% BUT iterative methods don't give you the exact solution, right? Isn't that a problem? No. Tunable accuracy is actually preferred due to discretization accuracy, etc.
+\begin{frame}{Motivation}
 \begin{block}{Numerical accuracy}
 \bit
 \item Discretization accuracy
 \item Accuracy of the algebraic solve
 \eit
 \end{block}
+\end{frame}
 
+\begin{frame}{Motivation}
+\begin{block}{The slide where you show how long it takes to solve the same problem with a bunch of different methods of increasing efficiency}
+\bit
+\item 
+\eit
+\end{block}
 \end{frame}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -188,7 +194,6 @@
 \item Drawbacks: n dependent convergence that gets very slow as n gets large
 \eit
 \end{block}
-
 \end{frame}
 
 
@@ -201,7 +206,6 @@
 \item Hope that $||\mathbf{u} - \mathbf{u}^{(i)}||$ is acceptably small for reasonable $i$
 \eit
 \end{block}
-
 \end{frame}
 
 
@@ -213,9 +217,9 @@
 \eit
 \eq{
 \begin{bmatrix}
-a_{1,1} & a_{1,2} & a_{1,3} &... & & & & \\
-a_{2,1} & a_{2,2} & a_{2,3} &... & & & & \\
-a_{3,1} & a_{3,2} & a_{3,3} & & & & & \\
+a_{0,0} & a_{0,1} & a_{0,2} &... & & & & \\
+a_{1,0} & a_{1,1} & a_{1,2} &... & & & & \\
+a_{2,0} & a_{2,1} & a_{2,2} & & & & & \\
 \ddots&  & \ddots & \ddots & \ddots & & & \\
 & & & & & & & \\
 & & & & & & & \\
@@ -242,7 +246,6 @@ f_{N-1} \\
 \end{bmatrix}
 }
 \end{block}
-
 \end{frame}
 
 \begin{frame}{Basic iterative methods}
@@ -259,10 +262,89 @@ u_i &= \frac{1}{a_{i,i}} (f_i - \sum_{j\neq i} a_{i,j}u_j)
 \item One iteration of Jacobi: for all $i$, set $u^{(k+1)}_i = \frac{1}{a_{i,i}} (f_i - \sum_{j\neq i} a_{i,j}u^{(k)}_j)$
 \eit
 \end{block}
-
 \end{frame}
 
+\begin{frame}{Basic iterative methods}
+\begin{block}{Gauss-Seidel}
+\bit
+\item Gauss-Seidel solves the equations one after another
+\item Similar to Jacobi, but uses updated solution
+\item One iteration of Jacobi: for $i = 0,1,...$, overwrite $u_i \leftarrow \frac{1}{a_{i,i}} (f_i - \sum_{j\neq i} a_{i,j}u_j)$
+\eit
+\end{block}
+\end{frame}
 
+\begin{frame}{Basic iterative methods}
+\begin{block}{Matrix representations of iterative methods}
+\bit
+\item Matrix form of Jacobi:
+\eit
+\eq{
+A\mathbf{u} &= \mathbf{f} \\
+(D - L - U)\mathbf{u} &= \mathbf{f} \\
+D\mathbf{u} &= \mathbf{f} + (L + U)\mathbf{u} \\
+\mathbf{u} &= D^{-1}(\mathbf{f} + (L+U)\mathbf{u})
+}
+\bit
+\item One iteration of Jacobi: $\mathbf{u} \leftarrow D^{-1}(\mathbf{f} + (L+U)\mathbf{u})$
+\eit
+\end{block}
+\end{frame}
+
+\begin{frame}{Basic iterative methods}
+\begin{block}{Matrix representations of iterative methods}
+\bit
+\item Matrix form of Gauss-Seidel:
+\eit
+\eq{
+A\mathbf{u} &= \mathbf{f} \\
+(D - L - U)\mathbf{u} &= \mathbf{f} \\
+(D - L)\mathbf{u} &= \mathbf{f} + U\mathbf{u} \\
+\mathbf{u} &= (D-L)^{-1}(\mathbf{f} + U\mathbf{u})
+}
+\bit
+\item One iteration of Gauss-Seidel: $\mathbf{u} \leftarrow (D-L)^{-1}(\mathbf{f} + U\mathbf{u})$
+\eit
+\end{block}
+\end{frame}
+
+\begin{frame}{Basic iterative methods}
+\begin{block}{General matrix splittings}
+\bit
+\item Jacobi and Gauss-Seidel are both examples of matrix splittings
+\item General matrix splitting: $A = M - N$
+\item Iteration: $\mathbf{u} \leftarrow M^{-1}(\mathbf{f} + N\mathbf{u})$
+\eit
+\end{block}
+\end{frame}
+
+\begin{frame}{Basic iterative methods}
+\begin{block}{Matrix splitting error analysis}
+\bit
+\item Let $A\mathbf{u} = \mathbf{f}$, $\mathbf{u}^{(k)}$, the $k^{th}$ iterate, and $\mathbf{e}^{(k)} = \mathbf{u}^{(k)} - \mathbf{u}$
+\eit
+\eq{
+M\mathbf{u}^{(k)} &= \mathbf{f} + N\mathbf{u}^{(k-1)} \\
+M\mathbf{u} &= \mathbf{f} + N\mathbf{u} \\
+\Rightarrow M\mathbf{e}^{(k)} &= N\mathbf{e}^{(k-1)} \\
+\mathbf{e}^{(k)} &= M^{-1}N\mathbf{e}^{(k-1)} \\
+\mathbf{e}^{(k)} &= (M^{-1}N)^k\mathbf{e}^{(0)}
+}
+\bit
+\item The iteration converges if and only if $(M^{-1}N)^k \rightarrow 0$ as $k\rightarrow \infty$, or equivalently $\rho (M^{-1}N) < 1$
+\eit
+\end{block}
+\end{frame}
+
+\begin{frame}{Basic iterative methods}
+\begin{block}{Convergence of Jacobi and Gauss-Seidel}
+\bit
+\item If $A$ is strictly diagonally dominant, then Jacobi converges
+\item If $A$ is symmetric positive definite (SPD), then Gauss-Seidel converges
+\item Speed of convergence depends on $\rho (M^{-1}N)$ and can be \emph{very} slow
+\eit
+\end{block}
+\end{frame}
 
 \begin{frame}{Basic iterative methods}
 \begin{block}{}
@@ -270,34 +352,21 @@ u_i &= \frac{1}{a_{i,i}} (f_i - \sum_{j\neq i} a_{i,j}u_j)
 \item 
 \eit
 \end{block}
+\end{frame}
 
+\begin{frame}{Basic iterative methods}
+\begin{block}{}
+\bit
+\item 
+\eit
+\end{block}
 \end{frame}
 
 
 % Basic convergence theory for splitting methods and apply to Jacobi and GS
-
-\begin{frame}{Basic iterative methods}
-\begin{block}{}
-\bit
-\item 
-\eit
-\end{block}
-
-\end{frame}
-
-
 % Something on motivating weighted Jacobi. Show how weight affects which modes are damped and by how much for Jacobi. Show curves.
-
-\begin{frame}{Basic iterative methods}
-\begin{block}{}
-\bit
-\item 
-\eit
-\end{block}
-
-\end{frame}
-
-
+% Show performance of different methods
+% Discuss idea of red-black GS as a way to get more parallelism
 
 
 
@@ -309,10 +378,7 @@ u_i &= \frac{1}{a_{i,i}} (f_i - \sum_{j\neq i} a_{i,j}u_j)
 
 \section{Model problem}
 
-
-
-
-\begin{frame}{Motivation and model problems}
+\begin{frame}{Model problem}
 \begin{block}{Model problem: Poisson}
 \bit
 \item Classic model problem is a simple Poisson problem with zero Dirichlet boundary conditions:
@@ -327,10 +393,9 @@ u &= 0, & \partial \Omega
 &u_0 = u_{N+1} = 0
 }
 \end{block}
-
 \end{frame}
 
-\begin{frame}{Motivation and model problems}
+\begin{frame}{Model problem}
 \begin{block}{Model problem: Poisson}
 \begin{center}
 \includegraphics[width=0.7\textwidth]{../figures/1DFDPoisson}
@@ -366,29 +431,123 @@ f_N \\
 \end{bmatrix}
 }
 \end{block}
-
 \end{frame}
 
 % TODO: Make visualizations (jupyter notebook?) that shows Jacobi and GS solves step by step for 1D poisson problem
-
+% TODO: discuss condition number
+% TODO: general matrix preliminaries: SPD, diagonal dominant definitions, maybe some properties, condition number
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{Krylov subspace methods}
 
-\begin{frame}{Basic iterative methods}
+\begin{frame}{Krylov subspace methods}
 \begin{block}{In this section}
+\bit
+\item Gradient descent
+\item Conjugate gradient
+\item CG converges in $n$ iterations, but usually far less
+\item Mention GMRES and BiCGSTAB for non-symmetric
+\eit
+\end{block}
+\end{frame}
+
+\begin{frame}{Krylov subspace methods}
+\begin{block}{Definition of a Krylov subspace}
+\bit
+\item $\mathcal{K}_r(A,\mathbf{f}) = \text{span}\{\mathbf{f},A\mathbf{f},A^2\mathbf{f},...,A^{r-1}\mathbf{f}\}$
+\item TODO: why might this be a good space to search in?
+\eit
+\end{block}
+\end{frame}
+
+\begin{frame}{Krylov subspace methods}
+\begin{block}{Gradient descent}
+\bit
+\item Assume $A$ is SPD
+\item Recast $A\mathbf{u} = \mathbf{f}$ as a minimization problem:
+\eq{
+   \phi(\mathbf{u}) = \frac{1}{2}\mathbf{u}^TA\mathbf{u} - \mathbf{u}^T\mathbf{f}
+}
+\item Note that $-\nabla \phi(\mathbf{u}) = \mathbf{f} - A\mathbf{u}$
+\item Thus $\phi(\mathbf{u})$ is minimized at the solution $A^{-1}\mathbf{f}$ and the direction of \emph{steepest descent} towards that minimum is in the direction of the residual, $\mathbf{r} = \mathbf{f} = A\mathbf{u}$
+\eit
+\end{block}
+\end{frame}
+
+% TODO: visualization of gradient descent
+
+\begin{frame}{Krylov subspace methods}
+\begin{block}{Gradient descent}
+\bit
+\item $\mathbf{r}$ definest the search direction, and $\alpha = \langle \mathbf{r}, \mathbf{r} \rangle / \langle \mathbf{r}, A\mathbf{r} \rangle$
+\item $\alpha$ is chosen by an exact line search to minimize $\phi(\mathbf{u} + \alpha \mathbf{r})$
+\eit
+\end{block}
+\begin{algorithm}[H]
+\caption{Gradient descent}
+\begin{algorithmic}
+\State Set $\mathbf{u}$ initial guess
+\For{k = 0,1,...}
+\State $\mathbf{r} \leftarrow \mathbf{f} - A\mathbf{u}$
+\State $\alpha \leftarrow \langle \mathbf{r}, \mathbf{r} \rangle / \langle \mathbf{r}, A\mathbf{r} \rangle$
+\State $\mathbf{u} \leftarrow \mathbf{u} + \alpha\mathbf{r}$
+\EndFor
+\end{algorithmic}
+\end{algorithm}
+\end{frame}
+
+\begin{frame}{Krylov subspace methods}
+\begin{block}{Gradient descent}
+\bit
+\item TODO: visualize gradient descent
+\eit
+\end{block}
+\end{frame}
+
+\begin{frame}{Krylov subspace methods}
+\begin{block}{Gradient descent}
+\bit
+\item TODO: visualize canyon pitfall of gradient descent
+\eit
+\end{block}
+\end{frame}
+
+\begin{frame}{Krylov subspace methods}
+\begin{block}{Conjugate Gradient}
 \bit
 \item 
 \eit
 \end{block}
-
 \end{frame}
 
-\end{document}
-
+\begin{frame}{Krylov subspace methods}
+\begin{block}{}
+\bit
+\item 
+\eit
+\end{block}
+\end{frame}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{Preconditiong Krylov methods}
+
+\begin{frame}{Preconditiong Krylov methods}
+\begin{block}{In this section}
+\bit
+\item Why does ill conditioning hurt CG?
+\item How to do preconditioning
+\item Couple examples of preconditioners: diagonal
+\eit
+\end{block}
+\end{frame}
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\end{document}
+
