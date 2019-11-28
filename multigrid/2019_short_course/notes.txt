@@ -1,11 +1,15 @@
-Lectures:
-2x 90 min. 
+Multigrid course: 
+
+9:15 - 10:45, 11:15 - 12:45, lunch, 14:15 - 15:45
+First two blocks are lecture, last is exercises plus Q&A
+
+Lectures: 2x 90 min. 
 Each block, say 30 slides max.
 
 Exercises:
 1.5 hours... ish
 
-
+===============================================================
 
 Day 1: Motivation and basic iterative methods
 Session 1: Motivation and basic iterative methods
@@ -15,7 +19,7 @@ Exercises:
 
 Day 2: Basics of multigrid
 Session 1: motivations, basics of smoothing, coarsening, correction
-Session 2: present geometric multigrid all together and give some examples
+Session 2: present geometric multigrid all together and give some examples, briefly look at anisotropy (as example of needing to tailor MG algorithm to problem), look briefly at FMG
 Exercises:
 
 
@@ -35,3 +39,52 @@ Day 5: Parallel multigrid and future directions
 Session 1: the hypre story
 Session 2: GPUs and motivation, AMG-DD
 Exercises:
+
+===============================================================
+
+Day 1: Motivation and basic iterative methods
+Briefly introduce the model problem and use it in the exercises (or as a demonstration problem during lecture), but don't get into too much detail with eigenmodes, etc.
+Linear scaling is important if you want to solve large problems on large machines. 
+Don’t forget to include reference to books (e.g. multigrid tutorial), seminal papers, etc.
+
+===============================================================
+
+Day 2: Basics of multigrid
+Question: What's the argument for full coarsening instead of injection? Why do you end up with R = cP^T instead of just R = P^T?
+Why is solving the residual equation for the correction important again? Right, residual is smooth, solution not necessarily smooth. So the solution is not necessarily representable on a coarse grid, but the error is.
+Soldiers in a line problem?
+Return to the model Poisson problem and this time go into more detail.
+Eigenvectors are the sine modes. 
+Jacobi is easily applied and attenuates some of these modes effectively: it is a smoother.
+Smooth becomes oscillatory on a coarser scale: two level.
+Recurse to get multilevel.
+How far do I want to generalize? I actually don't know geometric multigrid super well when it comes to more difficult problems with variable coefficients and anisotropies in different parts of the domain, etc. The Copper slides go over this a bit, variational coarsening etc.... Need to read up myself. Related to AMG, so might be good to mention.
+
+===============================================================
+
+Day 3: Algebraic Multigrid
+Start again with Poisson, then generalize.
+Eventually, if everything is algebraic, you can solve even non-elliptic problems or problems that do not come from PDEs.
+	Show AIR stuff.
+	Show graph stuff.
+
+===============================================================
+
+Day 4: Extensions and special topics
+
+===============================================================
+
+Day 5: Parallel multigrid and future directions
+Look through Rob’s slides
+I can pretty much tell a lot of the hypre development story at this point, I think: development of parallel coarsening and interpolation strategies, etc. 
+New ideas in parallel MG: Communication limitedness on large modern machines
+NIRD/AMG-DD
+
+===============================================================
+
+Exercises:
+Fuck around with jupyter or ipynb (same thing?) for demonstrations:
+1. Show fill in for solving Poisson with Gaussian Elimination.
+2. Discretization accuracy: show analytic solution, exact discrete solution, approximate discrete solution.
+
+
