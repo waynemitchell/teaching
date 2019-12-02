@@ -35,3 +35,19 @@ Day 5: Parallel multigrid and future directions
 Session 1: the hypre story
 Session 2: GPUs and motivation, AMG-DD
 Exercises:
+
+
+
+
+
+--------------------------
+
+
+Day 1: 
+Maybe during exercises:
+For Jacobi and GS, note their performance on different Fourier modes for the model problem. Foreshadow the MG: methods do a good job of reducing certain modes.
+
+
+Day 2:
+Session 1: 
+Story: recall the iterative methods from Day 1. Review performance of Jacobi/GS on the Fourier modes. Use this to motivate MG.
