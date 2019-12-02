@@ -517,9 +517,31 @@ f_N \\
 \begin{frame}{Krylov subspace methods}
 \begin{block}{Conjugate Gradient}
 \bit
-\item 
+\item Grandient descent can be improved by orthogonalizing search directions
+\item Rather than using the residual (direction of steepest descent), orthogonalize the residual against previous search directions
+\item Search directions, $p_k$, are $A$-orthogonal to eachother: $p_k\in\text{span}\{Ap_0,...,Ap_{k-1}\}^\perp$
+% \item Search for a solution in the Krylov subspace, $\mathcal{K}_r(A,\mathbf{f}) = \text{span}\{\mathbf{f},A\mathbf{f},A^2\mathbf{f},...,A^{r-1}\mathbf{f}\}$ !!! TODO: check this? Notation and correctness...
 \eit
 \end{block}
+\end{frame}
+
+\begin{frame}{Krylov subspace methods}
+\begin{algorithm}[H]
+\caption{Conjugate Gradient (CG)}
+\begin{algorithmic}
+\State Set $\mathbf{u}$ initial guess
+\For{k = 0,1,...}
+\State $\mathbf{r} \leftarrow \mathbf{f} - A\mathbf{u}$
+\If{k = 0}
+\State $p_k = r$
+\Else
+\State $p_k = \min||p_k - r||$ subject to $p_k\in\text{span}\{Ap_0,...,Ap_{k-1}\}^\perp$
+\EndIf
+\State $\alpha \leftarrow \langle \mathbf{p_k}, \mathbf{r} \rangle / \langle \mathbf{p_k}, A\mathbf{p_k} \rangle$
+\State $\mathbf{u} \leftarrow \mathbf{u} + \alpha\mathbf{p_k}$
+\EndFor
+\end{algorithmic}
+\end{algorithm}
 \end{frame}
 
 \begin{frame}{Krylov subspace methods}
