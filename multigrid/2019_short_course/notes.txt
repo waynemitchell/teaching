@@ -8,6 +8,8 @@ Each block, say 30 slides max.
 
 Exercises:
 1.5 hours... ish
+https://colab.research.google.com/github/copper-multigrid-conference/2019-tutorials/
+https://github.com/copper-multigrid-conference/2019-tutorials
 
 ===============================================================
 
