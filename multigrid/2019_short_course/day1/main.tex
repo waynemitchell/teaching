@@ -42,11 +42,11 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\section{Course introduction}
+\section{Introduction}
 
 % Slide
-\begin{frame}{Course introduction}
-\begin{block}{Goals}
+\begin{frame}{Introduction}
+\begin{block}{Course Goals}
 \bit
 \item Basics of scientific computing and motivations for multigrid
 \item Understanding of basic multigrid principles
@@ -54,18 +54,27 @@
 \item Mention some current research topics
 \eit
 \end{block}
-\begin{block}{Acknowledgements}
+\end{frame}
+
+% Slide
+\begin{frame}{Introduction}
+\begin{block}{Day 1 Goals}
 \bit
-\item These slides are based on previous tutorials by Steve McCormick, Van Henson, Rob Falgout, Irad Yavneh, David Moulton.
+\item Motivations for multigrid
+\item Basic iterative methods and convergence theory
+\item Krylov methods and preconditioning
+\item Groundwork for introducing multigrid
 \eit
 \end{block}
 \end{frame}
 
 % Slide
-\begin{frame}{Course introduction}
+\begin{frame}{Introduction}
 \begin{block}{Resources}
 \bit
-\item 
+\item A Multigrid Tutorial. Briggs, Henson, McCormick.
+\item Multigrid. Trottenberg, Oosterlee, Sch\"uller.
+\item Matrix Computations. Golub, Van Loan.
 \eit
 \end{block}
 \end{frame}
@@ -176,6 +185,86 @@
 \begin{block}{The slide where you show how long it takes to solve the same problem with a bunch of different methods of increasing efficiency}
 \bit
 \item 
+\eit
+\end{block}
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Preliminaries and a model problem}
+
+\begin{frame}{Preliminaries}
+\begin{block}{In this section}
+\bit
+\item Define notation: matrices, vectors, norms, inner products
+\item Orthogonality definition, relation between inner products and norms, different matrix norms, other stuff?
+\item Eigenvalues/vectors
+\item Span, subspaces, etc.
+\item condition number
+\eit
+\end{block}
+\end{frame}
+
+\begin{frame}{Model problem}
+\begin{block}{Model problem: Poisson}
+\bit
+\item Classic model problem is a simple Poisson problem with zero Dirichlet boundary conditions:
+\eq{
+\Delta u &= f, & \Omega \\
+u &= 0, & \partial \Omega
+}
+\item Discretizing with finite differences on a regular 1D mesh:
+\eit
+\eq{
+&\frac{-u_{i-1} + 2u_i - u_{i+1}}{h^2} = f_i, & i = 1,2,..., N\\
+&u_0 = u_{N+1} = 0
+}
+\end{block}
+\end{frame}
+
+\begin{frame}{Model problem}
+\begin{block}{Model problem: Poisson}
+\begin{center}
+\includegraphics[width=0.7\textwidth]{../figures/1DFDPoisson}
+\end{center}
+\eq{
+\frac{1}{h^2}\begin{bmatrix}
+2 & -1 & & & & & & \\
+-1 & 2 & -1 & & & & & \\
+& -1 & 2 & - 1 & & & & \\
+&  & \ddots & \ddots & \ddots & & & \\
+& & & & & & & \\
+& & & & & -1 & 2 & -1 \\
+& & & & & & -1 & 2 \\
+\end{bmatrix}
+\begin{bmatrix}
+u_1 \\
+u_2 \\
+\\
+\vdots \\
+\\
+\\
+u_N \\
+\end{bmatrix}
+=
+\begin{bmatrix}
+f_1 \\
+f_2 \\
+\\
+\vdots \\
+\\
+\\
+f_N \\
+\end{bmatrix}
+}
+\end{block}
+\end{frame}
+
+\begin{frame}{Basic iterative methods}
+\begin{block}{In this section}
+\bit
+\item Matrix properties (define all): symmetric, positive definite, diagonally dominant, (others?)
 \eit
 \end{block}
 \end{frame}
@@ -364,78 +453,10 @@ M\mathbf{u} &= \mathbf{f} + N\mathbf{u} \\
 
 
 % Basic convergence theory for splitting methods and apply to Jacobi and GS
+% Wikipedia: convergence rate for Jacobi/GS is something like 1 - 2/k(A)... verify and include this.
 % Something on motivating weighted Jacobi. Show how weight affects which modes are damped and by how much for Jacobi. Show curves.
 % Show performance of different methods
 % Discuss idea of red-black GS as a way to get more parallelism
-
-
-
-
-
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\section{Model problem}
-
-\begin{frame}{Model problem}
-\begin{block}{Model problem: Poisson}
-\bit
-\item Classic model problem is a simple Poisson problem with zero Dirichlet boundary conditions:
-\eq{
-\Delta u &= f, & \Omega \\
-u &= 0, & \partial \Omega
-}
-\item Discretizing with finite differences on a regular 1D mesh:
-\eit
-\eq{
-&\frac{-u_{i-1} + 2u_i - u_{i+1}}{h^2} = f_i, & i = 1,2,..., N\\
-&u_0 = u_{N+1} = 0
-}
-\end{block}
-\end{frame}
-
-\begin{frame}{Model problem}
-\begin{block}{Model problem: Poisson}
-\begin{center}
-\includegraphics[width=0.7\textwidth]{../figures/1DFDPoisson}
-\end{center}
-\eq{
-\frac{1}{h^2}\begin{bmatrix}
-2 & -1 & & & & & & \\
--1 & 2 & -1 & & & & & \\
-& -1 & 2 & - 1 & & & & \\
-&  & \ddots & \ddots & \ddots & & & \\
-& & & & & & & \\
-& & & & & -1 & 2 & -1 \\
-& & & & & & -1 & 2 \\
-\end{bmatrix}
-\begin{bmatrix}
-u_1 \\
-u_2 \\
-\\
-\vdots \\
-\\
-\\
-u_N \\
-\end{bmatrix}
-=
-\begin{bmatrix}
-f_1 \\
-f_2 \\
-\\
-\vdots \\
-\\
-\\
-f_N \\
-\end{bmatrix}
-}
-\end{block}
-\end{frame}
-
-% TODO: Make visualizations (jupyter notebook?) that shows Jacobi and GS solves step by step for 1D poisson problem
-% TODO: discuss condition number
-% TODO: general matrix preliminaries: SPD, diagonal dominant definitions, maybe some properties, condition number
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -519,10 +540,30 @@ f_N \\
 \bit
 \item Grandient descent can be improved by orthogonalizing search directions
 \item Rather than using the residual (direction of steepest descent), orthogonalize the residual against previous search directions
-\item Search directions, $p_k$, are $A$-orthogonal to eachother: $p_k\in\text{span}\{Ap_0,...,Ap_{k-1}\}^\perp$
+\item Search directions, $\mathbf{p}_k$, are $A$-orthogonal to eachother: $\mathbf{p}_k\in\text{span}\{A\mathbf{p}_0,...,A\mathbf{p}_{k-1}\}^\perp$
 % \item Search for a solution in the Krylov subspace, $\mathcal{K}_r(A,\mathbf{f}) = \text{span}\{\mathbf{f},A\mathbf{f},A^2\mathbf{f},...,A^{r-1}\mathbf{f}\}$ !!! TODO: check this? Notation and correctness...
+% TODO: note that use of A inner product assumes an SPD matrix (CG only for SPD matrices!)
 \eit
 \end{block}
+\end{frame}
+
+\begin{frame}{Krylov subspace methods}
+\begin{algorithm}[H]
+\caption{Conjugate Gradient (idea)}
+\begin{algorithmic}
+\State Set $\mathbf{u}$ initial guess
+\For{k = 0,1,...}
+\State $\mathbf{r} \leftarrow \mathbf{f} - A\mathbf{u}$
+\If{k = 0}
+\State $\mathbf{p}_k = \mathbf{r}$
+\Else
+\State $\mathbf{p}_k = \min||\mathbf{p}_k - \mathbf{r}||$ subject to $p_k\in\text{span}\{Ap_0,...,Ap_{k-1}\}^\perp$
+\EndIf
+\State $\alpha \leftarrow \langle \mathbf{p}_k, \mathbf{r} \rangle / \langle \mathbf{p}_k, A\mathbf{p}_k \rangle$
+\State $\mathbf{u} \leftarrow \mathbf{u} + \alpha\mathbf{p}_k$
+\EndFor
+\end{algorithmic}
+\end{algorithm}
 \end{frame}
 
 \begin{frame}{Krylov subspace methods}
@@ -533,21 +574,39 @@ f_N \\
 \For{k = 0,1,...}
 \State $\mathbf{r} \leftarrow \mathbf{f} - A\mathbf{u}$
 \If{k = 0}
-\State $p_k = r$
+\State $\mathbf{p}_k = \mathbf{r}$
 \Else
-\State $p_k = \min||p_k - r||$ subject to $p_k\in\text{span}\{Ap_0,...,Ap_{k-1}\}^\perp$
+\State $\beta  = -\langle p_{k-1}, A\mathbf{r} \rangle / \langle \mathbf{p}_{k-1}, A\mathbf{p}_{k-1} \rangle$
+\State $\mathbf{p}_k = \mathbf{r} + \beta \mathbf{p}_{k-1}$
 \EndIf
-\State $\alpha \leftarrow \langle \mathbf{p_k}, \mathbf{r} \rangle / \langle \mathbf{p_k}, A\mathbf{p_k} \rangle$
-\State $\mathbf{u} \leftarrow \mathbf{u} + \alpha\mathbf{p_k}$
+\State $\alpha \leftarrow \langle \mathbf{p}_k, \mathbf{r} \rangle / \langle \mathbf{p}_k, A\mathbf{p}_k \rangle$
+\State $\mathbf{u} \leftarrow \mathbf{u} + \alpha\mathbf{p}_k$
 \EndFor
 \end{algorithmic}
 \end{algorithm}
 \end{frame}
 
 \begin{frame}{Krylov subspace methods}
-\begin{block}{}
+\begin{block}{Convergence of CG}
 \bit
-\item 
+\item CG converges to the exact solution in $n$ iterations.
+\item Each iteration requires just one mat-vec and some inner products, i.e. $O(n)$ operations
+\item Aim to achieve convergence with far fewer than $n$ iterations
+\item Can bound convergence in the $A$-norm, dependent on the condition number of $A$, $\kappa_2(A) = \kappa$.
+\eit
+\eq{||\mathbf{u} - \mathbf{u}_k||_A \leq 2||\mathbf{u} - \mathbf{u}_k||_A\left(\frac{\sqrt{\kappa}-1}{\sqrt{\kappa}+1}\right)^k}
+\end{block}
+\end{frame}
+
+\begin{frame}{Krylov subspace methods}
+\begin{block}{Convergence of CG}
+\bit
+\item Comparing convergence:
+\bit
+\item CG: $\left(\frac{\sqrt{\kappa}-1}{\sqrt{\kappa}+1}\right)^k$
+\item Jacobi/Gauss-Seidel: TODO
+\eit
+\item CG is much better, but still depends on condition number of $A$.
 \eit
 \end{block}
 \end{frame}
@@ -566,6 +625,45 @@ f_N \\
 \end{block}
 \end{frame}
 
+\begin{frame}{Preconditiong Krylov methods}
+\begin{block}{}
+\bit
+\item 
+\eit
+\end{block}
+\end{frame}
+
+\begin{frame}{Preconditiong Krylov methods}
+\begin{block}{}
+\bit
+\item 
+\eit
+\end{block}
+\end{frame}
+
+\begin{frame}{Preconditiong Krylov methods}
+\begin{block}{}
+\bit
+\item 
+\eit
+\end{block}
+\end{frame}
+
+\begin{frame}{Preconditiong Krylov methods}
+\begin{block}{}
+\bit
+\item 
+\eit
+\end{block}
+\end{frame}
+
+\begin{frame}{Preconditiong Krylov methods}
+\begin{block}{}
+\bit
+\item 
+\eit
+\end{block}
+\end{frame}
 
 
 

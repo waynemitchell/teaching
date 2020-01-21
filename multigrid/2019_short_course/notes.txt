@@ -8,6 +8,7 @@ Each block, say 30 slides max.
 
 Exercises:
 1.5 hours... ish
+https://colab.research.google.com/github/
 https://colab.research.google.com/github/copper-multigrid-conference/2019-tutorials/
 https://github.com/copper-multigrid-conference/2019-tutorials
 
@@ -44,10 +45,21 @@ Exercises:
 
 ===============================================================
 
+General notes:
+Make it friendly for non-math folks!!! 
+   1. Explain the difference between symmetric and non-symmetric problems
+   2. Explain condition number of problems, make many references throughout as to why poor conditioning is hard to solve
+   3. Explain orthogonality? Certainly A-orthogonality.
+   4. Eigenvalues and eigenvectors. Spans and subspaces.
+   5. Define inner products and norms
+
+===============================================================
+
 Day 1: Motivation and basic iterative methods
 Briefly introduce the model problem and use it in the exercises (or as a demonstration problem during lecture), but don't get into too much detail with eigenmodes, etc.
 Linear scaling is important if you want to solve large problems on large machines. 
 Don’t forget to include reference to books (e.g. multigrid tutorial), seminal papers, etc.
+Look at behavior of iterative methods on model problem, namely start hinting at their qualitative smoothing properties so that you can reference this again the next day.
 
 ===============================================================
 
@@ -61,6 +73,9 @@ Jacobi is easily applied and attenuates some of these modes effectively: it is a
 Smooth becomes oscillatory on a coarser scale: two level.
 Recurse to get multilevel.
 How far do I want to generalize? I actually don't know geometric multigrid super well when it comes to more difficult problems with variable coefficients and anisotropies in different parts of the domain, etc. The Copper slides go over this a bit, variational coarsening etc.... Need to read up myself. Related to AMG, so might be good to mention.
+Things to show in visualizing basic iterative methods:
+   1. They smooth the residual. Even if the error is oscillatory, the residual is smooth and can be represented on a coarse grid.
+   2. Show that unweighted Jacobi doesn't damp the highest frequencies for the model problem. You need to use the appropriate weight to get the smoothing property.
 
 ===============================================================
 

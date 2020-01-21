@@ -22,7 +22,7 @@
 
 
 \title[Multigrid]{Introduction to Multigrid Methods}
-\subtitle{Day : }
+\subtitle{Day 2: Geometric Multigrid}
 \author[Mitchell]{Wayne Mitchell}
 \institute{\pgfuseimage{logo}\\Universit\"at Heidelberg\\Institut f\"ur Technische Informatik}
 \date[]{\alert{}}
@@ -42,8 +42,202 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\section{}
+\section{Introduction}
 
+% Slide
+\begin{frame}{Introduction}
+\begin{block}{Day 2 Goals}
+\bit
+\item Basic theoretical motivations for multigrid
+\item Define the basic components of multigrid: relaxation, interpolation, and restriction
+\item Outline geometric multigrid on a model problem
+\eit
+\end{block}
+\end{frame}
+
+% Slide
+\begin{frame}
+\begin{block}{Acknowledgements}
+\bit
+\item These slides are based on previous tutorials by Steve McCormick, Van Henson, Rob Falgout, Irad Yavneh, David Moulton.
+\item https://github.com/copper-multigrid-conference
+\eit
+\end{block}
+\end{frame}
+
+% Slide
+\begin{frame}{Introduction}
+\begin{block}{Resources}
+\bit
+\item A Multigrid Tutorial. Briggs, Henson, McCormick.
+\item Multigrid. Trottenberg, Oosterlee, Sch\"uller.
+\item Matrix Computations. Golub, Van Loan.
+\eit
+\end{block}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Basic iterative methods and a model problem}
+
+
+% Slide
+\begin{frame}{Basic iterative methods and a model problem}
+\begin{block}{Moving from basic iterative methods to multigrid}
+\bit
+\item Focus on a model elliptic PDE problem
+\item Examine the behavior of basic iterative methods on this problem
+\item Use that behavior to motivate the move towards multigrid
+\eit
+\end{block}
+\end{frame}
+
+% Slide
+\begin{frame}{Basic iterative methods and a model problem}
+\begin{block}{Model problem: Poisson}
+\bit
+\item Classic model problem is a simple Poisson problem with zero Dirichlet boundary conditions:
+\eq{
+\Delta u &= f, & \Omega \\
+u &= 0, & \partial \Omega
+}
+\item Discretizing with finite differences on a regular 1D mesh:
+\eit
+\eq{
+&\frac{-u_{i-1} + 2u_i - u_{i+1}}{h^2} = f_i, & i = 1,2,..., N\\
+&u_0 = u_{N+1} = 0
+}
+\end{block}
+\end{frame}
+
+% Slide
+\begin{frame}{Basic iterative methods and a model problem}
+\begin{block}{Model problem: Poisson}
+\begin{center}
+\includegraphics[width=0.7\textwidth]{../figures/1DFDPoisson}
+\end{center}
+\eq{
+\frac{1}{h^2}\begin{bmatrix}
+2 & -1 & & & & & & \\
+-1 & 2 & -1 & & & & & \\
+& -1 & 2 & - 1 & & & & \\
+&  & \ddots & \ddots & \ddots & & & \\
+& & & & & & & \\
+& & & & & -1 & 2 & -1 \\
+& & & & & & -1 & 2 \\
+\end{bmatrix}
+\begin{bmatrix}
+u_1 \\
+u_2 \\
+\\
+\vdots \\
+\\
+\\
+u_N \\
+\end{bmatrix}
+=
+\begin{bmatrix}
+f_1 \\
+f_2 \\
+\\
+\vdots \\
+\\
+\\
+f_N \\
+\end{bmatrix}
+}
+\end{block}
+\end{frame}
+
+% Review of eigenvalues and eigenvectors and describe them for the model problem. Symmetric problem, evecs are a basis.
+% Write error reduction as a decomposition into the evecs (the fourier modes in the case of the model problem)
+
+
+% Slide
+\begin{frame}{Basic iterative methods and a model problem}
+\begin{block}{Review of eigenvalues and eigenvectors}
+\bit
+\item Eigenvalues, $\lambda$, and eigenvectors, $v$, of a matrix, $A$, are defined by
+\[Av = \lambda v\]
+\item Evals and evecs can be a way to think about ``action" of an operator: rotation and scaling
+\item Important in many applications from physics and engineering
+\eit
+\end{block}
+\end{frame}
+
+% Slide
+\begin{frame}{Basic iterative methods and a model problem}
+\begin{block}{Review of eigenvalues and eigenvectors}
+\bit
+\item If $A$ is symmetric positive definite (SPD), then eigenvectors form a basis for $\mathcal{R}^n$
+\item Thus, any vector, $x\in\mathcal{R}^n$ can be decomposed as 
+\item We can study behavior of iterative methods by considering their effect on different eigenvectors
+\eit
+\end{block}
+\end{frame}
+
+% Slide
+\begin{frame}{Basic iterative methods and a model problem}
+\begin{block}{Review of eigenvalues and eigenvectors}
+\bit
+\item If $A$ is symmetric positive definite (SPD), then eigenvectors form a basis for $\mathcal{R}^n$
+\eit
+\end{block}
+\end{frame}
+
+% Look at behavior of Jacobi/GS on fourier modes. Note stalling 
+% Definition of "smoothing factor" and motivation for weighted Jacobi as a smoother
+% Visualize some 1D examples to show qualitatively how things are smoothed out
+% Brief similar examples for GS
+
+
+
+% Slide
+\begin{frame}{Basic iterative methods and a model problem}
+\begin{block}{}
+\bit
+\item 
+\eit
+\end{block}
+\end{frame}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Towards multigrid}
+
+
+% Observation 1: smooth error is relatively oscillatory on a coarser grid
+% Observation 2: use of the residual equation on the coarse grid
+% Result: coarse grid correction
+% Define interpolation
+% Define restriction
+% Define 2 grid
+% Define MG cycles
+% Cost of MG: count up the operations to get compute cost
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Some basic convergence theory}
+
+
+% Two grid convergence
+% multilevel?
+% FMG convergence to discretization accuracy
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Other stuff?}
+
+% 2D examples, anisotropic examples with line smoothing and semicoarsening
+% Use of MG as preconditioner for Krylov methods
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+% Slide
 \begin{frame}{}
 \begin{block}{}
 \bit
