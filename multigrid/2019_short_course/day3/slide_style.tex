@@ -1,0 +1,26 @@
+%!TEX root = ./main.tex
+\tikzstyle{block} = [rectangle, draw, rounded corners, shade, top color=white, text width=5em,
+  bottom color=blue!50!black!20, draw=blue!40!black!60, very thick, text centered, minimum height=4em]
+  \tikzstyle{line} = [draw, -latex']
+  \tikzstyle{cloud} = [draw, ellipse,top color=white, bottom color=red!20, node distance=2cm, minimum height=2em]
+
+  \frame{\titlepage}
+
+  \addtobeamertemplate{frametitle}{}{%
+      \begin{textblock*}{100mm}(0.9\textwidth,-0.88cm)
+    \pgfuseimage{small_logo}
+    \end{textblock*}
+  }
+
+\AtBeginSection[] { 
+  \begin{frame}[t]
+    \frametitle{\bf Outline:}
+    \framesubtitle{~~} 
+    \tableofcontents[currentsection] 
+  \end{frame} 
+  \addtocounter{framenumber}{-1} 
+} 
+
+\let\tempone\itemize
+\let\temptwo\enditemize
+\renewenvironment{itemize}{\tempone\addtolength{\itemsep}{0.5\baselineskip}}{\temptwo}

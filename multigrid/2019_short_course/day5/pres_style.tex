@@ -1,0 +1,92 @@
+%!TEX root = ./main.tex
+\usepackage {bbm}
+\usepackage {textpos}
+\usepackage {tikz}
+\usepackage {graphicx}
+
+
+\definecolor{blue1}{RGB}{176,196,222 }
+\definecolor{blue2}{RGB}{54,100,139}
+
+\definecolor{grey1}{RGB}{139,139,131}
+\definecolor{grey2}{RGB}{235,235,235}
+
+\definecolor{black1}{RGB}{50,50,50}
+
+\mode<presentation>
+{
+  % \usetheme{Pittsburgh}   
+  %\usetheme{Boadilla}  
+\usetheme{Madrid}  
+  \usefonttheme[onlymath]{serif}
+  \setbeamertemplate{items}[circle] 
+  \setbeamertemplate{sections/subsections in toc}[circle]
+  \setbeamercovered{invisible}
+  \setbeamertemplate{navigation symbols}{}
+% \usecolortheme{seahorse}
+%
+%  % Color Theme 
+  \setbeamercolor{normal text}{bg=white,fg=black1} %All standard text
+  \setbeamercolor{structure}{fg=blue2} %% Table of Contents 
+
+  \setbeamercolor*{frametitle}{fg=black1,bg=grey2} % Frame title colors
+%  \setbeamerfont{frametitle}{series=\bfseries}
+  \setbeamercolor*{framesubtitle}{fg=blue2} % Frame subtitle color
+
+  \setbeamercolor*{palette primary}{use=structure,fg=black1, bg=grey2} %right bottom
+  \setbeamercolor*{palette secondary}{use=structure,bg=blue1} %middle bottom
+  \setbeamercolor*{palette tertiary}{use=structure,bg=blue2,fg=grey2} %left bottom
+
+  \setbeamercolor*{block body}{fg=black1,bg=blue1!10} % Color of blocks
+  \setbeamercolor*{block title}{parent=structure,fg=black1,bg=blue1} % Block Titles
+  \setbeamercolor{alerted text}{fg=blue2!85!black,} % Alerted Text (ie. highlight with \alert)
+  \setbeamerfont{alerted text}{series=\bfseries}
+
+  % not sure what these do.
+  \setbeamercolor{item projected}{use=item,fg=black1,bg=item.fg!35}
+  \setbeamercolor*{block title alerted}{parent=alerted text,bg=black1!15}
+  \setbeamercolor*{block title example}{parent=example text,bg=black1!15}
+  \setbeamerfont{framesubtitle}{size=\small}
+}
+
+\makeatletter
+\setbeamertemplate{footline}
+{
+  \leavevmode%
+    \hbox{%
+      \begin{beamercolorbox}[wd=.333333\paperwidth,ht=2.25ex,dp=1ex,center]{author in head/foot}%
+        \usebeamerfont{author in head/foot}\insertshortauthor%~~\beamer@ifempty{\insertshortinstitute}{}{(\insertshortinstitute)}
+      \end{beamercolorbox}%
+        \begin{beamercolorbox}[wd=.333333\paperwidth,ht=2.25ex,dp=1ex,center]{title in head/foot}%
+        \usebeamerfont{title in head/foot}\insertshorttitle
+        \end{beamercolorbox}%
+        \begin{beamercolorbox}[wd=.333333\paperwidth,ht=2.25ex,dp=1ex,right]{date in head/foot}%
+        \usebeamerfont{date in head/foot}\insertshortdate{}\hspace*{2em}
+        \insertframenumber{} / \inserttotalframenumber\hspace*{2ex} 
+      \end{beamercolorbox}}%
+        \vskip0pt%
+}
+\makeatother
+
+%\usepackage{kerkis}
+\usepackage{helvet} 
+\usepackage[T1]{fontenc}
+\usepackage[protrusion=true,expansion=true]{microtype}
+\usepackage{amsmath}
+
+\renewcommand*{\thefootnote}{\fnsymbol{footnote}}
+
+
+\pgfdeclareimage[height=1.5cm]{logo}{./logos/hd_logo}
+\pgfdeclareimage[height=0.8cm]{small_logo}{./logos/hd_logo}
+
+\AtBeginSection[] { 
+  \begin{frame}[plain] 
+    \frametitle{\bf Outline:}
+    \framesubtitle{~~} 
+    \tableofcontents[currentsection] 
+  \end{frame} 
+  \addtocounter{framenumber}{-1} 
+} 
+
+\setbeamercovered{transparent}

@@ -1,0 +1,293 @@
+%!TEX root = ../main.tex
+
+
+\newcommand{\beq}{\begin{equation}}
+\newcommand{\eeq}{\end{equation}}
+
+\newcommand{\eq}[1]{\begin{align*}#1\end{align*}}
+
+\newcommand{\bfi}{\begin{figure}}
+\newcommand{\efi}{\end{figure}}
+
+\newcommand{\icg}{\includegraphics}
+
+\newcommand{\bdm}{\begin{displaymath}}
+\newcommand{\edm}{\end{displaymath}}
+
+\newcommand{\beqa}{\begin{eqnarray}}
+\newcommand{\eeqa}{\end{eqnarray}}
+
+\newcommand{\beqas}{\begin{eqnarray*}}
+\newcommand{\eeqas}{\end{eqnarray*}}
+
+\newcommand{\barr}{\begin{array}}
+\newcommand{\earr}{\end{array}}
+
+\newcommand{\bit}{\begin{itemize}}
+\newcommand{\eit}{\end{itemize}}
+
+\newcommand{\qq}[1]{\qquad \mbox{#1} \qquad}
+
+\def\hyph{-\penalty0\hskip0pt\relax}
+
+% Tikz
+\definecolor{blue1}{RGB}{176,196,222 }
+\definecolor{blue2}{RGB}{54,100,139}
+\definecolor{grey1}{RGB}{139,139,131}
+\definecolor{grey2}{RGB}{235,235,235}
+\definecolor{black1}{RGB}{50,50,50}
+
+
+%Spaces
+\newcommand{\Sp}[1]{{\cal #1}}
+%
+\newcommand{\sA}{\Sp{A}}
+\newcommand{\sB}{\Sp{B}}
+\newcommand{\sC}{\Sp{C}}
+\newcommand{\sD}{\Sp{D}}
+\newcommand{\sE}{\Sp{E}}
+\newcommand{\sF}{\Sp{F}}
+\newcommand{\sG}{\Sp{G}}
+\newcommand{\sH}{\Sp{H}}
+\newcommand{\sI}{\Sp{I}}
+\newcommand{\sJ}{\Sp{J}}
+\newcommand{\sK}{\Sp{K}}
+\newcommand{\sL}{\Sp{L}}
+\newcommand{\sM}{\Sp{M}}
+\newcommand{\sN}{\Sp{N}}
+\newcommand{\sO}{\Sp{O}}
+\newcommand{\sP}{\Sp{P}}
+\newcommand{\sQ}{\Sp{Q}}
+\newcommand{\sR}{\Sp{R}}
+\newcommand{\sS}{\Sp{S}}
+\newcommand{\sT}{\Sp{T}}
+\newcommand{\sU}{\Sp{U}}
+\newcommand{\sV}{\Sp{V}}
+\newcommand{\sW}{\Sp{W}}
+\newcommand{\sX}{\Sp{X}}
+\newcommand{\sY}{\Sp{Y}}
+\newcommand{\sZ}{\Sp{Z}}
+
+%Vectors
+\newcommand{\V}[1]{{\bf #1}}
+%
+\newcommand{\va}{\V{a}}
+\newcommand{\vb}{\V{b}}
+\newcommand{\vc}{\V{c}}
+\newcommand{\vd}{\V{d}}
+\newcommand{\ve}{\V{e}}
+\newcommand{\vf}{\V{f}}
+\newcommand{\vg}{\V{g}}
+\newcommand{\vh}{\V{h}}
+\newcommand{\vi}{\V{i}}
+\newcommand{\vj}{\V{j}}
+\newcommand{\vk}{\V{k}}
+\newcommand{\vl}{\V{l}}
+\newcommand{\vm}{\V{m}}
+\newcommand{\vn}{\V{n}}
+\newcommand{\vo}{\V{o}}
+\newcommand{\vp}{\V{p}}
+\newcommand{\vq}{\V{q}}
+\newcommand{\vr}{\V{r}}
+\newcommand{\vs}{\V{s}}
+\newcommand{\vt}{\V{t}}
+\newcommand{\vu}{\V{u}}
+\newcommand{\vv}{\V{v}}
+\newcommand{\vw}{\V{w}}
+\newcommand{\vx}{\V{x}}
+\newcommand{\vy}{\V{y}}
+\newcommand{\vz}{\V{z}}
+
+\newcommand{\vA}{\V{A}}
+\newcommand{\vB}{\V{B}}
+\newcommand{\vC}{\V{C}}
+\newcommand{\vD}{\V{D}}
+\newcommand{\vE}{\V{E}}
+\newcommand{\vF}{\V{F}}
+\newcommand{\vG}{\V{G}}
+\newcommand{\vH}{\V{H}}
+\newcommand{\vI}{\V{I}}
+\newcommand{\vJ}{\V{J}}
+\newcommand{\vK}{\V{K}}
+\newcommand{\vL}{\V{L}}
+\newcommand{\vM}{\V{M}}
+\newcommand{\vN}{\V{N}}
+\newcommand{\vO}{\V{O}}
+\newcommand{\vP}{\V{P}}
+\newcommand{\vQ}{\V{Q}}
+\newcommand{\vR}{\V{R}}
+\newcommand{\vS}{\V{S}}
+\newcommand{\vT}{\V{T}}
+\newcommand{\vU}{\V{U}}
+\newcommand{\vV}{\V{V}}
+\newcommand{\vW}{\V{W}}
+\newcommand{\vX}{\V{X}}
+\newcommand{\vY}{\V{Y}}
+\newcommand{\vZ}{\V{Z}}
+
+\newcommand{\vone}{\V{1}}
+\newcommand{\vzero}{\V{0}}
+\newcommand{\B}{\V{B}}
+\newcommand{\E}{\V{E}}
+\newcommand{\Er}{\V{E}_r}
+\newcommand{\Es}{\V{E}_s}
+\newcommand{\un}{\hat{\vn}}
+
+
+
+%Vectors
+\newcommand{\T}[1]{\underline{\bf #1}}
+%
+\newcommand{\ta}{\T{a}}
+\newcommand{\tb}{\T{b}}
+\newcommand{\tc}{\T{c}}
+%\newcommand{\td}{\T{d}}
+\newcommand{\te}{\T{e}}
+\newcommand{\tf}{\T{f}}
+\newcommand{\tg}{\T{g}}
+%\newcommand{\th}{\T{h}}
+\newcommand{\ti}{\T{i}}
+\newcommand{\tj}{\T{j}}
+\newcommand{\tk}{\T{k}}
+\newcommand{\tl}{\T{l}}
+\newcommand{\tm}{\T{m}}
+\newcommand{\tn}{\T{n}}
+%\newcommand{\to}{\T{o}}
+\newcommand{\tp}{\T{p}}
+\newcommand{\tq}{\T{q}}
+\newcommand{\tr}{\T{r}}
+\newcommand{\ts}{\T{s}}
+%\newcommand{\tt}{\T{t}}
+\newcommand{\tu}{\T{u}}
+\newcommand{\tv}{\T{v}}
+\newcommand{\tw}{\T{w}}
+\newcommand{\tx}{\T{x}}
+\newcommand{\ty}{\T{y}}
+\newcommand{\tz}{\T{z}}
+
+\newcommand{\tA}{\T{A}}
+\newcommand{\tB}{\T{B}}
+\newcommand{\tC}{\T{C}}
+\newcommand{\tD}{\T{D}}
+\newcommand{\tE}{\T{E}}
+\newcommand{\tF}{\T{F}}
+\newcommand{\tG}{\T{G}}
+\newcommand{\tH}{\T{H}}
+\newcommand{\tI}{\T{I}}
+\newcommand{\tJ}{\T{J}}
+\newcommand{\tK}{\T{K}}
+\newcommand{\tL}{\T{L}}
+\newcommand{\tM}{\T{M}}
+\newcommand{\tN}{\T{N}}
+\newcommand{\tO}{\T{O}}
+\newcommand{\tP}{\T{P}}
+\newcommand{\tQ}{\T{Q}}
+\newcommand{\tR}{\T{R}}
+\newcommand{\tS}{\T{S}}
+\newcommand{\tT}{\T{T}}
+\newcommand{\tU}{\T{U}}
+\newcommand{\tV}{\T{V}}
+\newcommand{\tW}{\T{W}}
+\newcommand{\tX}{\T{X}}
+\newcommand{\tY}{\T{Y}}
+\newcommand{\tZ}{\T{Z}}
+
+\newcommand{\tone}{\T{1}}
+\newcommand{\tzero}{\T{0}}
+
+%Matrix
+\newcommand{\M}[1]{{\mathbb #1}}
+%
+\newcommand{\mA}{\M{A}}
+\newcommand{\mB}{\M{B}}
+\newcommand{\mC}{\M{C}}
+\newcommand{\mD}{\M{D}}
+\newcommand{\mE}{\M{E}}
+\newcommand{\mF}{\M{F}}
+\newcommand{\mG}{\M{G}}
+\newcommand{\mH}{\M{H}}
+\newcommand{\mI}{\M{I}}
+\newcommand{\mJ}{\M{J}}
+\newcommand{\mK}{\M{K}}
+\newcommand{\mL}{\M{L}}
+\newcommand{\mM}{\M{M}}
+\newcommand{\mN}{\M{N}}
+\newcommand{\mO}{\M{O}}
+\newcommand{\mP}{\M{P}}
+\newcommand{\mQ}{\M{Q}}
+\newcommand{\mR}{\M{R}}
+\newcommand{\mS}{\M{S}}
+\newcommand{\mT}{\M{T}}
+\newcommand{\mU}{\M{U}}
+\newcommand{\mV}{\M{V}}
+\newcommand{\mW}{\M{W}}
+\newcommand{\mX}{\M{X}}
+\newcommand{\mY}{\M{Y}}
+\newcommand{\mZ}{\M{Z}}
+
+\newcommand{\mzero}{\M{0}}
+\newcommand{\mone}{\M{1}}
+
+% Derivatives
+\newcommand{\pd}[2]{\frac{\partial #1}{\partial #2}}
+\newcommand{\ppd}[2]{\frac{\partial^2 #1}{\partial #2^2}}
+\newcommand{\td}[2]{\frac{\mathrm{d} #1}{\mathrm{d} #2}}
+
+\newcommand{\px}{ \partial_{x} }
+\newcommand{\py}{ \partial_{y} }
+\newcommand{\pz}{ \partial_{z} }
+\newcommand{\pt}{ \partial_{t} }
+\newcommand{\ptt}{ \partial_{tt} }
+
+\newcommand{\Div}[1]{\nabla \cdot #1}
+\newcommand{\Curl}[1]{\nabla \times #1}
+\newcommand{\Ctwo}[1]{\nabla_2 \times #1}
+\newcommand{\Grad}[1]{\nabla #1}
+\newcommand{\Gperp}[1]{\nabla^\perp #1}
+\newcommand{\Lap}[1]{\Delta #1}
+
+%integral d
+\newcommand{\dd}[0]{\, \mathrm{d}}
+
+% common discrete quantities
+\newcommand{\dt}[0]{\delta t}
+
+% physical variables
+\newcommand{\eps}[0]{\epsilon_0}
+\newcommand{\mus}[0]{\mu_0}
+\newcommand{\boltz}[0]{\kappa_B}
+\newcommand{\s}[0]{\alpha}
+\newcommand{\vths}[0]{v_{th_\s}}
+\newcommand{\vthe}[0]{v_{th_e}}
+\newcommand{\vthi}[0]{v_{th_i}}
+\newcommand{\Om}[0]{\Omega}
+\newcommand{\bdOm}{\partial \Omega}
+
+% bracketing
+\newcommand{\inner}[2]{\langle #1, #2 \rangle}
+\newcommand{\lb}[0]{\left[}
+\newcommand{\rb}[0]{\right]}
+\newcommand{\parn}[1]{\left( #1 \right)}
+\newcommand{\la}{\langle}
+\newcommand{\ra}{\rangle}
+\newcommand{\lcb}{\left\{}
+\newcommand{\rcb}{\right\}}
+
+\newcommand{\mathAnd}{\,\,\mbox{and}\,\,}
+\newcommand{\mathOn}{\,\,\mbox{on}\,\,}
+
+\newcommand{\h}{\hat}
+\newcommand{\wh}{\widehat}
+%\newcommand{\ul}{\underline}
+
+% math operators
+\DeclareMathOperator{\Trace}{trace}
+\DeclareMathOperator{\Supp}{supp}
+\DeclareMathOperator{\Span}{span}
+\DeclareMathOperator{\floor}{floor}
+\DeclareMathOperator{\diam}{diam}
+\DeclareMathOperator{\ceil}{ceil}
+\DeclareMathOperator*{\argmin}{arg\,min}
+
+
+\newcommand{\red}[1]{\textcolor{red}{#1}}
