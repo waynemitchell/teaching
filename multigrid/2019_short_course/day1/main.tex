@@ -34,6 +34,7 @@
 \DeclareRobustCommand{\Chi}{\raisebox{2pt}{$\chi$}}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+% Slide
 \begin{frame}
 \frametitle{\bf Outline:}
 \framesubtitle{~~}
@@ -85,17 +86,6 @@
 
 % Slide
 \begin{frame}{Motivation}
-\begin{block}{In this section}
-\bit
-\item General scientific computing a simulation and where large sparse linear systems come from
-\item Model Poisson problem
-\item Properties of matrix coming from Poisson (i.e. SPD... anything else?) and assumptions (for now) on the matrices we'll be using in general
-\item Methods for solving linear systems: direct vs. iterative, optimal complexity, the need for efficient solvers
-\eit
-\end{block}
-\end{frame}
-
-\begin{frame}{Motivation}
 \begin{block}{Scientific computing}
 \bit
 \item The three pillars of science: theory, experiments, and \emph{simulation}
@@ -105,6 +95,7 @@
 \end{block}
 \end{frame}
 
+% Slide
 \begin{frame}{Motivation}
 \begin{block}{Simulation pipeline}
 \bit
@@ -118,6 +109,7 @@
 \end{block}
 \end{frame}
 
+% Slide
 \begin{frame}{Motivation}
 \begin{block}{Large, sparse linear systems}
 \bit
@@ -133,6 +125,7 @@
 \end{block}
 \end{frame}
 
+% Slide
 \begin{frame}{Motivation}
 \begin{block}{Direct methods}
 \bit
@@ -150,6 +143,7 @@
 \end{block}
 \end{frame}
 
+% Slide
 \begin{frame}{Motivation}
 \begin{block}{Iterative methods}
 \bit
@@ -172,15 +166,20 @@
 \end{frame}
 
 % BUT iterative methods don't give you the exact solution, right? Isn't that a problem? No. Tunable accuracy is actually preferred due to discretization accuracy, etc.
+% Slide
 \begin{frame}{Motivation}
 \begin{block}{Numerical accuracy}
 \bit
-\item Discretization accuracy
-\item Accuracy of the algebraic solve
+\item Iterative methods don't give the exact solution ... but ...
+\item Typically, we are solving a discrete formulation of the problem
+\item Discretization accuracy: the maximum level of accuracy (to the continuous solution) achievable with the given discretization
+\item Algebraic accuracy: accuracy of the iterative solution to the true solution of the algebraic problem
+\item The goal is to achieve algebraic accuracy on the order of discretization accuracy
 \eit
 \end{block}
 \end{frame}
 
+% Slide TODO
 \begin{frame}{Motivation}
 \begin{block}{The slide where you show how long it takes to solve the same problem with a bunch of different methods of increasing efficiency}
 \bit
@@ -194,19 +193,43 @@
 
 \section{Preliminaries and a model problem}
 
-\begin{frame}{Preliminaries}
-\begin{block}{In this section}
+% Slide 
+\begin{frame}{Preliminaries and a model problem}
+\begin{block}{Notation}
 \bit
-\item Define notation: matrices, vectors, norms, inner products
-\item Orthogonality definition, relation between inner products and norms, different matrix norms, other stuff?
-\item Eigenvalues/vectors
-\item Span, subspaces, etc.
-\item condition number
+\item Matrices: $A$, $P$, $R$
+\item Matrix entries: $a_{i,j}$
+\item Vectors: $\mathbf{u}$, $\mathbf{f}$, $\mathbf{r}$
+\item Vector entries: $u_i$
+\item Scalars: $\alpha$, $\gamma$, $\omega$
+\item Indices: $i$, $j$, $k$
 \eit
 \end{block}
 \end{frame}
 
-\begin{frame}{Model problem}
+% Slide 
+\begin{frame}{Preliminaries and a model problem}
+\begin{block}{Definitions}
+\bit
+\item Inner products: 
+\eq{
+   \langle \mathbf{x}, \mathbf{y} \rangle = \prod_i x_iy_i
+}
+\item Norms: 
+\eq{
+   ||\mathbf{x}|| = \sqrt{\langle \mathbf{x}, \mathbf{x} \rangle}
+}
+\item Condition number:
+\eq{
+   \kappa(A) = ||A^{-1}||\cdot||A||
+}
+\eit
+\end{block}
+\end{frame}
+
+
+% Slide
+\begin{frame}{Preliminaries and a model problem}
 \begin{block}{Model problem: Poisson}
 \bit
 \item Classic model problem is a simple Poisson problem with zero Dirichlet boundary conditions:
@@ -223,7 +246,8 @@ u &= 0, & \partial \Omega
 \end{block}
 \end{frame}
 
-\begin{frame}{Model problem}
+% Slide
+\begin{frame}{Preliminaries and a model problem}
 \begin{block}{Model problem: Poisson}
 \begin{center}
 \includegraphics[width=0.7\textwidth]{../figures/1DFDPoisson}
@@ -261,31 +285,47 @@ f_N \\
 \end{block}
 \end{frame}
 
-\begin{frame}{Basic iterative methods}
-\begin{block}{In this section}
+% Slide 
+\begin{frame}{Preliminaries and a model problem}
+\begin{block}{Some nice properties}
 \bit
-\item Matrix properties (define all): symmetric, positive definite, diagonally dominant, (others?)
+\item Sparse
+\item Symmetric positive definite (SPD):
+\eq{
+   A &= A^T \\
+   \langle \mathbf{x}, A\mathbf{x} \rangle &> 0 , &\forall \mathbf{x}\neq\mathbf{0}
+}
+\item Diagonally dominant:
+\eq{
+   \sum_{j\neq i}|a_{i,j}| \leq |a_{i,i}|, \,\,\forall i
+}
+\eit
+\end{block}
+\begin{block}{Less nice properties}
+\bit
+\item Condition number increases with problem size % TODO: what's the rate in different dimensions? I think it's like O(1/h^2) = O(n^2d)? Not right...
 \eit
 \end{block}
 \end{frame}
+
+% Slide TODO: put this somewhere else 
+% \begin{frame}{Preliminaries and a model problem}
+% \begin{block}{Properties of SPD matrices}
+% \bit
+% \item Define an $A$ inner product and norm: 
+% \eq{
+%    ||\mathbf{x}||_A = \sqrt{\langle \mathbf{x}, A\mathbf{x} \rangle}
+% }
+% \item 
+% \eit
+% \end{block}
+% \end{frame}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{Basic iterative methods}
 
-\begin{frame}{Basic iterative methods}
-\begin{block}{In this section}
-\bit
-\item Matrix splittings, fixed point methods
-\item Basic convergence of splitting methods
-\item Jacobi and Gauss-Seidel
-\item Application of convergence theory to Jacobi
-\item Drawbacks: n dependent convergence that gets very slow as n gets large
-\eit
-\end{block}
-\end{frame}
-
-
+% Slide
 \begin{frame}{Basic iterative methods}
 \begin{block}{Iterative methods}
 \bit
@@ -298,6 +338,7 @@ f_N \\
 \end{frame}
 
 
+% Slide
 \begin{frame}{Basic iterative methods}
 \begin{block}{Jacobi iteration}
 \bit
@@ -337,6 +378,7 @@ f_{N-1} \\
 \end{block}
 \end{frame}
 
+% Slide
 \begin{frame}{Basic iterative methods}
 \begin{block}{Jacobi iteration}
 \bit
@@ -353,6 +395,7 @@ u_i &= \frac{1}{a_{i,i}} (f_i - \sum_{j\neq i} a_{i,j}u_j)
 \end{block}
 \end{frame}
 
+% Slide
 \begin{frame}{Basic iterative methods}
 \begin{block}{Gauss-Seidel}
 \bit
@@ -363,6 +406,7 @@ u_i &= \frac{1}{a_{i,i}} (f_i - \sum_{j\neq i} a_{i,j}u_j)
 \end{block}
 \end{frame}
 
+% Slide
 \begin{frame}{Basic iterative methods}
 \begin{block}{Matrix representations of iterative methods}
 \bit
@@ -380,6 +424,7 @@ D\mathbf{u} &= \mathbf{f} + (L + U)\mathbf{u} \\
 \end{block}
 \end{frame}
 
+% Slide
 \begin{frame}{Basic iterative methods}
 \begin{block}{Matrix representations of iterative methods}
 \bit
@@ -397,6 +442,7 @@ A\mathbf{u} &= \mathbf{f} \\
 \end{block}
 \end{frame}
 
+% Slide
 \begin{frame}{Basic iterative methods}
 \begin{block}{General matrix splittings}
 \bit
@@ -407,6 +453,7 @@ A\mathbf{u} &= \mathbf{f} \\
 \end{block}
 \end{frame}
 
+% Slide
 \begin{frame}{Basic iterative methods}
 \begin{block}{Matrix splitting error analysis}
 \bit
@@ -425,6 +472,7 @@ M\mathbf{u} &= \mathbf{f} + N\mathbf{u} \\
 \end{block}
 \end{frame}
 
+% Slide
 \begin{frame}{Basic iterative methods}
 \begin{block}{Convergence of Jacobi and Gauss-Seidel}
 \bit
@@ -435,45 +483,32 @@ M\mathbf{u} &= \mathbf{f} + N\mathbf{u} \\
 \end{block}
 \end{frame}
 
-\begin{frame}{Basic iterative methods}
-\begin{block}{}
-\bit
-\item 
-\eit
-\end{block}
-\end{frame}
+% Slide NOTE: This has spectral radius and matrix norms which you have not previously defined... probably omit
+% \begin{frame}{Basic iterative methods}
+% \begin{block}{Convergence of Jacobi}
+% \bit
+% \item Jacobi as a matrix splitting: $M = D$, $N = (L+U)$
+% \eq{
+%    \rho (M^{-1}N) &= \rho(D^{1}(L+U)) \\
+%    &\leq ||D^{-1}(L+U)||_\infty \\
+%    \max_i\sum_{j\neq i}\left|\frac{a_{i,j}}{a_{i,i}}\right|
+% }
+% \item Thus, $\rho (M^{-1}N) < 1$ if $A$ is strictly diagonally dominant
+% \item Usually, the greater the diagonal dominance, the swifter the convergence (not always)
+% \eit
+% \end{block}
+% \end{frame}
 
-\begin{frame}{Basic iterative methods}
-\begin{block}{}
-\bit
-\item 
-\eit
-\end{block}
-\end{frame}
+% TODO: Discuss idea of red-black GS as a way to get more parallelism?
 
-
-% Basic convergence theory for splitting methods and apply to Jacobi and GS
-% Wikipedia: convergence rate for Jacobi/GS is something like 1 - 2/k(A)... verify and include this.
-% Something on motivating weighted Jacobi. Show how weight affects which modes are damped and by how much for Jacobi. Show curves.
-% Show performance of different methods
-% Discuss idea of red-black GS as a way to get more parallelism
+% NOTE: do you want to do some demonstrations here? If you have time...
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{Krylov subspace methods}
 
-\begin{frame}{Krylov subspace methods}
-\begin{block}{In this section}
-\bit
-\item Gradient descent
-\item Conjugate gradient
-\item CG converges in $n$ iterations, but usually far less
-\item Mention GMRES and BiCGSTAB for non-symmetric
-\eit
-\end{block}
-\end{frame}
-
+% Slide
 \begin{frame}{Krylov subspace methods}
 \begin{block}{Definition of a Krylov subspace}
 \bit
@@ -483,6 +518,7 @@ M\mathbf{u} &= \mathbf{f} + N\mathbf{u} \\
 \end{block}
 \end{frame}
 
+% Slide
 \begin{frame}{Krylov subspace methods}
 \begin{block}{Gradient descent}
 \bit
@@ -497,8 +533,27 @@ M\mathbf{u} &= \mathbf{f} + N\mathbf{u} \\
 \end{block}
 \end{frame}
 
+% Slide
+\begin{frame}{Krylov subspace methods}
+\begin{block}{Gradient descent}
+\bit
+\item $A$ is SPD means we can define the $A$-norm:
+\eq{
+   ||\mathbf{u}||^2_A = \langle \mathbf{u}, A\mathbf{u} \rangle = \mathbf{u}^TA\mathbf{u}
+}
+\item If $A\mathbf{\tilde{u}} = \mathbf{f}$ and $\mathbf{u}$ is an approximate solution iterate, then 
+\eq{
+   ||\mathbf{u} - \mathbf{\tilde{u}}||^2_A = \mathbf{u}^TA\mathbf{u} - 2\mathbf{u}^T\mathbf{f} + ||\mathbf{\tilde{u}}||_A
+}
+\eit
+\end{block}
+\end{frame}
+
+
+
 % TODO: visualization of gradient descent
 
+% Slide
 \begin{frame}{Krylov subspace methods}
 \begin{block}{Gradient descent}
 \bit
@@ -519,6 +574,7 @@ M\mathbf{u} &= \mathbf{f} + N\mathbf{u} \\
 \end{algorithm}
 \end{frame}
 
+% Slide
 \begin{frame}{Krylov subspace methods}
 \begin{block}{Gradient descent}
 \bit
@@ -527,6 +583,7 @@ M\mathbf{u} &= \mathbf{f} + N\mathbf{u} \\
 \end{block}
 \end{frame}
 
+% Slide
 \begin{frame}{Krylov subspace methods}
 \begin{block}{Gradient descent}
 \bit
@@ -535,6 +592,7 @@ M\mathbf{u} &= \mathbf{f} + N\mathbf{u} \\
 \end{block}
 \end{frame}
 
+% Slide
 \begin{frame}{Krylov subspace methods}
 \begin{block}{Conjugate Gradient}
 \bit
@@ -547,6 +605,7 @@ M\mathbf{u} &= \mathbf{f} + N\mathbf{u} \\
 \end{block}
 \end{frame}
 
+% Slide
 \begin{frame}{Krylov subspace methods}
 \begin{algorithm}[H]
 \caption{Conjugate Gradient (idea)}
@@ -566,9 +625,10 @@ M\mathbf{u} &= \mathbf{f} + N\mathbf{u} \\
 \end{algorithm}
 \end{frame}
 
+% Slide
 \begin{frame}{Krylov subspace methods}
 \begin{algorithm}[H]
-\caption{Conjugate Gradient (CG)}
+\caption{Conjugate Gradient (CG) Version 1}
 \begin{algorithmic}
 \State Set $\mathbf{u}$ initial guess
 \For{k = 0,1,...}
@@ -576,7 +636,7 @@ M\mathbf{u} &= \mathbf{f} + N\mathbf{u} \\
 \If{k = 0}
 \State $\mathbf{p}_k = \mathbf{r}$
 \Else
-\State $\beta  = -\langle p_{k-1}, A\mathbf{r} \rangle / \langle \mathbf{p}_{k-1}, A\mathbf{p}_{k-1} \rangle$
+\State $\beta  = \langle \mathbf{p}_{k-1}, A\mathbf{r} \rangle / \langle \mathbf{p}_{k-1}, A\mathbf{p}_{k-1} \rangle$
 \State $\mathbf{p}_k = \mathbf{r} + \beta \mathbf{p}_{k-1}$
 \EndIf
 \State $\alpha \leftarrow \langle \mathbf{p}_k, \mathbf{r} \rangle / \langle \mathbf{p}_k, A\mathbf{p}_k \rangle$
@@ -586,6 +646,38 @@ M\mathbf{u} &= \mathbf{f} + N\mathbf{u} \\
 \end{algorithm}
 \end{frame}
 
+% Slide
+\begin{frame}{Krylov subspace methods}
+\begin{block}{Conjugate Gradient (CG)}
+\bit
+\item Can be made more efficient etc. TODO
+\eit
+\end{block}
+\end{frame}
+
+% Slide
+\begin{frame}{Krylov subspace methods}
+\begin{algorithm}[H]
+\caption{Conjugate Gradient (CG) Version 2}
+\begin{algorithmic}
+\State Set $\mathbf{u}$ initial guess
+\State $\mathbf{r}_0 = \mathbf{f} - A\mathbf{u}$
+\For{k = 0,1,...}
+\If{k = 0}
+\State $\mathbf{p} = \mathbf{r}_k$
+\Else
+\State $\beta  = \langle \mathbf{r}_k, \mathbf{r}_k \rangle / \langle \mathbf{r}_{k-1}, \mathbf{r}_{k-1} \rangle$
+\State $\mathbf{p}_k = \mathbf{r}_k + \beta \mathbf{p}_{k-1}$
+\EndIf
+\State $\alpha \leftarrow \langle \mathbf{r}_k, \mathbf{r}_k \rangle / \langle \mathbf{p}_k, A\mathbf{p}_k \rangle$
+\State $\mathbf{u} \leftarrow \mathbf{u} + \alpha\mathbf{p}_k$
+\State $\mathbf{r}_{k+1} \leftarrow \mathbf{r}_k - A\mathbf{p}_k$
+\EndFor
+\end{algorithmic}
+\end{algorithm}
+\end{frame}
+
+% Slide
 \begin{frame}{Krylov subspace methods}
 \begin{block}{Convergence of CG}
 \bit
@@ -598,33 +690,71 @@ M\mathbf{u} &= \mathbf{f} + N\mathbf{u} \\
 \end{block}
 \end{frame}
 
-\begin{frame}{Krylov subspace methods}
-\begin{block}{Convergence of CG}
-\bit
-\item Comparing convergence:
-\bit
-\item CG: $\left(\frac{\sqrt{\kappa}-1}{\sqrt{\kappa}+1}\right)^k$
-\item Jacobi/Gauss-Seidel: TODO
-\eit
-\item CG is much better, but still depends on condition number of $A$.
-\eit
-\end{block}
-\end{frame}
+% TODO: mention GMRES and BiCGSTAB for non-symmetric
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{Preconditiong Krylov methods}
 
+% Slide
 \begin{frame}{Preconditiong Krylov methods}
-\begin{block}{In this section}
+\begin{block}{Preconditioning in general}
 \bit
-\item Why does ill conditioning hurt CG?
-\item How to do preconditioning
-\item Couple examples of preconditioners: diagonal
+\item If $\kappa(A)$ is large, obtaining an accurate solution to $A\mathbf{u} = \mathbf{f}$ is difficult
+\item Transform the system into one that is easier to solve:
+\eq{
+   A\mathbf{u} = \mathbf{f} \\
+   M^{-1}A\mathbf{u} = M^{-1}\mathbf{f} \\
+   M^{-1}(\mathbf{f} - A\mathbf{u}) = \mathbf{0}
+}
+\item The condition number of the preconditioned system is $\kappa(M^{-1}A)$
 \eit
 \end{block}
 \end{frame}
 
+
+% Slide
+\begin{frame}{Preconditiong Krylov methods}
+\begin{block}{Preconditioning in general}
+\bit
+\item Choices for $M$:
+\bit
+\item $A \rightarrow$ $\kappa(M^{-1}A) = \kappa(I) = 1$, but cannot invert $M$
+\item $I \rightarrow$ Easily invertible, but no effect
+\item $D = diag(A) \rightarrow$ Still easily invertible, can be work for very diagonally dominant systems
+\item Multigrid methods! 
+\eit
+\eit
+\end{block}
+\end{frame}
+
+% TODO: better description of condition number? Something about residual vs. error from MG tutorial slides
+
+% Slide
+\begin{frame}{Preconditiong Krylov methods}
+\begin{algorithm}[H]
+\caption{Preconditioned Conjugate Gradient (PCG)}
+\begin{algorithmic}
+\State Set $\mathbf{u}$ initial guess
+\State $\mathbf{r}_0 = \mathbf{f} - A\mathbf{u}$
+\For{k = 0,1,...}
+\State $\mathbf{z}_k = M^{-1}\mathbf{r}_k$ \
+\If{k = 0}
+\State $\mathbf{p}_k = \mathbf{z}_k$
+\Else
+\State $\beta  = \langle \mathbf{r}_k, \mathbf{z}_k \rangle / \langle \mathbf{r}_{k-1}, \mathbf{z}_{k-1} \rangle$
+\State $\mathbf{p}_k = \mathbf{z}_k + \beta \mathbf{p}_{k-1}$
+\EndIf
+\State $\alpha \leftarrow \langle \mathbf{r}_k, \mathbf{z}_k \rangle / \langle \mathbf{p}_k, A\mathbf{p}_k \rangle$
+\State $\mathbf{u} \leftarrow \mathbf{u} + \alpha\mathbf{p}_k$
+\State $\mathbf{r}_{k+1} \leftarrow \mathbf{r}_k - A\mathbf{p}_k$
+\EndFor
+\end{algorithmic}
+\end{algorithm}
+\end{frame}
+
+% Slide
 \begin{frame}{Preconditiong Krylov methods}
 \begin{block}{}
 \bit
@@ -633,6 +763,7 @@ M\mathbf{u} &= \mathbf{f} + N\mathbf{u} \\
 \end{block}
 \end{frame}
 
+% Slide
 \begin{frame}{Preconditiong Krylov methods}
 \begin{block}{}
 \bit
@@ -641,6 +772,7 @@ M\mathbf{u} &= \mathbf{f} + N\mathbf{u} \\
 \end{block}
 \end{frame}
 
+% Slide
 \begin{frame}{Preconditiong Krylov methods}
 \begin{block}{}
 \bit
@@ -649,14 +781,7 @@ M\mathbf{u} &= \mathbf{f} + N\mathbf{u} \\
 \end{block}
 \end{frame}
 
-\begin{frame}{Preconditiong Krylov methods}
-\begin{block}{}
-\bit
-\item 
-\eit
-\end{block}
-\end{frame}
-
+% Slide
 \begin{frame}{Preconditiong Krylov methods}
 \begin{block}{}
 \bit

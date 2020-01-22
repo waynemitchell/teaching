@@ -15,9 +15,22 @@ https://github.com/copper-multigrid-conference/2019-tutorials
 ===============================================================
 
 Day 1: Motivation and basic iterative methods
-Session 1: Motivation and basic iterative methods
-Session 2: Krylov methods and preconditioning
+Session 1: 
+   Introduction
+   Motivation
+   Preliminaries and a model problem
+   Basic iterative methods
+Session 2:
+   Krylov subspace methods
+   Preconditioning Krylov methods
 Exercises: 
+   Jacobi and GS on some different problems
+   Visualize smoothing and forshadow multigrid
+   Show examples where Jacobi and GS converge and don't converge
+   Example where matrix is diagonally dominant and Jacobi converges fast/slow
+   CG: show complete convergence in n steps, good convergence in far less
+   Show convergence rate and theoretical convergence rate.
+   PCG: what preconditioners can I show? Show condition of A and M^-1A
 
 
 Day 2: Basics of multigrid
