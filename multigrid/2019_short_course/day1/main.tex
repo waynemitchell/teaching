@@ -308,19 +308,6 @@ f_N \\
 \end{block}
 \end{frame}
 
-% Slide TODO: put this somewhere else 
-% \begin{frame}{Preliminaries and a model problem}
-% \begin{block}{Properties of SPD matrices}
-% \bit
-% \item Define an $A$ inner product and norm: 
-% \eq{
-%    ||\mathbf{x}||_A = \sqrt{\langle \mathbf{x}, A\mathbf{x} \rangle}
-% }
-% \item 
-% \eit
-% \end{block}
-% \end{frame}
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{Basic iterative methods}
@@ -513,7 +500,9 @@ M\mathbf{u} &= \mathbf{f} + N\mathbf{u} \\
 \begin{block}{Definition of a Krylov subspace}
 \bit
 \item $\mathcal{K}_r(A,\mathbf{f}) = \text{span}\{\mathbf{f},A\mathbf{f},A^2\mathbf{f},...,A^{r-1}\mathbf{f}\}$
-\item TODO: why might this be a good space to search in?
+\item Krylov methods minimize an objective over a Krylov subspace
+\item Grow the subspace (i.e. increase $r$) on each iteration
+\item Subsequent iterates belong to ever richer subspaces and are thus more accurate
 \eit
 \end{block}
 \end{frame}
@@ -545,13 +534,10 @@ M\mathbf{u} &= \mathbf{f} + N\mathbf{u} \\
 \eq{
    ||\mathbf{u} - \mathbf{\tilde{u}}||^2_A = \mathbf{u}^TA\mathbf{u} - 2\mathbf{u}^T\mathbf{f} + ||\mathbf{\tilde{u}}||_A
 }
+\item Thus, minimizing $\phi(\mathbf{u})$ means minimizing the $A$-norm of the error along a given search direction
 \eit
 \end{block}
 \end{frame}
-
-
-
-% TODO: visualization of gradient descent
 
 % Slide
 \begin{frame}{Krylov subspace methods}
@@ -578,16 +564,9 @@ M\mathbf{u} &= \mathbf{f} + N\mathbf{u} \\
 \begin{frame}{Krylov subspace methods}
 \begin{block}{Gradient descent}
 \bit
-\item TODO: visualize gradient descent
-\eit
-\end{block}
-\end{frame}
-
-% Slide
-\begin{frame}{Krylov subspace methods}
-\begin{block}{Gradient descent}
-\bit
-\item TODO: visualize canyon pitfall of gradient descent
+\item Again, convergence can be prohibitively slow if $\kappa(A)$ is large
+\item Level curves of objective function, $\phi$, are elongated
+\item Minimization looks like finding the lowest point in a relatively flat, steep-sided valley
 \eit
 \end{block}
 \end{frame}
@@ -599,8 +578,6 @@ M\mathbf{u} &= \mathbf{f} + N\mathbf{u} \\
 \item Grandient descent can be improved by orthogonalizing search directions
 \item Rather than using the residual (direction of steepest descent), orthogonalize the residual against previous search directions
 \item Search directions, $\mathbf{p}_k$, are $A$-orthogonal to eachother: $\mathbf{p}_k\in\text{span}\{A\mathbf{p}_0,...,A\mathbf{p}_{k-1}\}^\perp$
-% \item Search for a solution in the Krylov subspace, $\mathcal{K}_r(A,\mathbf{f}) = \text{span}\{\mathbf{f},A\mathbf{f},A^2\mathbf{f},...,A^{r-1}\mathbf{f}\}$ !!! TODO: check this? Notation and correctness...
-% TODO: note that use of A inner product assumes an SPD matrix (CG only for SPD matrices!)
 \eit
 \end{block}
 \end{frame}
@@ -611,8 +588,8 @@ M\mathbf{u} &= \mathbf{f} + N\mathbf{u} \\
 \caption{Conjugate Gradient (idea)}
 \begin{algorithmic}
 \State Set $\mathbf{u}$ initial guess
-\For{k = 0,1,...}
 \State $\mathbf{r} \leftarrow \mathbf{f} - A\mathbf{u}$
+\For{k = 0,1,...}
 \If{k = 0}
 \State $\mathbf{p}_k = \mathbf{r}$
 \Else
@@ -620,6 +597,7 @@ M\mathbf{u} &= \mathbf{f} + N\mathbf{u} \\
 \EndIf
 \State $\alpha \leftarrow \langle \mathbf{p}_k, \mathbf{r} \rangle / \langle \mathbf{p}_k, A\mathbf{p}_k \rangle$
 \State $\mathbf{u} \leftarrow \mathbf{u} + \alpha\mathbf{p}_k$
+\State $\mathbf{r} \leftarrow \mathbf{f} - A\mathbf{u}$
 \EndFor
 \end{algorithmic}
 \end{algorithm}
@@ -631,8 +609,8 @@ M\mathbf{u} &= \mathbf{f} + N\mathbf{u} \\
 \caption{Conjugate Gradient (CG) Version 1}
 \begin{algorithmic}
 \State Set $\mathbf{u}$ initial guess
-\For{k = 0,1,...}
 \State $\mathbf{r} \leftarrow \mathbf{f} - A\mathbf{u}$
+\For{k = 0,1,...}
 \If{k = 0}
 \State $\mathbf{p}_k = \mathbf{r}$
 \Else
@@ -641,6 +619,7 @@ M\mathbf{u} &= \mathbf{f} + N\mathbf{u} \\
 \EndIf
 \State $\alpha \leftarrow \langle \mathbf{p}_k, \mathbf{r} \rangle / \langle \mathbf{p}_k, A\mathbf{p}_k \rangle$
 \State $\mathbf{u} \leftarrow \mathbf{u} + \alpha\mathbf{p}_k$
+\State $\mathbf{r} \leftarrow \mathbf{f} - A\mathbf{u}$
 \EndFor
 \end{algorithmic}
 \end{algorithm}
@@ -650,7 +629,9 @@ M\mathbf{u} &= \mathbf{f} + N\mathbf{u} \\
 \begin{frame}{Krylov subspace methods}
 \begin{block}{Conjugate Gradient (CG)}
 \bit
-\item Can be made more efficient etc. TODO
+\item The algorithm written above requires three mat-vec per iteration
+\item This version can be improved by recursively computing residuals
+\item Clever rearranging yields a version requiring only one mat-vec per iteration
 \eit
 \end{block}
 \end{frame}
@@ -671,7 +652,7 @@ M\mathbf{u} &= \mathbf{f} + N\mathbf{u} \\
 \EndIf
 \State $\alpha \leftarrow \langle \mathbf{r}_k, \mathbf{r}_k \rangle / \langle \mathbf{p}_k, A\mathbf{p}_k \rangle$
 \State $\mathbf{u} \leftarrow \mathbf{u} + \alpha\mathbf{p}_k$
-\State $\mathbf{r}_{k+1} \leftarrow \mathbf{r}_k - A\mathbf{p}_k$
+\State $\mathbf{r}_{k+1} \leftarrow \mathbf{r}_k - \alpha A\mathbf{p}_k$
 \EndFor
 \end{algorithmic}
 \end{algorithm}
@@ -690,9 +671,6 @@ M\mathbf{u} &= \mathbf{f} + N\mathbf{u} \\
 \end{block}
 \end{frame}
 
-% TODO: mention GMRES and BiCGSTAB for non-symmetric
-
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{Preconditiong Krylov methods}
@@ -704,11 +682,12 @@ M\mathbf{u} &= \mathbf{f} + N\mathbf{u} \\
 \item If $\kappa(A)$ is large, obtaining an accurate solution to $A\mathbf{u} = \mathbf{f}$ is difficult
 \item Transform the system into one that is easier to solve:
 \eq{
-   A\mathbf{u} = \mathbf{f} \\
-   M^{-1}A\mathbf{u} = M^{-1}\mathbf{f} \\
-   M^{-1}(\mathbf{f} - A\mathbf{u}) = \mathbf{0}
+   A\mathbf{u} &= \mathbf{f} \\
+   M^{-1}A\mathbf{u} &= M^{-1}\mathbf{f}
 }
+\item Usually the matrix, $M^{-1}$, is not explicitly formed (rather its action can be applied)
 \item The condition number of the preconditioned system is $\kappa(M^{-1}A)$
+\item Ideally, want $\kappa(M^{-1}A)$ to remain constant independent of problem size
 \eit
 \end{block}
 \end{frame}
@@ -716,20 +695,29 @@ M\mathbf{u} &= \mathbf{f} + N\mathbf{u} \\
 
 % Slide
 \begin{frame}{Preconditiong Krylov methods}
-\begin{block}{Preconditioning in general}
-\bit
-\item Choices for $M$:
+\begin{block}{Some choices for preconditioners}
 \bit
 \item $A \rightarrow$ $\kappa(M^{-1}A) = \kappa(I) = 1$, but cannot invert $M$
 \item $I \rightarrow$ Easily invertible, but no effect
 \item $D = diag(A) \rightarrow$ Still easily invertible, can be work for very diagonally dominant systems
-\item Multigrid methods! 
-\eit
+\item Incomplete factorization methods (ILU)
+\item Multigrid methods! Cost $O(N)$ to apply and $\kappa(M^{-1}A) = O(1)$.
 \eit
 \end{block}
 \end{frame}
 
-% TODO: better description of condition number? Something about residual vs. error from MG tutorial slides
+% Slide
+\begin{frame}{Preconditiong Krylov methods}
+\begin{block}{Preconditioned Conjugate Gradient (PCG)}
+\bit
+\item To precondition CG, apply CG to
+\eq{
+   M^{-1}A\mathbf{u} &= M^{-1}\mathbf{f}
+}
+\item Search directions now based on $\mathbf{z} = M^{-1}(\mathbf{f} - A\mathbf{u})$ 
+\eit
+\end{block}
+\end{frame}
 
 % Slide
 \begin{frame}{Preconditiong Krylov methods}
@@ -748,7 +736,7 @@ M\mathbf{u} &= \mathbf{f} + N\mathbf{u} \\
 \EndIf
 \State $\alpha \leftarrow \langle \mathbf{r}_k, \mathbf{z}_k \rangle / \langle \mathbf{p}_k, A\mathbf{p}_k \rangle$
 \State $\mathbf{u} \leftarrow \mathbf{u} + \alpha\mathbf{p}_k$
-\State $\mathbf{r}_{k+1} \leftarrow \mathbf{r}_k - A\mathbf{p}_k$
+\State $\mathbf{r}_{k+1} \leftarrow \mathbf{r}_k - \alpha A\mathbf{p}_k$
 \EndFor
 \end{algorithmic}
 \end{algorithm}
@@ -756,41 +744,24 @@ M\mathbf{u} &= \mathbf{f} + N\mathbf{u} \\
 
 % Slide
 \begin{frame}{Preconditiong Krylov methods}
-\begin{block}{}
+\begin{block}{Some notes on PCG}
 \bit
-\item 
+\item The preconditioner, $M$, also needs to be SPD
+\item $M^{-1}$ applied on each iterations, so should be relatively easy to solve
+\item With the proper choice of preconditioner, PCG can converge much faster than plain CG
 \eit
 \end{block}
 \end{frame}
 
 % Slide
 \begin{frame}{Preconditiong Krylov methods}
-\begin{block}{}
+\begin{block}{Other Krylov methods}
 \bit
-\item 
+\item Recall that PCG is only for SPD systems and preconditioners
+\item Other methods exist for indefinite or non-symmetric systems: GMRES, BiCGSTAB, etc.
 \eit
 \end{block}
 \end{frame}
-
-% Slide
-\begin{frame}{Preconditiong Krylov methods}
-\begin{block}{}
-\bit
-\item 
-\eit
-\end{block}
-\end{frame}
-
-% Slide
-\begin{frame}{Preconditiong Krylov methods}
-\begin{block}{}
-\bit
-\item 
-\eit
-\end{block}
-\end{frame}
-
-
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 

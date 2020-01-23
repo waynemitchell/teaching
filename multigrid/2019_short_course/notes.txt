@@ -34,9 +34,17 @@ Exercises:
 
 
 Day 2: Basics of multigrid
-Session 1: motivations, basics of smoothing, coarsening, correction
-Session 2: present geometric multigrid all together and give some examples, briefly look at anisotropy (as example of needing to tailor MG algorithm to problem), look briefly at FMG
+Session 1: 
+   Introduction
+   Basic iterative methods on a model problem
+   Towards multigrid
+Session 2: 
+   Components of multigrid
+   Some basic convergence theory
+   Other stuff?
 Exercises:
+   Show smoothing of Jacobi with different weights and Gauss-Seidel
+   Show case where the solution is oscillatory (i.e. not representable on a coarse grid) but the error after relaxation is smooth
 
 
 Day 3: Algebraic Multigrid

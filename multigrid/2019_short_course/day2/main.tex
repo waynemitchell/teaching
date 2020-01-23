@@ -78,11 +78,11 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\section{Basic iterative methods and a model problem}
+\section{Basic iterative methods on a model problem}
 
 
 % Slide
-\begin{frame}{Basic iterative methods and a model problem}
+\begin{frame}{Basic iterative methods on a model problem}
 \begin{block}{Moving from basic iterative methods to multigrid}
 \bit
 \item Focus on a model elliptic PDE problem
@@ -93,7 +93,7 @@
 \end{frame}
 
 % Slide
-\begin{frame}{Basic iterative methods and a model problem}
+\begin{frame}{Basic iterative methods on a model problem}
 \begin{block}{Model problem: Poisson}
 \bit
 \item Classic model problem is a simple Poisson problem with zero Dirichlet boundary conditions:
@@ -111,7 +111,7 @@ u &= 0, & \partial \Omega
 \end{frame}
 
 % Slide
-\begin{frame}{Basic iterative methods and a model problem}
+\begin{frame}{Basic iterative methods on a model problem}
 \begin{block}{Model problem: Poisson}
 \begin{center}
 \includegraphics[width=0.7\textwidth]{../figures/1DFDPoisson}
@@ -149,16 +149,14 @@ f_N \\
 \end{block}
 \end{frame}
 
-% Review of eigenvalues and eigenvectors and describe them for the model problem. Symmetric problem, evecs are a basis.
-% Write error reduction as a decomposition into the evecs (the fourier modes in the case of the model problem)
-
-
 % Slide
-\begin{frame}{Basic iterative methods and a model problem}
+\begin{frame}{Basic iterative methods on a model problem}
 \begin{block}{Review of eigenvalues and eigenvectors}
 \bit
-\item Eigenvalues, $\lambda$, and eigenvectors, $v$, of a matrix, $A$, are defined by
-\eq{Av = \lambda v}
+\item Eigenvalues, $\lambda_k$, and eigenvectors, $\mathbf{v}_k$, of a matrix, $A$, are defined by
+\eq{
+   A\mathbf{v}_k = \lambda_k \mathbf{v}_k
+}
 \item Evals and evecs can be a way to think about ``action" of an operator: rotation and scaling
 \item Important in many applications from physics and engineering
 \eit
@@ -166,48 +164,216 @@ f_N \\
 \end{frame}
 
 % Slide
-\begin{frame}{Basic iterative methods and a model problem}
+\begin{frame}{Basic iterative methods on a model problem}
 \begin{block}{Review of eigenvalues and eigenvectors}
 \bit
-\item If $A$ is symmetric positive definite (SPD), then eigenvectors form a basis for $\mathcal{R}^n$
-\item Thus, any vector, $x\in\mathcal{R}^n$ can be decomposed as 
+\item If $A$ is symmetric positive definite (SPD), then eigenvalues are real and positive and eigenvectors form an orthonormal basis for $\mathcal{R}^N$
+\item Thus, any vector, $\mathbf{x}\in\mathcal{R}^N$ can be decomposed as 
+\eq{
+   \mathbf{x} = \sum_{k=1}^N \langle \mathbf{x}, \mathbf{v}_k \rangle \mathbf{v}_k 
+}
 \item We can study behavior of iterative methods by considering their effect on different eigenvectors
 \eit
 \end{block}
 \end{frame}
 
 % Slide
-\begin{frame}{Basic iterative methods and a model problem}
-\begin{block}{Review of eigenvalues and eigenvectors}
+\begin{frame}{Basic iterative methods on a model problem}
+\begin{block}{Evals and evecs of the model problem}
 \bit
-\item If $A$ is symmetric positive definite (SPD), then eigenvectors form a basis for $\mathcal{R}^n$
+\item $A = tridiag(-1,2,-1)$, then
+\eq{
+   \lambda_k = 4\sin^2\left(\frac{k\pi}{2(N+1)}\right) \\
+   v_k,j = \sin\left(\frac{jk\pi}{N+1}\right)
+}
 \eit
 \end{block}
 \end{frame}
 
-% Introduce weighted Jacobi
-% Look at behavior of weighted Jacobi on fourier modes. Note stalling convergence on smooth modes.
-% Definition of "smoothing factor" and motivation for weighted Jacobi as a smoother
-% Visualize some 1D examples to show qualitatively how things are smoothed out
-% Brief similar examples for GS
+% Slide
+\begin{frame}{Basic iterative methods on a model problem}
+\begin{block}{Jacobi on the model problem}
+\bit
+\item Recall the Jacobi iteration
+\eq{
+   \mathbf{u} \leftarrow D^{-1}(\mathbf{f} + (L+U)\mathbf{u})
+}
+\item Jacobi is a matrix splitting iteration with error propagation matrix
+\eq{
+   E &= D^{-1}(L+U) \\
+   &= I - D^{-1}A
+}
+\eit
+\end{block}
+\end{frame}
 
+% Slide
+\begin{frame}{Basic iterative methods on a model problem}
+\begin{block}{Jacobi on the model problem}
+\bit
+\item $E$ and $A$ have the same evecs, $\mathbf{v}_k$
+\item The evals, $\tilde\lambda_k$, of $E$ are related to those of $A$ (recall $D = 2I$)
+\eq{
+   \tilde\lambda_k &= 1 - \frac{1}{2}\lambda_k \\
+   &= 1 - 2\sin^2\left(\frac{k\pi}{2(N+1)}\right)
+}
+\eit
+\end{block}
+\end{frame}
 
 
 % Slide
-\begin{frame}{Basic iterative methods and a model problem}
-\begin{block}{}
+\begin{frame}{Basic iterative methods on a model problem}
+\begin{block}{Error reduction for Jacobi}
 \bit
-\item 
+\item Given initial error, $\mathbf{e}^{(0)}$, error on the $i^th$ iteration is 
+\eq{
+   \mathbf{e}^{(i)} &= E^i\mathbf{e}^{(0)} \\
+   &= E^i\left(\sum_{k=1}^N \langle \mathbf{e}^{(0)}, \mathbf{v}_k \rangle \mathbf{v}_k\right) \\
+   &= \sum_{k=1}^N \tilde\lambda_k^i \langle \mathbf{e}^{(0)}, \mathbf{v}_k \rangle \mathbf{v}_k
+}
+\item So the $k^{th}$ ``error mode" is reduced by $\tilde\lambda_k$ on each iteration
 \eit
 \end{block}
 \end{frame}
 
+% Slide
+\begin{frame}{Basic iterative methods on a model problem}
+\begin{block}{Error reduction for Jacobi}
+\bit
+\item Error modes associated with large and small evals are damped very slowly
+\eq{
+   \tilde\lambda_k = 1 - 2\sin^2\left(\frac{k\pi}{2(N+1)}\right)
+}
+\eit
+\end{block}
+\begin{center}
+\includegraphics[width=0.5\textwidth]{../figures/jacobiModeDamping}
+\end{center}
+\end{frame}
 
+% Slide
+\begin{frame}{Basic iterative methods on a model problem}
+\begin{block}{Weighted Jacobi}
+\bit
+\item In practice, Jacobi is usually modified with a weighting parameter, $\omega$
+\eq{
+   \mathbf{u} \leftarrow (1 - \omega)\mathbf{u} + \omega D^{-1}(\mathbf{f} + (L+U)\mathbf{u})
+}
+\item The error propagation matrix in this case is
+\eq{
+   E &= I - \omega D^{-1}A
+}
+\item The associated evals are
+\eq{
+   \tilde\lambda_k &= 1 - 2\omega\sin^2\left(\frac{k\pi}{2(N+1)}\right)
+}
+\eit
+\end{block}
+\end{frame}
+
+% Slide
+\begin{frame}{Basic iterative methods on a model problem}
+\begin{center}
+\begin{block}{Error reduction for Jacobi}
+\bit
+\item With appropriate $\omega$, can effectively damp modes associated with large $k$
+\eq{
+   \tilde\lambda_k = 1 - 2\omega\sin^2\left(\frac{k\pi}{2(N+1)}\right)
+}
+\eit
+\end{block}
+\includegraphics[width=0.6\textwidth]{../figures/weightedJacobiModeDamping}
+\end{center}
+\end{frame}
+
+% Slide
+\begin{frame}{Basic iterative methods on a model problem}
+\begin{block}{Gauss-Seidel}
+\bit
+\item Gauss-Seidel exibits similar behavior
+\item Evecs of error propagation, $E$, for Gauss-Seidel are not the same as the evecs of $A$
+\item Gauss-Seidel also damps the evecs of $A$ associated with large evals
+\eit
+\end{block}
+\end{frame}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{Towards multigrid}
 
+% Slide
+\begin{frame}{Towards multigrid}
+\begin{block}{Observations}
+\bit
+\item Weighted Jacobi and Gauss-Seidel are not good solvers on their own
+\item They do a good job at damping certain error modes for the model problem
+\item Specifically, they remove ``high-frequency" error (they damp the oscillatory evecs of $A$)
+\item Call these ``smoothers" or ``relaxation methods"
+\eit
+\end{block}
+\end{frame}
+
+% Slide
+\begin{frame}{Towards multigrid}
+\begin{block}{Observations}
+\bit
+\item Smooth modes are representable on a coarser grid
+\item Furthermore, they are relatively more oscillatory on that grid 
+\eit
+\end{block}
+\only<1>{
+\begin{center}
+\includegraphics[width=0.6\textwidth]{../figures/smoothMode}
+\end{center}
+}
+\only<2>{
+\begin{center}
+\includegraphics[width=0.6\textwidth]{../figures/modeCoarse}
+\end{center}
+}
+\end{frame}
+
+% Slide
+\begin{frame}{Towards multigrid}
+\begin{block}{Observations}
+\bit
+\item Recall that relaxation makes the error, $\mathbf{e}$, smooth (even if the solution, $\mathbf{u}$, is oscillatory)
+\item The error satisfies the residual equation
+\eq{
+   A\mathbf{e} = \mathbf{r}
+}
+\item 
+\eit
+\end{block}
+\end{frame}
+
+% Slide
+\begin{frame}{Towards multigrid}
+\begin{block}{}
+\bit
+\item
+\eit
+\end{block}
+\end{frame}
+
+% Slide
+\begin{frame}{Towards multigrid}
+\begin{block}{}
+\bit
+\item
+\eit
+\end{block}
+\end{frame}
+
+% Slide
+\begin{frame}{Towards multigrid}
+\begin{block}{}
+\bit
+\item
+\eit
+\end{block}
+\end{frame}
 
 % Observation 1: smooth error is relatively oscillatory on a coarser grid
 % Observation 2: use of the residual equation on the coarse grid
@@ -220,8 +386,36 @@ f_N \\
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+\section{Components of multigrid}
+
+% Slide
+\begin{frame}{Components of multigrid}
+\begin{block}{}
+\bit
+\item
+\eit
+\end{block}
+\end{frame}
+
+% Define relaxation
+% Define interpolation
+% Define restriction
+% Define 2 grid
+% Define MG cycles
+% Cost of MG: count up the operations to get compute cost
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 \section{Some basic convergence theory}
 
+% Slide
+\begin{frame}{Some basic convergence theory}
+\begin{block}{}
+\bit
+\item
+\eit
+\end{block}
+\end{frame}
 
 % Two grid convergence
 % multilevel?
@@ -231,6 +425,7 @@ f_N \\
 
 \section{Other stuff?}
 
+% Generally mention that we've developed all this stuff for Poisson, but you can do similar stuff for more general problems: Just have to figure out how to construct effective MG components for your problem. Forshadow AMG tries to do this as a black box.
 % 2D examples, anisotropic examples with line smoothing and semicoarsening
 % Use of MG as preconditioner for Krylov methods
 
