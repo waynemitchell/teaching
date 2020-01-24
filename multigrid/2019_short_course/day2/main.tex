@@ -243,7 +243,7 @@ f_{N-1} \\
 \bit
 \item Error modes associated with large and small evals are damped very slowly
 \eq{
-   \tilde\lambda_k = 1 - 2\sin^2\left(\frac{k\pi}{2N)}\right)
+   \tilde\lambda_k = 1 - 2\sin^2\left(\frac{k\pi}{2N}\right)
 }
 \eit
 \end{block}
@@ -266,7 +266,7 @@ f_{N-1} \\
 }
 \item The associated evals are
 \eq{
-   \tilde\lambda_k &= 1 - 2\omega\sin^2\left(\frac{k\pi}{2N)}\right)
+   \tilde\lambda_k &= 1 - 2\omega\sin^2\left(\frac{k\pi}{2N}\right)
 }
 \eit
 \end{block}
@@ -352,11 +352,11 @@ f_{N-1} \\
 \begin{frame}{Towards multigrid}
 \begin{block}{Coarse-grid correction}
 \bit
-\item Relax on $A\mathbf{u} = \mathbf{f}$ to obtain approximate solution, $\mathbf{u}$
-\item Error, $\mathbf{e} = \mathbf{\tilde u} - \mathbf{u}$, is smooth
-\item Calculate the residual $\mathbf{r} = \mathbf{f} - A\mathbf{u}$
-\item Relax on $A\mathbf{e} = \mathbf{r}$ on a coarse grid to obtain approximate correction, $\mathbf{e}$
-\item Correct on the fine grid $\mathbf{u} \leftarrow \mathbf{u} + \mathbf{e}$
+\item Relax on $A^f\mathbf{u}^f = \mathbf{f}^f$ to obtain approximate fine-grid solution
+\item Error, $\mathbf{e}^f = \mathbf{\tilde u} - \mathbf{u}^f$, is smooth
+\item Calculate the residual $\mathbf{r}^f = \mathbf{f}^f - A^f\mathbf{u}^f$
+\item Relax on $A^c\mathbf{e}^c = \mathbf{r}^c$ to obtain a coarse-grid correction
+\item Correct on the fine grid $\mathbf{u}^f \leftarrow \mathbf{u}^f + \mathbf{e}^f$
 \eit
 \end{block}
 \end{frame}
@@ -395,8 +395,10 @@ f_{N-1} \\
 \bit
 \item Rediscretize the PDE with half the step size
 \eit
-TODO Figure
 \end{block}
+\begin{center}
+\includegraphics[width=0.7\textwidth]{../figures/coarse1DFDPoisson}
+\end{center}
 \end{frame}
 
 % Slide
@@ -418,33 +420,28 @@ TODO Figure
 
 % Slide
 \begin{frame}{Components of multigrid}
-\begin{block}{}
+\begin{block}{Interpolation (prolongation)}
 \bit
-\item 
+\item Linear interpolation accurately reproduces smooth fine-grid error from a coarse representation
 \eit
 \end{block}
+\only<1>{
 \begin{center}
-\includegraphics[width=0.7\textwidth]{../figures/coarse1DFDPoisson}
+\includegraphics[width=0.7\textwidth]{../figures/coarseError}
 \end{center}
-\end{frame}
-
-% Slide
-\begin{frame}{Components of multigrid}
-\begin{block}{}
-\bit
-\item 
-\eit
-\end{block}
+}
+\only<2>{
 \begin{center}
 \includegraphics[width=0.7\textwidth]{../figures/coarseCorrectionSmooth}
 \end{center}
+}
 \end{frame}
 
 % Slide
 \begin{frame}{Components of multigrid}
-\begin{block}{}
+\begin{block}{Interpolation (prolongation)}
 \bit
-\item 
+\item If the fine-grid error is oscillatory, linear interpolation from the coarse grid is not so accurate
 \eit
 \end{block}
 \begin{center}
@@ -454,45 +451,121 @@ TODO Figure
 
 % Slide
 \begin{frame}{Components of multigrid}
-\begin{block}{}
+\begin{block}{Interpolation (prolongation)}
 \bit
-\item 
+\item Matrix form of interpolation, $P\in\mathcal{R}^{(N-1)\times(N/2-1)}$
 \eit
+\eq{
+   \begin{bmatrix}
+   1/2 & & & \\
+   1 & & & \\
+   1/2 & 1/2 & & \\
+    & 1 & \ddots & \\
+    & \ddots & & \\
+    &  & 1/2 & 1/2 \\
+    &  & & 1 \\
+    &  & & 1/2 \\
+   \end{bmatrix}
+   \begin{bmatrix}
+   e^c_1 \\
+   e^c_2 \\
+   \vdots \\
+   e^c_{N/2-1}
+   \end{bmatrix}
+   =
+   \begin{bmatrix}
+   e^f_1 \\
+   e^f_2 \\
+   \\
+   \vdots \\
+   \\
+   e^f_{N-1}
+   \end{bmatrix}
+}
 \end{block}
-\begin{center}
-\includegraphics[width=0.7\textwidth]{../figures/coarseError}
-\end{center}
 \end{frame}
 
 % Slide
 \begin{frame}{Components of multigrid}
-\begin{block}{}
+\begin{block}{Restriction}
 \bit
-\item 
+\item Restriction by injection: C-points retain their value, F-points do not contribute
+\eit
+\eq{
+   r^c_i = r^f_{2i}
+}
+\end{block}
+\end{frame}
+
+% Slide
+\begin{frame}{Components of multigrid}
+\begin{block}{Restriction}
+\bit
+\item Restriction by injection: C-points retain their value, F-points do not contribute
 \eit
 \end{block}
+\only<1>{
 \begin{center}
 \includegraphics[width=0.7\textwidth]{../figures/fineResidual}
 \end{center}
-\end{frame}
-
-% Slide
-\begin{frame}{Components of multigrid}
-\begin{block}{}
-\bit
-\item 
-\eit
-\end{block}
+}
+\only<2>{
 \begin{center}
 \includegraphics[width=0.7\textwidth]{../figures/injectedResidual}
 \end{center}
+}
 \end{frame}
 
 % Slide
 \begin{frame}{Components of multigrid}
-\begin{block}{}
+\begin{block}{Restriction}
 \bit
-\item 
+\item Matrix form of injection restriction, $R\in\mathcal{R}^{(N/2-1)\times(N-1)}$
+\eit
+\eq{
+   \begin{bmatrix}
+    0 & 1 & 0& & & & \\
+    & & 0 & 1 & 0 & & \\
+    & & & \ddots & \ddots & & \\
+    & & & & & & \\
+    & & & & 0 & 1 & 0\\
+   \end{bmatrix}
+   \begin{bmatrix}
+   r^f_1 \\
+   r^f_2 \\
+   \\
+   \vdots \\
+   \\
+   r^f_{N-1}
+   \end{bmatrix}
+   =
+   \begin{bmatrix}
+   r^c_1 \\
+   r^c_2 \\
+   \vdots \\
+   r^c_{N/2-1}
+   \end{bmatrix}
+}
+\end{block}
+\end{frame}
+
+% Slide
+\begin{frame}{Components of multigrid}
+\begin{block}{Restriction}
+\bit
+\item Restriction by full-weighting: weighted average of C-points with their neighboring F-points
+\eit
+\eq{
+   r^c_i = \frac{1}{4}r^f_{2i-1} + \frac{1}{2}r^f_{2i} + \frac{1}{4}r^f_{2i+1}
+}
+\end{block}
+\end{frame}
+
+% Slide
+\begin{frame}{Components of multigrid}
+\begin{block}{Restriction}
+\bit
+\item Restriction by full-weighting: weighted average of C-points with their neighboring F-points
 \eit
 \end{block}
 \begin{center}
@@ -500,6 +573,80 @@ TODO Figure
 \end{center}
 \end{frame}
 
+
+% Slide
+\begin{frame}{Components of multigrid}
+\begin{block}{Restriction}
+\bit
+\item Matrix form of injection restriction, $R\in\mathcal{R}^{(N/2-1)\times(N-1)}$
+\eit
+\eq{
+   \begin{bmatrix}
+    1/4 & 1/2 & 1/4 & & & & \\
+    & & 1/4 & 1/2 & 1/4 & & \\
+    & & & \ddots & \ddots & & \\
+    & & & & & & \\
+    & & & & 1/4 & 1/2 & 1/4 \\
+   \end{bmatrix}
+   \begin{bmatrix}
+   r^f_1 \\
+   r^f_2 \\
+   \\
+   \vdots \\
+   \\
+   r^f_{N-1}
+   \end{bmatrix}
+   =
+   \begin{bmatrix}
+   r^c_1 \\
+   r^c_2 \\
+   \vdots \\
+   r^c_{N/2-1}
+   \end{bmatrix}
+}
+\end{block}
+\end{frame}
+
+% Slide
+\begin{frame}{Components of multigrid}
+\begin{block}{Restriction}
+\bit
+\item Note that with full-weighting, $R = cP^T$
+\item This relationship between interpolation and restriction is enforced in many multigrid hierarchies and yields nice properties
+\eit
+\end{block}
+\end{frame}
+
+% Slide
+\begin{frame}{Components of multigrid}
+\begin{block}{Two-grid cycle}
+\begin{algorithm}[H]
+\caption{Two-grid cycle}
+\begin{algorithmic}
+\State Set $\mathbf{u}$ initial guess
+\State Relax on $A^f\mathbf{u}^f = \mathbf{f}^f$
+\State Calculate residual $\mathbf{r}^f = \mathbf{f}^f - A^f\mathbf{u}^f$
+\State Restrict residual $\mathbf{r}^c = R\mathbf{r}^f$
+\State Solve on the coarse grid $A^c\mathbf{e}^c = \mathbf{r}^c$
+\State Interpolate coarse-grid correction $\mathbf{u}^f = \mathbf{u}^f + P\mathbf{e}^c$
+\State Relax again on $A^f\mathbf{u}^f = \mathbf{f}^f$
+\end{algorithmic}
+\end{algorithm}
+\end{block}
+\end{frame}
+
+
+
+
+
+
+
+
+
+
+
+
+
 % Slide
 \begin{frame}{Components of multigrid}
 \begin{block}{}
@@ -518,52 +665,19 @@ TODO Figure
 \end{block}
 \end{frame}
 
+% TODO: HEY! Mention the scaling for restriction. How does this relate to the h scaling and rediscretization?
+% TODO: Note that A^c = RAP
 
-% Define coarse grids
-% Define relaxation
-% Define interpolation
-% Define restriction
-% Define 2 grid
 % Define MG cycles
 % Cost of MG: count up the operations to get compute cost
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\section{Some basic convergence theory}
-
-% Slide
-\begin{frame}{Some basic convergence theory}
-\begin{block}{}
-\bit
-\item
-\eit
-\end{block}
-\end{frame}
-
-% Two grid convergence
-% multilevel?
-% FMG convergence to discretization accuracy
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\section{Other stuff?}
-
+% Brief comment on discretization accuracy
+% Save 2D examples for exercises
 % Generally mention that we've developed all this stuff for Poisson, but you can do similar stuff for more general problems: Just have to figure out how to construct effective MG components for your problem. Forshadow AMG tries to do this as a black box.
-% 2D examples, anisotropic examples with line smoothing and semicoarsening
 % Use of MG as preconditioner for Krylov methods
 
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-
-% Slide
-\begin{frame}{}
-\begin{block}{}
-\bit
-\item 
-\eit
-\end{block}
-\end{frame}
+% Maybe:
+% 2D examples, anisotropic examples with line smoothing and semicoarsening
 
 
 
