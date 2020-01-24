@@ -104,8 +104,8 @@ u &= 0, & \partial \Omega
 \item Discretizing with finite differences on a regular 1D mesh:
 \eit
 \eq{
-&\frac{-u_{i-1} + 2u_i - u_{i+1}}{h^2} = f_i, & i = 1,2,..., N\\
-&u_0 = u_{N+1} = 0
+&\frac{-u_{i-1} + 2u_i - u_{i+1}}{h^2} = f_i, & i = 1,2,..., N-1 \\
+&u_0 = u_N = 0
 }
 \end{block}
 \end{frame}
@@ -133,7 +133,7 @@ u_2 \\
 \vdots \\
 \\
 \\
-u_N \\
+u_{N-1} \\
 \end{bmatrix}
 =
 \begin{bmatrix}
@@ -143,7 +143,7 @@ f_2 \\
 \vdots \\
 \\
 \\
-f_N \\
+f_{N-1} \\
 \end{bmatrix}
 }
 \end{block}
@@ -167,10 +167,10 @@ f_N \\
 \begin{frame}{Basic iterative methods on a model problem}
 \begin{block}{Review of eigenvalues and eigenvectors}
 \bit
-\item If $A$ is symmetric positive definite (SPD), then eigenvalues are real and positive and eigenvectors form an orthonormal basis for $\mathcal{R}^N$
-\item Thus, any vector, $\mathbf{x}\in\mathcal{R}^N$ can be decomposed as 
+\item If $A$ is symmetric positive definite (SPD), then eigenvalues are real and positive and eigenvectors form an orthonormal basis for $\mathcal{R}^{N-1}$
+\item Thus, any vector, $\mathbf{x}\in\mathcal{R}^{N-1}$ can be decomposed as 
 \eq{
-   \mathbf{x} = \sum_{k=1}^N \langle \mathbf{x}, \mathbf{v}_k \rangle \mathbf{v}_k 
+   \mathbf{x} = \sum_{k=1}^{N-1} \langle \mathbf{x}, \mathbf{v}_k \rangle \mathbf{v}_k 
 }
 \item We can study behavior of iterative methods by considering their effect on different eigenvectors
 \eit
@@ -183,8 +183,8 @@ f_N \\
 \bit
 \item $A = tridiag(-1,2,-1)$, then
 \eq{
-   \lambda_k = 4\sin^2\left(\frac{k\pi}{2(N+1)}\right) \\
-   v_k,j = \sin\left(\frac{jk\pi}{N+1}\right)
+   \lambda_k &= 4\sin^2\left(\frac{k\pi}{2N}\right), &k = 1,...,N-1 \\
+   v_k,j &= \sin\left(\frac{jk\pi}{N}\right), &j,k = 1,...,N-1 
 }
 \eit
 \end{block}
@@ -215,7 +215,7 @@ f_N \\
 \item The evals, $\tilde\lambda_k$, of $E$ are related to those of $A$ (recall $D = 2I$)
 \eq{
    \tilde\lambda_k &= 1 - \frac{1}{2}\lambda_k \\
-   &= 1 - 2\sin^2\left(\frac{k\pi}{2(N+1)}\right)
+   &= 1 - 2\sin^2\left(\frac{k\pi}{2N}\right)
 }
 \eit
 \end{block}
@@ -229,8 +229,8 @@ f_N \\
 \item Given initial error, $\mathbf{e}^{(0)}$, error on the $i^th$ iteration is 
 \eq{
    \mathbf{e}^{(i)} &= E^i\mathbf{e}^{(0)} \\
-   &= E^i\left(\sum_{k=1}^N \langle \mathbf{e}^{(0)}, \mathbf{v}_k \rangle \mathbf{v}_k\right) \\
-   &= \sum_{k=1}^N \tilde\lambda_k^i \langle \mathbf{e}^{(0)}, \mathbf{v}_k \rangle \mathbf{v}_k
+   &= E^i\left(\sum_{k=1}^{N-1} \langle \mathbf{e}^{(0)}, \mathbf{v}_k \rangle \mathbf{v}_k\right) \\
+   &= \sum_{k=1}^{N-1} \tilde\lambda_k^i \langle \mathbf{e}^{(0)}, \mathbf{v}_k \rangle \mathbf{v}_k
 }
 \item So the $k^{th}$ ``error mode" is reduced by $\tilde\lambda_k$ on each iteration
 \eit
@@ -243,7 +243,7 @@ f_N \\
 \bit
 \item Error modes associated with large and small evals are damped very slowly
 \eq{
-   \tilde\lambda_k = 1 - 2\sin^2\left(\frac{k\pi}{2(N+1)}\right)
+   \tilde\lambda_k = 1 - 2\sin^2\left(\frac{k\pi}{2N)}\right)
 }
 \eit
 \end{block}
@@ -266,7 +266,7 @@ f_N \\
 }
 \item The associated evals are
 \eq{
-   \tilde\lambda_k &= 1 - 2\omega\sin^2\left(\frac{k\pi}{2(N+1)}\right)
+   \tilde\lambda_k &= 1 - 2\omega\sin^2\left(\frac{k\pi}{2N)}\right)
 }
 \eit
 \end{block}
@@ -279,7 +279,7 @@ f_N \\
 \bit
 \item With appropriate $\omega$, can effectively damp modes associated with large $k$
 \eq{
-   \tilde\lambda_k = 1 - 2\omega\sin^2\left(\frac{k\pi}{2(N+1)}\right)
+   \tilde\lambda_k = 1 - 2\omega\sin^2\left(\frac{k\pi}{2N}\right)
 }
 \eit
 \end{block}
@@ -343,46 +343,34 @@ f_N \\
 \eq{
    A\mathbf{e} = \mathbf{r}
 }
-\item 
+\item Idea: can use relaxation on a coarse grid to effectively solve the residual equation! 
 \eit
 \end{block}
 \end{frame}
 
 % Slide
 \begin{frame}{Towards multigrid}
-\begin{block}{}
+\begin{block}{Coarse-grid correction}
 \bit
-\item
+\item Relax on $A\mathbf{u} = \mathbf{f}$ to obtain approximate solution, $\mathbf{u}$
+\item Error, $\mathbf{e} = \mathbf{\tilde u} - \mathbf{u}$, is smooth
+\item Calculate the residual $\mathbf{r} = \mathbf{f} - A\mathbf{u}$
+\item Relax on $A\mathbf{e} = \mathbf{r}$ on a coarse grid to obtain approximate correction, $\mathbf{e}$
+\item Correct on the fine grid $\mathbf{u} \leftarrow \mathbf{u} + \mathbf{e}$
 \eit
 \end{block}
 \end{frame}
 
 % Slide
 \begin{frame}{Towards multigrid}
-\begin{block}{}
+\begin{block}{Remaining questions}
 \bit
-\item
+\item How to define the coarse grid?
+\item How to move between grid levels?
+\item How to go from two-grid to multigrid?
 \eit
 \end{block}
 \end{frame}
-
-% Slide
-\begin{frame}{Towards multigrid}
-\begin{block}{}
-\bit
-\item
-\eit
-\end{block}
-\end{frame}
-
-% Observation 1: smooth error is relatively oscillatory on a coarser grid
-% Observation 2: use of the residual equation on the coarse grid
-% Result: coarse grid correction
-% Define interpolation
-% Define restriction
-% Define 2 grid
-% Define MG cycles
-% Cost of MG: count up the operations to get compute cost
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -390,13 +378,73 @@ f_N \\
 
 % Slide
 \begin{frame}{Components of multigrid}
-\begin{block}{}
+\begin{block}{Components of multigrid}
 \bit
-\item
+\item Hierarchy of grids and associated problems
+\item Relaxation methods to apply to problems on each grid level
+\item Interpolation from coarse to fine grids
+\item Restriction from fine to coarse grids
+\item Cycle structure
 \eit
 \end{block}
 \end{frame}
 
+% Slide
+\begin{frame}{Components of multigrid}
+\begin{block}{Coarse grids}
+\bit
+\item Rediscretize the PDE with half the step size
+\eit
+TODO Figure
+\end{block}
+\end{frame}
+
+% Slide
+\begin{frame}{Components of multigrid}
+\begin{block}{Interpolation (prolongation)}
+\bit
+\item Linear interpolation
+\item Identity at C-points
+\item Average of neighbors at F-points
+\eq{
+   e^f_i = \begin{cases}
+   e^c_{i/2}, &i \,\,\text{even} \\
+   \frac{1}{2}(e^c_{(i-1)/2} + e^c_{(i+1)/2}, &i \,\,\text{odd}
+   \end{cases}
+}
+\eit
+\end{block}
+\end{frame}
+
+% Slide
+\begin{frame}{Components of multigrid}
+\begin{block}{}
+\bit
+\item 
+\eit
+\end{block}
+\end{frame}
+
+% Slide
+\begin{frame}{Components of multigrid}
+\begin{block}{}
+\bit
+\item 
+\eit
+\end{block}
+\end{frame}
+
+% Slide
+\begin{frame}{Components of multigrid}
+\begin{block}{}
+\bit
+\item 
+\eit
+\end{block}
+\end{frame}
+
+
+% Define coarse grids
 % Define relaxation
 % Define interpolation
 % Define restriction

@@ -240,8 +240,8 @@ u &= 0, & \partial \Omega
 \item Discretizing with finite differences on a regular 1D mesh:
 \eit
 \eq{
-&\frac{-u_{i-1} + 2u_i - u_{i+1}}{h^2} = f_i, & i = 1,2,..., N\\
-&u_0 = u_{N+1} = 0
+&\frac{-u_{i-1} + 2u_i - u_{i+1}}{h^2} = f_i, & i = 1,2,..., N-1\\
+&u_0 = u_N = 0
 }
 \end{block}
 \end{frame}
@@ -269,7 +269,7 @@ u_2 \\
 \vdots \\
 \\
 \\
-u_N \\
+u_{N-1} \\
 \end{bmatrix}
 =
 \begin{bmatrix}
@@ -279,7 +279,7 @@ f_2 \\
 \vdots \\
 \\
 \\
-f_N \\
+f_{N-1} \\
 \end{bmatrix}
 }
 \end{block}

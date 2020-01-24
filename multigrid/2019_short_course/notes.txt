@@ -27,7 +27,6 @@ Exercises:
    Jacobi and GS on some different problems
    Visualize smoothing and forshadow multigrid
    Show examples where Jacobi and GS converge and don't converge
-   Example where matrix is diagonally dominant and Jacobi converges fast/slow
    CG: show complete convergence in n steps, good convergence in far less
    Show convergence rate and theoretical convergence rate.
    PCG: what preconditioners can I show? Show condition of A and M^-1A
