@@ -1,0 +1,54 @@
+Exercises:
+
+
+colab.research.google.com
+Search for waynemitchell on GitHub
+
+
+Day 1:
+
+
+iterativeMethods:
+
+1D model problem:
+Show Jacobi step by step
+Show Jacobi oscillating back and forth. Motivate weighted Jacobi.
+Show that on the model problem, weighted Jacobi and Gauss-Seidel smooth the error.
+Show that even for a non-smooth solution, the error is smooth.
+
+
+Random matrix:
+Show divergence of methods, then restored convergence when you enforce diagonal dominance
+
+
+
+krylovMethods:
+
+
+
+
+
+
+Day 2:
+
+
+towardsMultigrid:
+
+Plot some eigenvectors of the model problem
+
+Convergence of weighted Jacobi on different eigenvectors:
+Weight 1: slow for small and large k
+Weight 2/3: slow only for small k
+
+Convergence on the coarse grid problem:
+Example mode that is slow on the fine grid and fast on the coarse grid
+
+Jacobi with random solution, zero initial guess:
+Quick initial convergence followed by stagnation
+Smooth error despite oscillatory solution
+
+
+geometricMultigrid:
+
+
+
