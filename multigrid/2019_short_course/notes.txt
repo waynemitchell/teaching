@@ -47,8 +47,13 @@ Exercises:
 
 
 Day 3: Algebraic Multigrid
-Session 1: motivation for algebraic methods, algebraic smoothness
-Session 2: the A norm and optimality of the correction, RS AMG, SA?
+Session 1: 
+   Motivation 
+   Algebraic smoothness
+   Interpolation
+Session 2:
+   Coarsening
+   Coarse grid operators
 Exercises:
 
 

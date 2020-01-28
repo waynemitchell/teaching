@@ -22,7 +22,7 @@
 
 
 \title[Multigrid]{Introduction to Multigrid Methods}
-\subtitle{Day : }
+\subtitle{Day 3: Algebraic Multigrid (AMG)}
 \author[Mitchell]{Wayne Mitchell}
 \institute{\pgfuseimage{logo}\\Universit\"at Heidelberg\\Institut f\"ur Technische Informatik}
 \date[]{\alert{}}
@@ -42,7 +42,92 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\section{}
+\section{Motivation}
+
+\begin{frame}{Motivation}
+\begin{block}{Benefits and limitations of geometric multigrid (GMG)}
+\bit
+\item Solution of many PDEs to discretization accuracy with optimal $O(N)$ cost
+\item Multigrid components depend on geometry and discretization:
+\bit
+\item Coarsening
+\item Interpolation and restriction
+\item Definition of coarse-grid problems
+\eit
+\item Unclear how to proceed with unstructured meshes (TODO figure?)
+\item Not applicable for problems with no underlying PDE or geometry
+\eit
+\end{block}
+\end{frame}
+
+\begin{frame}{Motivation}
+\begin{block}{Goals of algebraic multigrid (AMG)}
+\bit
+\item Construct an effective multigrid hierarchy given only a matrix system $A\mathbf{u} = \mathbf{f}$
+\item Agnostic to underlying PDE and discretization
+\item More of a ``black box" than GMG
+\eit
+\end{block}
+\end{frame}
+
+\begin{frame}{Motivation}
+\begin{block}{GMG vs. AMG}
+\bit
+\item GMG:
+\bit
+\item Grids and interpolation dictated by discretization/geometry
+\item Need to find appropriate smoother for the problem
+\eit
+\item AMG:
+\bit
+\item Relaxation method is 
+\item Construct coarsenings and interpolation constructed based on matrix entries
+\eit
+\eit
+\end{block}
+\end{frame}
+
+\begin{frame}{Motivation}
+\begin{block}{Main approaches to AMG}
+\bit
+\item Use of simple pointwise smoothers (weighted Jacobi, Gauss-Seidel)
+\item ``Algebraic smoothness" rather than geometric smoothness
+\item Strength of connection between points determined by matrix entries
+\eit
+\end{block}
+\end{frame}
+
+\begin{frame}{Motivation}
+\begin{block}{Flavors of AMG}
+\bit
+\item ``Classical" or Ruge-St\"uben AMG
+\bit
+\item Split grid into C- and F-points
+\item Interpolation to F-points based on matrix connections to C-point neighbors
+\eit
+\item Smoothed aggregation (SA)
+\bit
+\item Fine-grid points grouped and treated as single points on coarse grid
+\item Interpolation based on splitting smooth vectors over aggregates
+\eit
+\eit
+\end{block}
+\end{frame}
+
+\begin{frame}{Motivation}
+\begin{block}{Seminal papers}
+\bit
+\item 
+\eit
+\end{block}
+\end{frame}
+
+% Unstructured grids, etc. that are difficult for GMG
+% "Black box" but not really
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Algebraic smoothness}
 
 \begin{frame}{}
 \begin{block}{}
@@ -52,7 +137,56 @@
 \end{block}
 \end{frame}
 
+% Define algebraic smoothness
+% Example where algebraicly smooth error is geometrically oscillatory. Is this OK? How do we do a coarse grid for this?
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Interpolation}
+
+\begin{frame}{}
+\begin{block}{}
+\bit
+\item 
+\eit
+\end{block}
+\end{frame}
+
+% Define strong vs. weak connection
+% Define interpolation
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Coarsening}
+
+\begin{frame}{}
+\begin{block}{}
+\bit
+\item 
+\eit
+\end{block}
+\end{frame}
+
+% Define the 2 heuristics for coarse grid. They cannot always be satisfied!
+% Show the coloring algorithm
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Coarse grid operators}
+
+\begin{frame}{}
+\begin{block}{}
+\bit
+\item 
+\eit
+\end{block}
+\end{frame}
+
+% Define coarse grid operator
+% Show optimality of coarse grid correction in A norm
+% Other things to finish up? Strengths or pitfalls to show?
+% Mention coarse grid complexity issues.
+% Mention of SA?
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
