@@ -44,6 +44,7 @@
 
 \section{Motivation}
 
+% Slide
 \begin{frame}{Motivation}
 \begin{block}{Benefits and limitations of geometric multigrid (GMG)}
 \bit
@@ -60,6 +61,7 @@
 \end{block}
 \end{frame}
 
+% Slide
 \begin{frame}{Motivation}
 \begin{block}{Goals of algebraic multigrid (AMG)}
 \bit
@@ -70,6 +72,7 @@
 \end{block}
 \end{frame}
 
+% Slide
 \begin{frame}{Motivation}
 \begin{block}{GMG vs. AMG}
 \bit
@@ -87,6 +90,7 @@
 \end{block}
 \end{frame}
 
+% Slide
 \begin{frame}{Motivation}
 \begin{block}{Main approaches to AMG}
 \bit
@@ -97,6 +101,7 @@
 \end{block}
 \end{frame}
 
+% Slide
 \begin{frame}{Motivation}
 \begin{block}{Flavors of AMG}
 \bit
@@ -114,10 +119,11 @@
 \end{block}
 \end{frame}
 
+% Slide
 \begin{frame}{Motivation}
 \begin{block}{Seminal papers}
 \bit
-\item 
+\item TODO
 \eit
 \end{block}
 \end{frame}
@@ -129,36 +135,292 @@
 
 \section{Algebraic smoothness}
 
-\begin{frame}{}
-\begin{block}{}
+% Slide
+\begin{frame}{Algebraic smoothness}
+\begin{block}{Core idea of multigrid}
 \bit
-\item 
+\item Relaxation and coarse-grid correction are complementary processes
+\item Oscillatory/high-frequency/high-energy error damped by relaxation
+\item Smooth/low-frequency/low-energy error damped by coarse-grid correction
 \eit
 \end{block}
 \end{frame}
 
-% Define algebraic smoothness
-% Example where algebraicly smooth error is geometrically oscillatory. Is this OK? How do we do a coarse grid for this?
+% Slide
+\begin{frame}{Algebraic smoothness}
+\begin{block}{Smooth error}
+\bit
+\item Fundamental definition of smooth error, $\mathbf{e}$: error for which convergence of the smoother stalls
+\eq{
+   \mathbf{e}^{(k+1)} &= (I - M^{-1}A)\mathbf{e}^{(k)} \\
+   ||\mathbf{e}^{(k+1)}|| &\approx ||\mathbf{e}^{(k)}||
+}
+\eit
+\end{block}
+\end{frame}
+
+% Slide
+\begin{frame}{Algebraic smoothness}
+\begin{block}{GMG on Poisson}
+\bit
+\item Recall GMG on the model Poisson problem
+\item High-frequency evecs are damped by smoothing
+\item Low-frequency evecs are damped by coarse-grid correction
+\eit
+\end{block}
+TODO figure of high and low freq err
+\end{frame}
+
+% Slide
+\begin{frame}{Algebraic smoothness}
+\begin{block}{Algebraic characterization of smooth error}
+\bit
+\item How to characterize smooth error, $\mathbf{e}$, in an algebraic way?
+\begin{enumerate}
+   \item Small residual: $A\mathbf{e} \approx \mathbf{0}$
+   \item Low energy: $||\mathbf{e}||_A = \langle \mathbf{e}, A\mathbf{e} \rangle \approx 0$
+   \item Small eigenvalue: $A\mathbf{e} = \lambda\mathbf{e}$, with $\lambda \approx 0$
+\end{enumerate}
+\item Above characterizations are often related or equivalent
+\item Different definitions for smooth error may be used to motivate different AMG algorithms
+\eit
+\end{block}
+\end{frame}
+
+% Slide
+\begin{frame}{Algebraic smoothness}
+\begin{block}{Importance of smooth error in developing AMG components}
+\bit
+\item Interpolation must accurately reproduce smooth error
+\item Coarse grid must be able to represent smooth error
+\eit
+\end{block}
+\end{frame}
+
+% TODO? Example where algebraicly smooth error is geometrically oscillatory. 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{Interpolation}
 
-\begin{frame}{}
-\begin{block}{}
+% Slide
+\begin{frame}{Interpolation}
+\begin{block}{A first step toward algebraic interpolation}
 \bit
-\item 
+\item Linear interpolation in GMG required geometric info
+\item Want to define interpolation based only on $A$
+\item Goal: accurately interpolate smooth error
 \eit
 \end{block}
 \end{frame}
 
-% Define strong vs. weak connection
-% Define interpolation
+% Slide
+\begin{frame}{Interpolation}
+\begin{block}{A first step toward algebraic interpolation}
+\bit
+\item Algebraically smooth error has a small residual:
+\eq{
+   &A\mathbf{e} = \mathbf{r} \approx \mathbf{0} \\
+   &\sum_j a_{i,j}e_j \approx 0, & \forall i \\
+   &e_i \approx -\frac{1}{a_{i,i}} \sum_{j\neq i} a_{i,j}e_j, & \forall i
+}
+\item This implies that each component, $e_i$, can be written as a weighted average of its neighbors using entries in $A$
+\eit
+\end{block}
+\end{frame}
+
+% Slide
+\begin{frame}{Interpolation}
+\begin{block}{Strength of connection}
+\bit
+\item One more concept before defining interpolation: strength of connection
+\item Given some threshold, $0 < \theta \leq 1$, we say $e_i$ strongly depends on $e_j$ if
+\eq{
+   -a_{i,j} \geq \theta\max_{k\neq i}(-a_{i,k})
+}
+\item Note: assume $A$ is an M-matrix, i.e. $a_{i,j}\leq 0$ for $i\neq j$
+\item Smooth error varies slowly along strong connections 
+\eit
+\end{block}
+\end{frame}
+
+% Slide
+\begin{frame}{Interpolation}
+\begin{block}{Classical interpolation formula}
+\bit
+\item Assume a given C/F splitting
+\item Let $C_i$ be the set of strongly connected C-points for point $i$
+\item Goal is to construct interpolation, $P$, such that
+\eq{
+   (P\mathbf{e})_i = \begin{cases}
+   e_i, & i\in C \\
+   \sum_{j\in C_i} w_{i,j}e_j, & i \in F
+   \end{cases}
+}
+\item Need to determine interpolation weights, $w_{i,j}$
+\eit
+\end{block}
+\end{frame}
+
+% Slide
+\begin{frame}{Interpolation}
+\begin{block}{Classical interpolation formula}
+\bit
+\item Again start with the assumption that $A\mathbf{e} \approx \mathbf{0}$
+\eq{
+   a_{i,i} e_i = -\sum_{j\neq i} a_{i,j}e_j
+}
+\item Now break up the sum into different sets of points
+\eq{
+   a_{i,i} e_i = -\sum_{j\in C_i} a_{i,j}e_j - \sum_{j\in D^s_i} a_{i,j}e_j - \sum_{j\in D^w_i} a_{i,j}e_j
+}
+\item $D^s_i$ and $D^w_i$ are the strongly and weakly connected F-points respectively
+\eit
+\end{block}
+\end{frame}
+
+% NOTE: Can think of this as collapsing the stencil or infering the values at fine-grid points from the diagonal and connected C-points
+% Collapsing the stencil: collapse F-F matrix entries to the diagonal or C-F connections
+% Infering values: replace e_j (an F point) with e_i (the diagonal) or a weighted average of e_k's (C-poings)
+
+% Slide
+\begin{frame}{Interpolation}
+\begin{block}{Classical interpolation formula}
+\bit
+\item The ``stencil" of point $i$ includes the entire neighborhood of connected points
+\eit
+\end{block}
+\begin{center}
+\includegraphics[width=0.5\textwidth]{../figures/interpStencil} % TODO fix all figures
+\end{center}
+\end{frame}
+
+% Slide
+\begin{frame}{Interpolation}
+\begin{block}{Classical interpolation formula}
+\bit
+\item Strongly connected C-points form the interpolatory set
+\item Rather than disregard F-F connections, collapse their values to the interpolation stencil
+\eit
+\end{block}
+\begin{center}
+\includegraphics[width=0.5\textwidth]{../figures/interpStencilCpts}
+\end{center}
+\end{frame}
+
+% Slide
+\begin{frame}{Interpolation}
+\begin{block}{Classical interpolation formula}
+\bit
+\item Weakly connected F-points are added to the diagonal
+\item Assume $e_i\approx e_j$ for $j\in D^w_i$
+\eit
+\end{block}
+\begin{center}
+\includegraphics[width=0.5\textwidth]{../figures/interpStencilWeakF}
+\end{center}
+\end{frame}
+
+% Slide
+\begin{frame}{Interpolation}
+\begin{block}{Classical interpolation formula}
+\eq{
+   a_{i,i} e_i = - \sum_{j\in C_i} a_{i,j}e_j - \sum_{j\in D^s_i} a_{i,j}e_j - \sum_{j\in D^w_i} a_{i,j}e_j \\
+   (a_{i,i} + \sum_{j\in D^w_i} a_{i,j}) e_i = - \sum_{j\in C_i} a_{i,j}e_j - \sum_{j\in D^s_i} a_{i,j}e_j
+}
+\end{block}
+\begin{center}
+\includegraphics[width=0.5\textwidth]{../figures/interpStencilWeakF}
+\end{center}
+\end{frame}
+
+% Slide
+\begin{frame}{Interpolation}
+\begin{block}{Classical interpolation formula}
+\bit
+\item Could do something similar with strong F-F connections
+\item Practice has shown better results collapsing these values to the C-points
+\eit
+\end{block}
+\begin{center}
+\includegraphics[width=0.5\textwidth]{../figures/interpStencilStrongF}
+\end{center}
+\end{frame}
+
+% Slide
+\begin{frame}{Interpolation}
+\begin{block}{Classical interpolation formula}
+\eq{
+   e_j \approx \frac{\sum_{k \in C_i}a_{j,k}e_k}{\sum_{k \in C_i}a_{j,k}}
+}
+\end{block}
+\begin{center}
+\includegraphics[width=0.5\textwidth]{../figures/interpStencilStrongF}
+\end{center}
+\end{frame}
+
+% Slide
+\begin{frame}{Interpolation}
+\begin{block}{Classical interpolation formula}
+\eq{
+   &(a_{i,i} + \sum_{j\in D^w_i} a_{i,j}) e_i = - \sum_{j\in C_i} a_{i,j}e_j - \sum_{j\in D^s_i} a_{i,j}e_j \\
+   &(a_{i,i} + \sum_{j\in D^w_i} a_{i,j}) e_i = - \sum_{j\in C_i} a_{i,j}e_j - \sum_{j\in D^s_i} a_{i,j}\frac{\sum_{k \in C_i}a_{j,k}e_k}{\sum_{k \in C_i}a_{j,k}}
+}
+\end{block}
+\begin{center}
+\includegraphics[width=0.5\textwidth]{../figures/interpStencilStrongF}
+\end{center}
+\end{frame}
+
+% Slide
+\begin{frame}{Interpolation}
+\begin{block}{Classical interpolation formula}
+\bit
+\item Final interpolation formula
+\eq{
+   w_{i,j} = -\frac{a_{i,j} + \sum_{m\in D^s_i} \left( \frac{a_{i,m}a_{m,j}}{\sum_{k\in C_i} a_{m,k}} \right)}{a_ii + \sum_{n \in D^w_i} a_{i,j}}
+}
+\eit
+\end{block}
+\begin{center}
+\includegraphics[width=0.5\textwidth]{../figures/interpStencilCpts}
+\end{center}
+\end{frame}
+
+% Slide
+\begin{frame}{Interpolation}
+\begin{block}{Classical interpolation formula}
+\bit
+\item Final interpolation formula
+\eq{
+   (P\mathbf{e})_i = \begin{cases}
+   e_i, & i\in C \\
+   \sum_{j\in C_i} w_{i,j}e_j, & i \in F
+   \end{cases}
+}
+\eit
+\end{block}
+\begin{center}
+\includegraphics[width=0.5\textwidth]{../figures/interpStencilCpts}
+\end{center}
+\end{frame}
+
+% Slide
+\begin{frame}{Interpolation}
+\begin{block}{Notes on classical interpolation}
+\bit
+\item This is just one way of calculating interpolation weights
+\item There are many other approaches
+\item Active area of research for more difficult problems
+\eit
+\end{block}
+\end{frame}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{Coarsening}
 
+% Slide
 \begin{frame}{}
 \begin{block}{}
 \bit
@@ -169,11 +431,13 @@
 
 % Define the 2 heuristics for coarse grid. They cannot always be satisfied!
 % Show the coloring algorithm
+% Show that you naturally get semicoarsening for grid-aligned anisotropy
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{Coarse grid operators}
 
+% Slide
 \begin{frame}{}
 \begin{block}{}
 \bit
