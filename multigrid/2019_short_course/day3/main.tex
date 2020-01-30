@@ -421,36 +421,242 @@ TODO figure of high and low freq err
 \section{Coarsening}
 
 % Slide
-\begin{frame}{}
-\begin{block}{}
+\begin{frame}{Coarsening}
+\begin{block}{Requirements for the coarse grid}
 \bit
-\item 
+\item Accurate approximate represention of smooth error from the fine grid
+\item Accurate interpolation from coarse to fine grid
+\item Significantly fewer points than the fine grid
 \eit
 \end{block}
 \end{frame}
 
-% Define the 2 heuristics for coarse grid. They cannot always be satisfied!
-% Show the coloring algorithm
-% Show that you naturally get semicoarsening for grid-aligned anisotropy
+% Slide
+\begin{frame}{Coarsening}
+\begin{block}{Coarse grid heuristics}
+\bit
+\item Let $S_i$ be the set of points that strongly influence $i$
+\item Let $C_i$ be the interpolatory set for F-point, $i$
+\item Then the coarse grid should attempt to ensure the following heuristics:
+\begin{enumerate}
+\item For each F-point, $i$, every point $j\in S_i$ is either in $C_i$ or strongly depends on at least one point in $C_i$
+\item The set of C-points is a maximal subset such that no C-point strongly depends on another C-point.
+\end{enumerate}
+\eit
+\end{block}
+\end{frame}
+
+% Slide
+\begin{frame}{Coarsening}
+\begin{block}{Coarse grid heuristics}
+\bit
+\item Heuristic 1 allows collapsing strong F-F connections to C-points in the interpolation stencil
+\item Heuristic 2 controls the size of the coarse grid: large enough for good convergence but small enough to control computational work
+\item Not always possible to enforce both heuristics
+\eit
+\end{block}
+\end{frame}
+
+% Slide
+\begin{frame}{Coarsening}
+\begin{block}{Coloring scheme}
+\bit
+\item Classical AMG selects the coarse grid using a coloring scheme
+\item Proceeds in two passes 
+\item First, ``high-quality" C-points are added following heuristic 2
+\item Second, additional C-points are added to enforce heuristic 1
+\eit
+\end{block}
+\end{frame}
+
+% Slide
+\begin{frame}{Coarsening}
+\begin{block}{Coloring scheme}
+\bit
+\item High-quality C-points strongly influence lots of F-points
+\item Let $S^T_i$ be the set of points that $i$ strongly influences and $\lambda_i = |S^T_i|$
+\item First pass proceeds as follows:
+\begin{enumerate}
+\item Select a point, $i$, with maximum $\lambda_i$ and mark as C-point
+\item Mark points $j\in S^T_i$ as F-points
+\item Increment $\lambda_k$ for unmarked points $k\in S_j$ for each $j\in S^T_i$
+\item Repeat
+\end{enumerate}
+\eit
+\end{block}
+\end{frame}
+
+% Slide
+\begin{frame}{Coarsening}
+\only<1>{
+\begin{center}
+\includegraphics[width=0.7\textwidth]{../figures/amgCoarsening} % TODO fix all figures
+\end{center}}
+\only<2>{
+\begin{center}
+\includegraphics[width=0.7\textwidth]{../figures/amgCoarsening-2} % TODO fix all figures
+\end{center}}
+\only<3>{
+\begin{center}
+\includegraphics[width=0.7\textwidth]{../figures/amgCoarsening-3} % TODO fix all figures
+\end{center}}
+\only<4>{
+\begin{center}
+\includegraphics[width=0.7\textwidth]{../figures/amgCoarsening-4} % TODO fix all figures
+\end{center}}
+\only<5>{
+\begin{center}
+\includegraphics[width=0.7\textwidth]{../figures/amgCoarsening-5} % TODO fix all figures
+\end{center}}
+\only<6>{
+\begin{center}
+\includegraphics[width=0.7\textwidth]{../figures/amgCoarsening-6} % TODO fix all figures
+\end{center}}
+\only<7>{
+\begin{center}
+\includegraphics[width=0.7\textwidth]{../figures/amgCoarsening-7} % TODO fix all figures
+\end{center}}
+\only<8>{
+\begin{center}
+\includegraphics[width=0.7\textwidth]{../figures/amgCoarsening-8} % TODO fix all figures
+\end{center}}
+\only<9>{
+\begin{center}
+\includegraphics[width=0.7\textwidth]{../figures/amgCoarsening-9} % TODO fix all figures
+\end{center}}
+\only<10>{
+\begin{center}
+\includegraphics[width=0.7\textwidth]{../figures/amgCoarsening-10} % TODO fix all figures
+\end{center}}
+\only<11>{
+\begin{center}
+\includegraphics[width=0.7\textwidth]{../figures/amgCoarsening-11} % TODO fix all figures
+\end{center}}
+\footnotesize{Slide credit: Luke Olson, Copper Mountain 2019 tutorial}
+\end{frame}
+
+% Slide
+\begin{frame}{Coarsening}
+\begin{block}{Coloring scheme}
+\bit
+\item The above example is done after one pass
+\item Both heuristics are satisfied
+\item Coarsening produced is the same as geometric coarsening
+\eit
+\end{block}
+\end{frame}
+
+% Slide
+\begin{frame}{Coarsening}
+\begin{block}{Coloring scheme}
+\bit
+\item Second pass switches some F-points to C-points to enforce heuristic 1
+\item Not always used in practice
+\eit
+\end{block}
+\end{frame}
+
+% Slide
+\begin{frame}{Coarsening}
+\begin{block}{Benefits of the coloring scheme}
+\bit
+\item Completely algebraic method for coarsening
+\item Incorporates strength of connection
+\item Automatically generates appropriate coarsenings that must be hand-selcted in GMG, e.g. semi-coarsening for anisotropic problems
+\eit
+\end{block}
+\end{frame}
+
+% TODO (or in exercises) Show that you naturally get semicoarsening for grid-aligned anisotropy
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{Coarse grid operators}
 
 % Slide
-\begin{frame}{}
-\begin{block}{}
+\begin{frame}{Coarse grid operators}
+\begin{block}{Coarse grid operators}
 \bit
-\item 
+\item Coarsening and interpolation are defined
+\item Still need restriction and coarse-grid operators
+\item Typical choice of restriction: $R = P^T$
+\item Galerkin coarse-grid operator: $A^c = RAP = P^TAP$
 \eit
 \end{block}
 \end{frame}
 
-% Define coarse grid operator
-% Show optimality of coarse grid correction in A norm
-% Other things to finish up? Strengths or pitfalls to show?
-% Mention coarse grid complexity issues.
-% Mention of SA?
+% Slide
+\begin{frame}{Coarse grid operators}
+\begin{block}{Optimality in $A$-norm}
+\bit
+\item Choosing $A^c = P^TAP$ provides optimal coarse-grid correction in the $A$-norm
+\item Recall coarse-grid correction
+\eit
+\eq{
+   \mathbf{u} \leftarrow \mathbf{u} + P(A^c)^{-1}R(\mathbf{f} - A\mathbf{u})
+}
+\end{block}
+\end{frame}
+
+% Slide
+\begin{frame}{Coarse grid operators}
+\begin{block}{Optimality in $A$-norm}
+\bit
+\item Error propagator for coarse-grid correction
+\eq{
+   \mathbf{e} &\leftarrow \mathbf{e} - P(A^c)^{-1}RA\mathbf{e} \\
+   \mathbf{e} &\leftarrow (I - P(P^TAP)^{-1}P^TA)\mathbf{e}
+}
+\item So coarse-grid correction applies $(I - P(P^TAP)^{-1}P^TA)$ to the error
+\item Want $(P(P^TAP)^{-1}P^TA)\mathbf{e}$ to be a good approximation to $\mathbf{e}$
+\eit
+\end{block}
+\end{frame}
+
+% Slide
+\begin{frame}{Coarse grid operators}
+\begin{block}{Optimality in $A$-norm}
+\bit
+\item Correction provided is in the range of interpolation, $Ran(P)$
+\item The best correction in the $A$-norm is obtained by the minimization
+\eq{
+   \min_{\mathbf{v}\in Ran(P)} ||\mathbf{e} - \mathbf{v}||_A
+}
+\item The minimum is obtained by the orthogonal projection onto $Ran(P)$
+\eit
+\end{block}
+\end{frame}
+
+% Slide
+\begin{frame}{Coarse grid operators}
+\begin{block}{Optimality in $A$-norm}
+\bit
+\item Can check that $\pi = (P(P^TAP)^{-1}P^TA)$ is an $A$-orthogonal projection
+\bit
+\item \pi^2 = \pi
+\itme \langle \pi \mathbf{x}, A \mathbf{y} \rangle = \langle \mathbf{x}, A \pi\mathbf{y} \rangle
+\eit
+\item Thus, the AMG coarse-grid correction is the best possible correction (in the $A$-norm) in the range of $P$
+\eq{
+   \min_{\mathbf{v}\in Ran(P)} ||\mathbf{e} - \mathbf{v}||_A = ||\mathbf{e} - (P(P^TAP)^{-1}P^TA)\mathbf{e}||_A
+}
+\eit
+\end{block}
+\end{frame}
+
+% Slide
+\begin{frame}{Coarse grid operators}
+\begin{block}{Coase grid operator complexity}
+\bit
+\item Cost of GMG is straightforward to determine
+\item Cost of AMG is less predictable
+\item Coarse-grid operators tend to 
+\eit
+\end{block}
+\end{frame}
+
+% TODO Other things to finish up? Strengths or pitfalls to show?
+% TODO Mention coarse grid complexity issues.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
