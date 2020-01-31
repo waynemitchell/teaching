@@ -51,4 +51,18 @@ Smooth error despite oscillatory solution
 geometricMultigrid:
 
 
+Day 3:
+
+amgCoarsening:
+
+
+amg:
+
+
+
+Day 4:
+
+newton:
+visualize Newton's method for nonlinear problems
+
 
