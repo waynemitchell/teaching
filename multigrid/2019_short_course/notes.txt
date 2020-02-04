@@ -57,9 +57,13 @@ Session 2:
 Exercises:
 
 
-Day 4: Extensions and special topics
-Session 1: AMG for non-pde problems (graphs), nonsymmetric MG
-Session 2: nonlinear MG, FAS, Newton MG
+Day 4: Advanced problems
+Session 1:
+   Introduction
+   Non-linear problems
+Session 2: 
+   Non-symmetric problems
+   Graph problems
 Exercises:
 
 

@@ -62,7 +62,7 @@ amg:
 
 Day 4:
 
-newton:
-visualize Newton's method for nonlinear problems
+Newton:
+Visualize Newton's method for nonlinear problems. Show case where you start outside basin of attraction.
 
 

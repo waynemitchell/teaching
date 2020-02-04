@@ -22,7 +22,7 @@
 
 
 \title[Multigrid]{Introduction to Multigrid Methods}
-\subtitle{Day : }
+\subtitle{Day 4: Advanced Problems}
 \author[Mitchell]{Wayne Mitchell}
 \institute{\pgfuseimage{logo}\\Universit\"at Heidelberg\\Institut f\"ur Technische Informatik}
 \date[]{\alert{}}
@@ -34,6 +34,7 @@
 \DeclareRobustCommand{\Chi}{\raisebox{2pt}{$\chi$}}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+% Slide
 \begin{frame}
 \frametitle{\bf Outline:}
 \framesubtitle{~~}
@@ -42,9 +43,330 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\section{}
+\section{Introduction}
 
-\begin{frame}{}
+% Slide
+\begin{frame}{Introduction}
+\begin{block}{Advanced problems}
+\bit
+\item Previous lectures focused on multigrid for symmetric positive definite (SPD) problems resulting from discretization of elliptic PDEs
+\item Today's lecture examines a few extensions to more advanced problems:
+\bit
+\item Non-linear
+\item Non-symmetric
+\item Non-PDE
+\eit
+\eit
+\end{block}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Non-linear problems}
+
+% TODO model problem?
+
+% Slide
+\begin{frame}{Non-linear problems}
+\begin{block}{Definition of linearity}
+\bit
+\item $A$ is linear if:
+\bit
+\item $A(\mathbf{u} + \mathbf{v}) = A(\mathbf{u}) + A(\mathbf{v})$, if $\mathbf{u},\mathbf{v}$ arbitrary vectors
+\item $A(\alpha\mathbf{u}) = \alpha A(\mathbf{u})$, if $\alpha$ is a scalar
+\eit
+\eit
+\end{block}
+\end{frame}
+
+% Slide
+\begin{frame}{Non-linear problems}
+\begin{block}{Definition of linearity}
+\bit
+\item Consider $A = -\Delta$. Then,
+\bit
+\item $A(u + v) = -\Delta(u + v) = -\Delta u - \Delta v$
+\item $A(\alpha u) -\Delta (\alpha u) = -\alpha \Delta u$
+\eit
+\item Now consider $A(u) = u^2$
+\bit
+\item $A(u + v) = (u + v)^2 \neq u^2 + v^2$
+\item $A(\alpha u) = (\alpha u)^2 \neq \alpha u^2$
+\eit
+\eit
+\end{block}
+\end{frame}
+
+% Slide
+\begin{frame}{Non-linear problems}
+\begin{block}{Newton's method}
+\bit
+\item Newton's method is an iterative solution method for non-linear equations
+\item Consider a non-linear equation in 1D, $A(\tilde{u}) = 0$
+\item Given initial guess, $u$, and error, $e = \tilde{u} - u$, consider the Taylor expansion about $u$:
+\eq{
+   0 = A(\tilde{u}) = A(u + e) = A(u) + eA'(u) + \frac{s^2}{2}A''(\xi)
+}
+for $\xi$ between $u$ and $\tilde{u}$
+\eit
+\end{block}
+\end{frame}
+
+% Slide
+\begin{frame}{Non-linear problems}
+\begin{block}{Newton's method}
+\bit
+\item Neglecting higher-order terms, solve for the correction, $e$:
+\eq{
+   0 &= A(u) + eA'(u) \\
+   e &= -\frac{A(u)}{A'(u)}
+}
+\item Use approximate error to iteratively update the guess
+\eq{
+   u \leftarrow u - \frac{A(u)}{A'(u)}
+}
+\item The above iteration is Newton's method
+\eit
+\end{block}
+\end{frame}
+
+% Slide
+\begin{frame}{Non-linear problems}
+\begin{block}{Newton's method}
+\bit
+\item Consider the $N$-dimensional non-linear system:
+\eq{
+   A(\mathbf{\tilde{u}}) 
+   = 
+   \begin{bmatrix}
+   A_1(\tilde{u}_1,\tilde{u}_2,...,\tilde{u}_N) \\
+   A_2(\tilde{u}_1,\tilde{u}_2,...,\tilde{u}_N) \\
+   \vdots \\
+   A_N(\tilde{u}_1,\tilde{u}_2,...,\tilde{u}_N)
+   \end{bmatrix} 
+   = 
+   \begin{bmatrix}
+   0 \\
+   0 \\
+   \vdots \\
+   0
+   \end{bmatrix} 
+   =
+   \mathbf{0}
+}
+\eit
+\end{block}
+\end{frame}
+
+% Slide
+\begin{frame}{Non-linear problems}
+\begin{block}{Newton's method}
+\bit
+\item Taylor expansion in $N$ dimensions about guess, $\mathbf{u}$, with error, $\mathbf{e}$:
+\eq{
+   \mathbf{0} = A(\mathbf{u} + \mathbf{e}) = A(\mathbf{u}) + J(\mathbf{u})\mathbf{e} + \text{higher-order terms}
+}
+where $J(\mathbf{u})$ is the Jacobian matrix $J$ evaluated at $\mathbf{u}$
+\eq{
+   J(\mathbf{u})
+   = 
+   \begin{bmatrix}
+   \frac{\partial A_1(\mathbf{u})}{\partial u_1} & \frac{\partial A_1(\mathbf{u})}{\partial u_2} & \dots & \frac{\partial A_1(\mathbf{u})}{\partial u_N} \\
+   \frac{\partial A_2(\mathbf{u})}{\partial u_1} & \frac{\partial A_2(\mathbf{u})}{\partial u_2} & \dots & \frac{\partial A_2(\mathbf{u})}{\partial u_N} \\
+   \vdots \\
+   \frac{\partial A_N(\mathbf{u})}{\partial u_1} & \frac{\partial A_N(\mathbf{u})}{\partial u_2} & \dots & \frac{\partial A_N(\mathbf{u})}{\partial u_N}
+   \end{bmatrix}    
+}
+\eit
+\end{block}
+\end{frame}
+
+% Slide
+\begin{frame}{Non-linear problems}
+\begin{block}{Newton's method}
+\bit
+\item Newton's method for systems:
+\eq{
+   u \leftarrow u - (J(u))^{-1}A(u)
+}
+\item Note: the non-linear problem has been reduced to iteratively solving a sequence of linear systems!
+\eit
+\end{block}
+\end{frame}
+
+% Slide
+\begin{frame}{Non-linear problems}
+\begin{block}{Newton-Multigrid}
+\bit
+\item Obvious application of multigrid: solve $(J(u))^{-1}A(u)$ with multigrid
+\item This approach is called Newton-Multigrid and can work well
+\item We would like to apply multigrid principles directly to the non-linear problem
+\eit
+\end{block}
+\end{frame}
+
+% Slide
+\begin{frame}{Non-linear problems}
+\begin{block}{Non-linear relaxation}
+\bit
+\item Need a relaxation method for the non-linear system, $A(\mathbf{u}) = \mathbf{f}$
+\item Non-linear Gauss-Seidel: 
+\bit
+\item For $j = 1...N$:
+\item Solve the $j^{th}$ equation for the $j^{th}$ component of the solution vector:
+\eq{
+   A_j(\mathbf{u}+s\mathbf{\epsilon}_j) = f_j
+}
+where $\mathbf{\epsilon}_j$ is the $j^{th}$ canonical basis vector
+\item Can use scalar Newton's method for the solve above
+\item Update solution vector: $\mathbf{u} \leftarrow \mathbf{u} + s\mathbf{\epsilon}_j$
+\eit
+\eit
+\end{block}
+\end{frame}
+
+% Slide
+\begin{frame}{Non-linear problems}
+\begin{block}{Non-linear coarse-grid correction}
+\bit
+\item Coarse-grid correction is based on solving the residual equation
+\item In the linear case, $A\mathbf{e} = A(\mathbf{\tilde{u}} - \mathbf{u}) = \mathbf{f} - A\mathbf{u}$
+\item Not so in the non-linear case!
+\eit
+\end{block}
+\end{frame}
+
+% Slide
+\begin{frame}{Non-linear problems}
+\begin{block}{Non-linear coarse-grid correction}
+\bit
+\item Still want to solve the residual equation for a correction, $\mathbf{e}$:
+\eq{
+   \mathbf{f} - A(\mathbf{u}) = \mathbf{r} \\
+   A(\mathbf{u} + \mathbf{e}) - A(\mathbf{u}) = \mathbf{r}
+}
+\item Furthermore, want to solve for the correction on a coarse grid:
+\eq{
+   A^c(\mathbf{u}^c + \mathbf{e}^c) - A^c(\mathbf{u})^c = \mathbf{r}^c 
+}
+\eit
+\end{block}
+\end{frame}
+
+% Slide
+\begin{frame}{Non-linear problems}
+\begin{block}{Non-linear coarse-grid correction}
+\bit
+\item Can restrict the residual $\mathbf{r}^c$ from the fine grid as usual:
+\eq{
+   \mathbf{r}^c = R\mathbf{r} = R(\mathbf{f} - A(\mathbf{u}))
+}
+\item Similarly, restrict the current solution iterate, $\mathbf{u}$:
+\eq{
+   \mathbf{u}^c = R\mathbf{u}
+}
+\eit
+\end{block}
+\end{frame}
+
+
+% Slide
+\begin{frame}{Non-linear problems}
+\begin{block}{Non-linear coarse-grid correction}
+\bit
+\item Substitute these into the coarse-grid residual equation:
+\eq{
+   A^c(R\mathbf{u} + \mathbf{e}^c) - A^c(R\mathbf{u}) = R\mathbf{r} \\
+   A^c(\mathbf{\tilde{u}^c}) = A^c(R\mathbf{u}) + R\mathbf{r} 
+}
+\item Coarse-grid correction:
+\bit
+\item Solve for $\mathbf{\tilde{u}^c}$: 
+\eq{
+   A^c(\mathbf{\tilde{u}^c}) = A^c(R\mathbf{u}) + R(\mathbf{f} - A(\mathbf{u})) 
+}
+\item Get the coarse-grid correction:
+\eq{
+   \mathbf{e}^c = \mathbf{\tilde{u}}^c - R\mathbf{u}
+}
+\item Interpolate and add the correction:
+\eq{
+   \mathbf{u} \leftarrow \mathbf{u} + P\mathbf{e}^c
+}
+\eit
+\eit
+\end{block}
+\end{frame}
+
+% Slide
+\begin{frame}{Non-linear problems}
+\begin{block}{Interpolation, restriction, and coarse-grid operator}
+\bit
+\item Often the same linear interpolation and full-weighting restriction used in the linear case are sufficient (can also use higher-order geometric interpolation)
+\item Coarse-grid operator is usually obtained through rediscretization on the coarse grid
+\item Can also sometimes form $A^c(\mathbf{u}^c) = RA(\mathbf{u})P$
+\eit 
+\end{block}
+\end{frame}
+
+% Slide
+\begin{frame}{Non-linear problems}
+\begin{block}{Full approximation scheme (FAS)}
+\bit
+\item Now have all the pieces for a multigrid cycle
+\begin{algorithm}[H]
+\caption{Full approximation scheme (FAS) two-grid cycle}
+\begin{algorithmic}
+\State Set $\mathbf{u}$ initial guess
+\State Do non-linear relaxation on $A(\mathbf{u}) = \mathbf{f}$
+\State Calculate residual $\mathbf{r} = \mathbf{f} - A(\mathbf{u})$
+\State Restrict residual $\mathbf{r}^c = R\mathbf{r}$
+\State Restrict approximate solution $\mathbf{u}^c = R\mathbf{u}$
+\State Solve on the coarse grid $A^c(\mathbf{\tilde{u}}^c) = A^c(R\mathbf{u}) + R\mathbf{r}$
+\State Get the coarse-grid correction $\mathbf{e}^c = \mathbf{\tilde{u}^c} - \mathbf{u}^c$
+\State Interpolate coarse-grid correction $\mathbf{u} = \mathbf{u} + P\mathbf{e}^c$
+\State Do non-linear relaxation on $A(\mathbf{u}) = \mathbf{f}$
+\end{algorithmic}
+\end{algorithm}
+\eit
+\end{block}
+\end{frame}
+
+
+% Slide
+\begin{frame}{Non-linear problems}
+\begin{block}{Full approximation scheme (FAS)}
+\bit
+\item Similar extension to multilevel as in the linear case: V-cycles, W-cycles, FMG
+\item Note that if $A$ is linear, FAS reduces to regular multigrid cycling
+\item FAS is a fixed point iteration 
+\eit
+\end{block}
+\end{frame}
+
+% Slide
+\begin{frame}{Non-linear problems}
+\begin{block}{$\tau$ correction}
+\bit
+\item 
+\eit
+\end{block}
+\end{frame}
+
+% Slide
+\begin{frame}{Non-linear problems}
+\begin{block}{FMG and the basin of attraction}
+\bit
+\item 
+\eit
+\end{block}
+\end{frame}
+
+
+
+
+% Slide
+\begin{frame}{Non-linear problems}
 \begin{block}{}
 \bit
 \item 
@@ -52,6 +374,52 @@
 \end{block}
 \end{frame}
 
+% FMG FAS and basin of attraction
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Non-symmetric problems}
+
+% Slide
+\begin{frame}{Non-symmetric problems}
+\begin{block}{}
+\bit
+\item 
+\eit
+\end{block}
+\end{frame}
+
+% Slide
+\begin{frame}{Non-symmetric problems}
+\begin{block}{}
+\bit
+\item 
+\eit
+\end{block}
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Graph problems}
+
+% Slide
+\begin{frame}{Graph problems}
+\begin{block}{}
+\bit
+\item 
+\eit
+\end{block}
+\end{frame}
+
+% Slide
+\begin{frame}{Graph problems}
+\begin{block}{}
+\bit
+\item 
+\eit
+\end{block}
+\end{frame}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
