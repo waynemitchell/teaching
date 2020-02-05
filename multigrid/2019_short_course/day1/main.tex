@@ -35,42 +35,31 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Slide
-\begin{frame}
-\frametitle{\bf Outline:}
-\framesubtitle{~~}
-\tableofcontents
-\end{frame}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\section{Introduction}
-
-% Slide
-\begin{frame}{Introduction}
-\begin{block}{Course Goals}
-\bit
-\item Basics of scientific computing and motivations for multigrid
-\item Understanding of basic multigrid principles
-\item Overview of various multigrid algorithms
-\item Mention some current research topics
-\eit
-\end{block}
-\end{frame}
-
-% Slide
-\begin{frame}{Introduction}
+\begin{frame}{}
 \begin{block}{Day 1 Goals}
+\bit
+\item Session 1:
 \bit
 \item Motivations for multigrid
 \item Basic iterative methods and convergence theory
+\eit
+\item Session 2:
+\bit
 \item Krylov methods and preconditioning
 \item Groundwork for introducing multigrid
+\eit
+\item Session 3:
+\bit
+\item Discussion and hands-on examples
+\eit
 \eit
 \end{block}
 \end{frame}
 
+% TODO: if time.... add to the resources page
+
 % Slide
-\begin{frame}{Introduction}
+\begin{frame}{}
 \begin{block}{Resources}
 \bit
 \item A Multigrid Tutorial. Briggs, Henson, McCormick.
@@ -80,12 +69,20 @@
 \end{block}
 \end{frame}
 
+% Slide
+\begin{frame}
+\frametitle{\bf Outline:}
+\framesubtitle{~~}
+\tableofcontents
+\end{frame}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\section{Motivation}
+\section{Introduction and motivation}
+
 
 % Slide
-\begin{frame}{Motivation}
+\begin{frame}{Introduction and motivation}
 \begin{block}{Scientific computing}
 \bit
 \item The three pillars of science: theory, experiments, and \emph{simulation}
@@ -96,7 +93,7 @@
 \end{frame}
 
 % Slide
-\begin{frame}{Motivation}
+\begin{frame}{Introduction and motivation}
 \begin{block}{Simulation pipeline}
 \bit
 \item Physical phenomenon (potential field)
@@ -110,7 +107,7 @@
 \end{frame}
 
 % Slide
-\begin{frame}{Motivation}
+\begin{frame}{Introduction and motivation}
 \begin{block}{Large, sparse linear systems}
 \bit
 \item Resulting linear systems tend to be large and sparse
@@ -126,7 +123,7 @@
 \end{frame}
 
 % Slide
-\begin{frame}{Motivation}
+\begin{frame}{Introduction and motivation}
 \begin{block}{Direct methods}
 \bit
 \item General purpose direct methods:
@@ -144,7 +141,7 @@
 \end{frame}
 
 % Slide
-\begin{frame}{Motivation}
+\begin{frame}{Introduction and motivation}
 \begin{block}{Iterative methods}
 \bit
 \item Basic iterative methods:
@@ -167,7 +164,7 @@
 
 % BUT iterative methods don't give you the exact solution, right? Isn't that a problem? No. Tunable accuracy is actually preferred due to discretization accuracy, etc.
 % Slide
-\begin{frame}{Motivation}
+\begin{frame}{Introduction and motivation}
 \begin{block}{Numerical accuracy}
 \bit
 \item Iterative methods don't give the exact solution ... but ...
@@ -179,13 +176,24 @@
 \end{block}
 \end{frame}
 
-% Slide TODO
-\begin{frame}{Motivation}
-\begin{block}{The slide where you show how long it takes to solve the same problem with a bunch of different methods of increasing efficiency}
+% Slide
+\begin{frame}{Introduction and motivation}
+\begin{block}{The importance of complexity}
 \bit
-\item 
+\item Larger problems and larger more powerful computers make optimal complexity a necessity!
 \eit
+\begin{table}
+\begin{tabular}{c | c | c | c | c}
+$O(N^3)$ alg & $O(N^2)$ alg & $O(N)$ alg & N & Comp speed \\
+\hline
+0.000001 sec &  0.001 sec & 1 sec & 1 & $10^6$ flops (1980's) \\
+1 sec &  1 sec & 1 sec & $10^3$ & $10^9$ flops (1990's) \\
+12 days &  17 min & 1 sec & $10^6$ & $10^{12}$ flops (2000's) \\
+31,710 years &  12 day & 1 sec & $10^9$ & $10^{15}$ flops (2010's)
+\end{tabular}
+\end{table}
 \end{block}
+\footnotesize{Table credit: Ulrich R\"ude, Erlangen}
 \end{frame}
 
 
@@ -221,7 +229,7 @@
 }
 \item Condition number:
 \eq{
-   \kappa(A) = ||A^{-1}||\cdot||A||
+   \kappa(A) = ||A^{-1}||\cdot||A|| = \frac{\sigma_{\max}(A)}{\sigma_{\min}(A)} \geq 1
 }
 \eit
 \end{block}
@@ -303,7 +311,7 @@ f_{N-1} \\
 \end{block}
 \begin{block}{Less nice properties}
 \bit
-\item Condition number increases with problem size % TODO: what's the rate in different dimensions? I think it's like O(1/h^2) = O(n^2d)? Not right...
+\item Condition number increases with problem size 
 \eit
 \end{block}
 \end{frame}
@@ -469,26 +477,6 @@ M\mathbf{u} &= \mathbf{f} + N\mathbf{u} \\
 \eit
 \end{block}
 \end{frame}
-
-% Slide NOTE: This has spectral radius and matrix norms which you have not previously defined... probably omit
-% \begin{frame}{Basic iterative methods}
-% \begin{block}{Convergence of Jacobi}
-% \bit
-% \item Jacobi as a matrix splitting: $M = D$, $N = (L+U)$
-% \eq{
-%    \rho (M^{-1}N) &= \rho(D^{1}(L+U)) \\
-%    &\leq ||D^{-1}(L+U)||_\infty \\
-%    \max_i\sum_{j\neq i}\left|\frac{a_{i,j}}{a_{i,i}}\right|
-% }
-% \item Thus, $\rho (M^{-1}N) < 1$ if $A$ is strictly diagonally dominant
-% \item Usually, the greater the diagonal dominance, the swifter the convergence (not always)
-% \eit
-% \end{block}
-% \end{frame}
-
-% TODO: Discuss idea of red-black GS as a way to get more parallelism?
-
-% NOTE: do you want to do some demonstrations here? If you have time...
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

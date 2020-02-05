@@ -16,8 +16,7 @@ https://github.com/copper-multigrid-conference/2019-tutorials
 
 Day 1: Motivation and basic iterative methods
 Session 1: 
-   Introduction
-   Motivation
+   Introduction and motivation
    Preliminaries and a model problem
    Basic iterative methods
 Session 2:

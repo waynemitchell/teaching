@@ -34,46 +34,42 @@
 \DeclareRobustCommand{\Chi}{\raisebox{2pt}{$\chi$}}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\begin{frame}
-\frametitle{\bf Outline:}
-\framesubtitle{~~}
-\tableofcontents
-\end{frame}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\section{Introduction}
-
 % Slide
-\begin{frame}{Introduction}
+\begin{frame}{}
 \begin{block}{Day 2 Goals}
 \bit
+\item Session 1:
+\bit
 \item Basic theoretical motivations for multigrid
-\item Define the basic components of multigrid: relaxation, interpolation, and restriction
-\item Outline geometric multigrid on a model problem
+\item Move from basic iterative methods toward multigrid
+\eit
+\item Session 2:
+\bit
+\item Define basic multgrid components: relaxation, interpolation, and restriction
+\item Define multigrid cycles and examine cost and convergence
+\eit
+\item Session 3:
+\bit
+\item Discussion and hands-on examples
+\eit
 \eit
 \end{block}
 \end{frame}
 
 % Slide
-\begin{frame}
+\begin{frame}{}
 \begin{block}{Acknowledgements}
 \bit
-\item These slides are based on previous tutorials by Steve McCormick, Van Henson, Rob Falgout, Irad Yavneh, David Moulton.
+\item These slides are based on previous tutorials by Steve McCormick, Van Henson, Rob Falgout, Irad Yavneh, David Moulton, Luke Olson.
 \item https://github.com/copper-multigrid-conference
 \eit
 \end{block}
 \end{frame}
 
-% Slide
-\begin{frame}{Introduction}
-\begin{block}{Resources}
-\bit
-\item A Multigrid Tutorial. Briggs, Henson, McCormick.
-\item Multigrid. Trottenberg, Oosterlee, Sch\"uller.
-\item Matrix Computations. Golub, Van Loan.
-\eit
-\end{block}
+\begin{frame}
+\frametitle{\bf Outline:}
+\framesubtitle{~~}
+\tableofcontents
 \end{frame}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -411,7 +407,7 @@ f_{N-1} \\
 \eq{
    e^f_i = \begin{cases}
    e^c_{i/2}, &i \,\,\text{even} \\
-   \frac{1}{2}(e^c_{(i-1)/2} + e^c_{(i+1)/2}, &i \,\,\text{odd}
+   \frac{1}{2}(e^c_{(i-1)/2} + e^c_{(i+1)/2}), &i \,\,\text{odd}
    \end{cases}
 }
 \eit
@@ -578,7 +574,7 @@ f_{N-1} \\
 \begin{frame}{Components of multigrid}
 \begin{block}{Restriction}
 \bit
-\item Matrix form of injection restriction, $R\in\mathcal{R}^{(N/2-1)\times(N-1)}$
+\item Matrix form of full-weighting restriction, $R\in\mathcal{R}^{(N/2-1)\times(N-1)}$
 \eit
 \eq{
    \begin{bmatrix}
@@ -609,10 +605,12 @@ f_{N-1} \\
 
 % Slide
 \begin{frame}{Components of multigrid}
-\begin{block}{Restriction}
+\begin{block}{Full-weighting and the Galerkin coarse-grid operator}
 \bit
-\item Note that with full-weighting, $R = cP^T$
+\item Note that with full-weighting, $R = sP^T$, with $s = 1/2$
 \item This relationship between interpolation and restriction is enforced in many multigrid hierarchies and yields nice properties
+\item For the model problem, if $R = sP^T$, then rediscretization on the coarse grid is equivalent to $A^c = RA^fP$
+\item $A^c = RA^fP$ is the Galerkin coarse-grid operator
 \eit
 \end{block}
 \end{frame}
@@ -635,50 +633,162 @@ f_{N-1} \\
 \end{block}
 \end{frame}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-
-
-
-
-
-
-
-
-
-
+\section{Multigrid cycles}
 
 % Slide
-\begin{frame}{Components of multigrid}
-\begin{block}{}
+\begin{frame}{Multigrid cycles}
+\begin{block}{From two level to multilevel}
 \bit
-\item 
+\item The simplest way to go from the two-grid cycle to a multigrid cycle is to recurse
+\item Instead of an exact solve on the coarse grid, solve via relaxation and further coarse-grid correction
+\item Result is a multigrid V-cycle
 \eit
 \end{block}
 \end{frame}
 
 % Slide
-\begin{frame}{Components of multigrid}
-\begin{block}{}
+\begin{frame}{Multigrid cycles}
+
+\begin{algorithm}[H]
+\caption{Recursive V-cycle$(\mathbf{u},\mathbf{f})$}
+\begin{algorithmic}
+\State Relax on $A\mathbf{u} = \mathbf{f}$
+\State Calculate residual $\mathbf{r} = \mathbf{f} - A\mathbf{u}$
+\State Restrict residual $\mathbf{r}^c = R\mathbf{r}$
+
+\If{Coarse-grid system, $A^c$, is small enough for direct solve}
+\State $\mathbf{e}^c = (A^c)^{-1}\mathbf{r}^c$
+\Else
+\State Set $\mathbf{e}^c = \mathbf{0}$
+\State Call recursive V-cycle$(\mathbf{e}^c, \mathbf{r}^c)$
+\EndIf
+\State Interpolate coarse-grid correction $\mathbf{u} = \mathbf{u} + P\mathbf{e}^c$
+\State Relax again on $A\mathbf{u} = \mathbf{f}^f$
+\end{algorithmic}
+\end{algorithm}
+\end{frame}
+
+% Slide
+\begin{frame}{Multigrid cycles}
+\begin{center}
+% \includegraphics[width=0.7\textwidth]{../figures/Vcycle} TODO
+\end{center}
+\end{frame}
+
+% Slide
+\begin{frame}{Multigrid cycles}
+\begin{block}{V-cycle cost}
 \bit
-\item 
+\item Recall the claim that multigrid has optimal, $O(N)$ computational cost
+\item Define a ``work unit" (WU) as the cost of one mat-vec on the fine grid, $A\mathbf{u}$
+\item If $A$ is sparse, then one WU has $O(N)$ cost
+\item Point-wise relaxation (e.g. Gauss-Seidel) costs one WU
 \eit
 \end{block}
 \end{frame}
 
-% TODO: HEY! Mention the scaling for restriction. How does this relate to the h scaling and rediscretization?
-% TODO: Note that A^c = RAP
+% Slide
+\begin{frame}{Multigrid cycles}
+\begin{block}{V-cycle cost}
+\bit
+\item Assume regular, $d$-dimensional grids and a constance coarsening factor, $C$
+\item Then the total number of WU for two relaxations and a residual calculation on level $l$ is $\approx 3/C^{ld}$
+\item Summing over the levels yields the cost for a V-cycle
+\eq{
+  \text{Total cost in WU } \approx \sum_{l=0}^{L-1} \frac{3}{C^{ld}} \leq \frac{3}{1 - C^{-d}}
+}
+\item For 1D model problem, total cost is less than 6 WU.
+\eit
+\end{block}
+\end{frame}
 
-% Define MG cycles
-% Cost of MG: count up the operations to get compute cost
-% Brief comment on discretization accuracy
-% Save 2D examples for exercises
-% Generally mention that we've developed all this stuff for Poisson, but you can do similar stuff for more general problems: Just have to figure out how to construct effective MG components for your problem. Forshadow AMG tries to do this as a black box.
-% Use of MG as preconditioner for Krylov methods
 
+% Slide
+\begin{frame}{Multigrid cycles}
+\begin{block}{Other cycle types}
+\bit
+\item V-cycles are very common in practice
+\item More generally, V$(\nu_1, \nu_2)$-cycles perform $\nu_1$ pre-relaxations and $\nu_2$ post-relaxations
+\item Can also use different cycle structures (visit the grid levels in different orders)
+\eit
+\end{block}
+\end{frame}
 
-% Maybe:
-% 2D examples, anisotropic examples with line smoothing and semicoarsening
+% Slide
+\begin{frame}{Multigrid cycles}
+\begin{algorithm}[H]
+\caption{Recursive W-cycle$(\mathbf{u},\mathbf{f})$}
+\begin{algorithmic}
+\State Relax on $A\mathbf{u} = \mathbf{f}$
+\State Calculate residual $\mathbf{r} = \mathbf{f} - A\mathbf{u}$
+\State Restrict residual $\mathbf{r}^c = R\mathbf{r}$
 
+\If{Coarse-grid system, $A^c$, is small enough for direct solve}
+\State $\mathbf{e}^c = (A^c)^{-1}\mathbf{r}^c$
+\Else
+\State Set $\mathbf{e}^c = \mathbf{0}$
+\State Call recursive W-cycle$(\mathbf{e}^c, \mathbf{r}^c)$
+\State Call recursive W-cycle$(\mathbf{e}^c, \mathbf{r}^c)$ again
+\EndIf
+\State Interpolate coarse-grid correction $\mathbf{u} = \mathbf{u} + P\mathbf{e}^c$
+\State Relax again on $A\mathbf{u} = \mathbf{f}^f$
+\end{algorithmic}
+\end{algorithm}
+\end{frame}
+
+% Slide
+\begin{frame}{Multigrid cycles}
+\begin{center}
+% \includegraphics[width=0.7\textwidth]{../figures/Wcycle} TODO
+\end{center}
+\end{frame}
+
+% Slide
+\begin{frame}{Multigrid cycles}
+\begin{block}{Full multigrid (FMG)}
+\bit
+\item Another cycle type: full multigrid (FMG), or nested iteration
+\item Start on the coarsest level
+\item Use interpolated solution as initial guess on next finest grid
+\eit
+\end{block}
+\end{frame}
+
+% Slide
+\begin{frame}{Multigrid cycles}
+\begin{algorithm}[H]
+\caption{Full multigrid (FMG)}
+\begin{algorithmic}
+\State Solve $A_L\mathbf{u}_L = \mathbf{f}_L$ on the coarsest level
+\For {level, $l = L-1 ... 0$}
+\State Interpolate coarse solution $\mathbf{u}_l = P_l\mathbf{u}_{l+1}$
+\State Solve $A_l\mathbf{u}_l = \mathbf{f}_l$ with V-cycles
+\EndFor
+\end{algorithmic}
+\end{algorithm}
+\end{frame}
+
+% Slide
+\begin{frame}{Multigrid cycles}
+\begin{center}
+% \includegraphics[width=0.7\textwidth]{../figures/FMGcycle} TODO
+\end{center}
+\end{frame}
+
+% Slide
+\begin{frame}{Multigrid cycles}
+\begin{block}{Cycle cost and convergence}
+\bit
+\item Can show that W-cycles and FMG also have $O(N)$ cost
+\item V-cycles often achieve convergence factors that are independent of $N$
+\item Thus V-cycles achieve fixed error reduction with $O(N)$ cost
+\item W-cycles similarly achieve fixed error reduction with $O(N)$ cost and can be more robust than V-cycles
+\item FMG achieves \emph{discretization accuracy} with $O(N)$ cost!
+\eit
+\end{block}
+\end{frame}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
