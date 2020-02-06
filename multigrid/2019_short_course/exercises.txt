@@ -50,6 +50,12 @@ Smooth error despite oscillatory solution
 
 geometricMultigrid:
 
+1D Poisson
+
+2D Poisson 
+
+Anisotropic diffusion
+
 
 Day 3:
 

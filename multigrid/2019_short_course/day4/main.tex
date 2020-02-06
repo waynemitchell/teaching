@@ -343,7 +343,7 @@ where $\mathbf{\epsilon}_j$ is the $j^{th}$ canonical basis vector
 \State Calculate residual $\mathbf{r} = \mathbf{f} - A(\mathbf{u})$
 \State Restrict residual $\mathbf{r}^c = R\mathbf{r}$
 \State Restrict approximate solution $\mathbf{u}^c = R\mathbf{u}$
-\State Solve on the coarse grid $A^c(\mathbf{\tilde{u}}^c) = A^c(R\mathbf{u}) + R\mathbf{r}$
+\State Solve on the coarse grid $A^c(\mathbf{\tilde{u}}^c) = A^c(\mathbf{u}^c) + \mathbf{r}^c$
 \State Get the coarse-grid correction $\mathbf{e}^c = \mathbf{\tilde{u}^c} - \mathbf{u}^c$
 \State Interpolate coarse-grid correction $\mathbf{u} = \mathbf{u} + P\mathbf{e}^c$
 \State Do non-linear relaxation on $A(\mathbf{u}) = \mathbf{f}$
@@ -369,7 +369,28 @@ where $\mathbf{\epsilon}_j$ is the $j^{th}$ canonical basis vector
 \begin{frame}{Non-linear problems}
 \begin{block}{$\tau$ correction}
 \bit
-\item 
+\item A different way to write the coarse-grid equation:
+\eq{
+   A^c(\mathbf{\tilde{u}}^c) &= A^c(\mathbf{u}^c) + \mathbf{r}^c \\
+   A^c(\mathbf{\tilde{u}}^c) &= A^c(R\mathbf{u}) + R(\mathbf{f} - A(\mathbf{u})) \\
+   A^c(\mathbf{\tilde{u}}^c) &= R\mathbf{f} + (A^c(R\mathbf{u}) - RA(\mathbf{u})) 
+}
+\item Let $R\mathbf{f} = \mathbf{f}^cc$ and $\tau = A^c(R\mathbf{u}) - RA(\mathbf{u})$
+\item Then the coare-grid equation is:
+\eq{
+   A^c(\mathbf{\tilde{u}}^c) = \mathbf{f}^c + \tau
+}
+\eit
+\end{block}
+\end{frame}
+
+% Slide
+\begin{frame}{Non-linear problems}
+\begin{block}{$\tau$ correction}
+\bit
+\item Thus the coarse grid equation is not simply $A^c(\mathbf{\tilde{u}}^c) = \mathbf{f}^c$, as one might expect
+\item The $\tau$ correction is a modification of the coarse-grid equation to enhance approximation properties of the coarse-grid solution
+\item The $\tau$ correction yields coarse-grid solution $\mathbf{\tilde{u}}^c$ that has \emph{accuracy} comparable to the fine-grid $\mathbf{\tilde{u}}$, but at the \emph{resolution} of the coarse grid
 \eit
 \end{block}
 \end{frame}
@@ -378,24 +399,12 @@ where $\mathbf{\epsilon}_j$ is the $j^{th}$ canonical basis vector
 \begin{frame}{Non-linear problems}
 \begin{block}{FMG and the basin of attraction}
 \bit
-\item 
+\item In general, non-linear solvers need a good initial guess in order to convergece
+\item An initial guess that is good enough to yield convergence is said to be in the basin of attraction
+\item Running FAS in an FMG cycle is usually an effective way to generate a good fine-grid initial guess
 \eit
 \end{block}
 \end{frame}
-
-
-
-
-% Slide
-\begin{frame}{Non-linear problems}
-\begin{block}{}
-\bit
-\item 
-\eit
-\end{block}
-\end{frame}
-
-% FMG FAS and basin of attraction
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -426,7 +435,89 @@ where $\mathbf{\epsilon}_j$ is the $j^{th}$ canonical basis vector
 
 % Slide
 \begin{frame}{Graph problems}
-\begin{block}{}
+\begin{block}{Graphs}
+\bit
+\item A graph is defined by a collection of nodes, edges, and weights: $G = (\mathcal{N},\mathcal{E},W)$
+\item An edge, $e_{i,j}\in\mathcal{E}$, is a connection between two nodes, $i,j\in\mathcal{N}$ and may have an assigned weight, $w_{i,j}\in W$.
+\item A graph with no self-loops has no edges $e_{i,i}$
+\item In an undirected graph, if there is a connection $e_{i,j}$ with weight $w_{i,j}$, then there is also an edge $e_{j,i}$ with weight $w_{j,i} = w_{i,j}$
+\item In an unweighted graph, $w_{i,j} = 1$ for all $i,j$
+\item A graph is connected if there is some path connecting all pairs of nodes
+\eit
+\end{block}
+\end{frame}
+
+% Slide
+\begin{frame}{Graph problems}
+\begin{block}{Graph applications}
+\bit
+\item PDEs on graphs
+\item Electical networks/power grids
+\item Machine learning regression and classification problems
+\item Social networks
+\item Internet web page graphs and page rank
+\eit
+\end{block}
+\end{frame}
+
+% Slide
+\begin{frame}{Graph problems}
+\begin{block}{Graph Laplacians}
+\bit
+\item The graph Laplacian, $A$, is a matrix representation of a graph with entries
+\eq{
+   a_{i,j} = \begin{cases}
+   \sum_k w_{i,k}\,, & j = i \\
+   w_{i,j}\,, & e_{i,j}\in\mathcal{E} \\
+   0\,, & \text{else} 
+   \end{cases}
+}
+\item Assume $G$ is an undirected graph with all positive weights and no self-loops
+\item Then $A$ resembles a discrete Laplacian operator 
+\eit
+\end{block}
+\end{frame}
+
+% Slide
+\begin{frame}{Graph problems}
+\begin{block}{Graph Laplacians vs. discretized PDEs}
+\bit
+\item Structured grid: regular stencil patterns, easy geometric coarsening/interpolation (GMG)
+\item Unstructured grid: still regular stencil patterns, need algebraic coarsening/interpolation (AMG)
+\item Arbitrary graph: no geometry and arbitrary connectivity/stencils (need special AMG)
+\eit
+\end{block}
+\begin{center}
+\includegraphics[width=0.3\textwidth]{../figures/structuredGrid}
+\includegraphics[width=0.3\textwidth]{../figures/unstructuredGrid}
+\includegraphics[width=0.3\textwidth]{../figures/graph}
+\end{center}
+\end{frame}
+
+% Slide
+\begin{frame}{Graph problems}
+\begin{block}{Lean algebraic multigrid (LAMG)}
+\bit
+\item Livne and Brandt. Lean algebraic multigrid (LAMG): fast graph Laplacian linear solver. SIAM J. Sci. Comp. 2012.
+\item AMG algorithm tailored to solving graph Laplacians for undirected graphs
+\item ``Lean" because it utilizes simple components designed to optimize cycle efficiency
+\bit
+\item Full rank $P$ with unit row sums
+\item Galerkin coarse-grid operators, $A^c = P^TAP$, are also graph Laplacians
+\item Gauss-Seidel relaxation
+\item Simpler, piecewise constant interpolation (limits complexity of constructing $P$ and fill-in of coarse operators) (similar to unsmoothed aggregation)
+\item Lean methodology
+\item Low-degree elimination
+\item Affinity
+\item Energy-corrected aggregation
+\eit
+\eit
+\end{block}
+\end{frame}
+
+% Slide
+\begin{frame}{Graph problems}
+\begin{block}{LAMG coarsening}
 \bit
 \item 
 \eit
@@ -441,6 +532,11 @@ where $\mathbf{\epsilon}_j$ is the $j^{th}$ canonical basis vector
 \eit
 \end{block}
 \end{frame}
+
+% Main emphasis: there's other stuff besides PDEs to solve and you can adapt AMG to such environments
+% Don't need too much detail on LAMG
+% Need to spend some time just explaining what graph laplacians are, why we care, similarities and differences to meshed and discretized PDEs
+% Would like to plug Aly's work: just mention her major contrubitions
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

@@ -22,7 +22,7 @@
 
 
 \title[Multigrid]{Introduction to Multigrid Methods}
-\subtitle{Day : }
+\subtitle{Day 5: parallel AMG}
 \author[Mitchell]{Wayne Mitchell}
 \institute{\pgfuseimage{logo}\\Universit\"at Heidelberg\\Institut f\"ur Technische Informatik}
 \date[]{\alert{}}
@@ -74,6 +74,608 @@
 \end{block}
 \end{frame}
 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Motivation}
+
+% Slide
+% We are interested in solving elliptic PDEs, which arrise in many scientific applications. Specifically, we wish to solve the sparse linear systems that result from discretizing elliptic PDEs on large parallel computers, as the solution of these linear systems often represents a significant computational bottleneck. Multigrid methods are well known as a class of optimal solvers for many elliptic PDE problems, and Algebraic Multigrid in particular is quite widely applicable and widely used.
+% \begin{frame}{Motivation}
+% \begin{block}{Solving elliptic PDEs on large parallel machines}
+% \begin{itemize}
+% \item Problems from electrostatics, fluid dynamics, astrophysics require the solution of elliptic PDEs
+% \item Discretization of elliptic PDEs yield large linear systems 
+% \item Solving these linear systems is a computational bottleneck for many applications
+% \item Algebraic Multigrid (AMG) is a widely applicable and widely used scalable solver with optimal computational complexity
+% \end{itemize}
+% \end{block}
+
+% \end{frame}
+
+% Slide 
+% To motivate this talk, I'll return to some very basic principles of multigrid. The core idea behind a multigrid algorithm involves recursively coarsening a problem to generate a hierarchy of grids such that easily applied relaxations on each of these different grid levels efficiently reduce different error modes. The fact that the coarser grids are smaller and subsequently computationally cheaper is the key to the efficiency and optimal scalability of MG.
+\begin{frame}{Motivation}
+\begin{block}{Basic principles of multigrid}
+\begin{itemize}
+\item Recursively coarsen the problem representation
+\item Different grid levels reduce different error modes
+\item Coarse grids are computationally cheap
+\end{itemize}
+\end{block}
+
+\centering
+\includegraphics[width=\textwidth]{figures/compGridCreation1D1}
+
+\end{frame}
+
+
+% Slide 
+% When we move to a parallel setting, however, this hierarchy is distributed amongst a bunch of processors, and now matrix vector multiplication involves communication among processors and this cost remains significant on coarse grids. 
+\begin{frame}{Motivation}
+\begin{block}{Parallelizing AMG}
+\begin{itemize}
+\item AMG cycles involve matrix-vector multiplies on each level 
+\item Coarse grids are computationally cheap
+\item Communication on coarse grids remains expensive
+\end{itemize}
+\end{block}
+
+\centering
+\includegraphics[width=\textwidth]{figures/compGridCreation1D2}
+
+\end{frame}
+
+% Slide 
+\begin{frame}{Motivation}
+\begin{block}{A Brief Introduction to Multigrid}
+\begin{itemize}
+\item Growing complexity on AMG coarse grids yields growing communication stencils
+\end{itemize}
+\end{block}
+
+\centering
+\includegraphics[width=0.7\textwidth]{figures/nonGalerkinFigure}
+
+\tiny{Figure taken from \emph{Reducing parallel communication in algebraic multigrid through sparsification} by Bienz, Falgout, Gropp, Olson, and Schroder.}
+
+\end{frame}
+
+% Slide 
+% This is where AMG-DD comes in.
+\begin{frame}{Motivation}
+\begin{block}{Algebraic multigrid domain decomposition (AMG-DD)}
+\begin{itemize}
+\item AMG-DD seeks to reduce communication cost by
+\begin{itemize}
+\item Enabling more independent computation in between communications
+\item Trading moderately more computation for significantly less communication
+\end{itemize}
+\end{itemize}
+\end{block}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{The AMG-DD Algorithm}
+
+% Slide
+\begin{frame}{The AMG-DD Algorithm}
+\begin{block}{Composite Grids}
+\begin{itemize}
+\item Each processor solves a representation of the global problem
+\item Composite grids resemble adaptively refined meshes but are built using an existing AMG hierarchy
+\end{itemize}
+\end{block}
+\centering
+\includegraphics[width=\textwidth]{figures/compGridCreation1D13}
+\end{frame}
+
+% Slide
+% Composite grids are constructed as follows. We first choose a value called the padding, for this example we'll use padding 2. Then starting on the fine grid, add all points withing distance 2 through the stencil of the matrix. Then coarsen that set and add those points on the next level to the composite grid. Now simply repeat this process all the way down.
+\begin{frame}{The AMG-DD Algorithm}
+\begin{block}{}
+Composite grid creation in 1D with padding 2
+\end{block}
+\vspace{1 cm}
+\only<1>{\includegraphics[width=\textwidth]{figures/compGridCreation1D3}}
+\only<2>{\includegraphics[width=\textwidth]{figures/compGridCreation1D4}}
+\only<3>{\includegraphics[width=\textwidth]{figures/compGridCreation1D5}}
+\only<4>{\includegraphics[width=\textwidth]{figures/compGridCreation1D6}}
+\only<5>{\includegraphics[width=\textwidth]{figures/compGridCreation1D7}}
+\only<6>{\includegraphics[width=\textwidth]{figures/compGridCreation1D8}}
+\only<7>{\includegraphics[width=\textwidth]{figures/compGridCreation1D9}}
+\only<8>{\includegraphics[width=\textwidth]{figures/compGridCreation1D10}}
+\only<9>{\includegraphics[width=\textwidth]{figures/compGridCreation1D11}}
+\only<10>{\includegraphics[width=\textwidth]{figures/compGridCreation1D12}}
+\only<11>{\includegraphics[width=\textwidth]{figures/compGridCreation1D13}}
+\end{frame}
+
+% Slide
+\begin{frame}{The AMG-DD Algorithm}
+\begin{block}{Features of the composite grid}
+\begin{itemize}
+\item Covers the entire computational domain
+\item Cycling requires no communication 
+\item Fine resolution in and near the processor subdomain
+\item Goal: composite solution is accurate to the full solution over the processor subdomain
+\end{itemize}
+\end{block}
+
+\end{frame}
+
+% Slide
+\begin{frame}{The AMG-DD Algorithm}
+\begin{block}{AMG-DD pseudo code}
+\begin{itemize}
+\item Setup:
+\begin{itemize}
+\item Generate AMG hierarchy
+\item Form composite grids
+\end{itemize}
+\item Iterate:
+\begin{itemize}
+\item Update fine-grid residual and restrict to all levels (communication)
+\item Each processor obtains updated residual at all composite grid points (communication)
+\item Each processor cycles on the composite grid (no communication)
+\item The global solution is updated by patching together processor subdomains (no communication)
+\end{itemize}
+\end{itemize}
+\end{block}
+
+\end{frame}
+
+%% Slide
+%\begin{frame}{The AMG-DD Algorithm}
+%\begin{block}{Brief details: residual communication}
+%\begin{itemize}
+%\item Proceeds from coarse to fine level
+%\item Communication patterns based on padding
+%\end{itemize}
+%\end{block}
+%
+%\centering
+%\includegraphics[width=0.7\textwidth]{figures/resComm}
+%
+%\hspace{0.5 cm}
+%
+%\tiny{Figure taken from \emph{Algebraic multigrid domain and range decomposition (AMG-DD/AMG-RD)} by Bank, Falgout, Jones, Manteuffel, McCormick, and Ruge.}
+%
+%\end{frame}
+
+% Slide
+\begin{frame}{The AMG-DD Algorithm}
+\begin{block}{Brief details: residual communication}
+\begin{itemize}
+\item Communication on each level moving from coarse to fine
+\item Communication stencils are based on padding
+\item With padding 1, same communication pattern as operator matrix-vector multiplies on each level 
+\end{itemize}
+\end{block}
+
+\end{frame}
+
+% Slide
+\begin{frame}{The AMG-DD Algorithm}
+\begin{block}{Brief details: composite-grid solve}
+\begin{itemize}
+\item Fast adaptive composite (FAC) cycle
+\item Action is equivalent to global cycle with suppressed relaxation
+\end{itemize}
+\end{block}
+
+\centering
+\includegraphics[width=\textwidth]{figures/compGridCreation1D13}
+
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Numerical Results}
+
+% Slide
+\begin{frame}{Numerical Results}
+\begin{block}{Test problems}
+
+\begin{align*}
+-\nabla \cdot K \nabla u &= \mathbf{1}\,, \hspace{1 cm} \Omega \\
+u &= 0\,, \hspace{1 cm} \partial \Omega
+\end{align*}
+
+\begin{itemize}
+\item 3D Poisson: $K = I$ and $\Omega$ is the unit cube
+\item 2D rotated anisotropic diffusion: $\Omega$ is the unit square, $K = Q^TDQ$
+\end{itemize}
+
+\begin{align*}
+Q &= \begin{bmatrix}
+\cos(\theta) & \sin(\theta) \\
+-\sin(\theta) & \cos(\theta)
+\end{bmatrix}
+&
+D &= \begin{bmatrix}
+1 & 0\\
+0 & \epsilon
+\end{bmatrix}
+\end{align*}
+with $\theta=\pi/8$ and $\epsilon=0.001$
+\end{block}
+
+
+\end{frame}
+
+% Slide
+\begin{frame}{Numerical Results}
+\begin{block}{Parameters}
+\begin{itemize}
+\item Implementation on top of BoomerAMG in hypre
+\item AMG best-practices parameters:
+\begin{itemize}
+   \item Coarsening: HMIS
+   \item Interpolation: extended + i
+\end{itemize}
+\item AMG-DD parameters:
+\begin{itemize}
+   \item Padding
+   \item Number of FAC cycles
+\end{itemize}
+\item Problem setup:
+\begin{itemize}
+   \item 256 processors
+   \item 12,000 or 18,000 degrees of freedom per processor
+\end{itemize}
+\end{itemize}
+\end{block}
+
+\end{frame}
+
+% Slide
+\begin{frame}{Numerical Results}
+\begin{block}{Padding}
+Larger padding yields:
+\begin{itemize}
+   \item Better accuracy to the global problem
+   \item Larger composite grids
+   \item More communication and computation
+\end{itemize}
+\end{block}
+
+\centering
+\vspace{0.5 cm}
+\includegraphics[height=0.3\textwidth]{figures/resConvPadProb0}
+\includegraphics[height=0.3\textwidth]{figures/resConvPadProb2}
+
+\end{frame}
+
+%% Slide
+%\begin{frame}{Numerical Results}
+%\begin{block}{Padding}
+%Larger padding yields:
+%\begin{itemize}
+%   \item Better accuracy to the global problem
+%   \item Larger composite grids
+%   \item More communication and computation
+%\end{itemize}
+%\end{block}
+%
+%\centering
+%\vspace{0.5 cm}
+%\includegraphics[height=0.3\textwidth]{figures/gridSizePadProb0}
+%\includegraphics[height=0.3\textwidth]{figures/gridSizePadProb2}
+%
+%\end{frame}
+%
+%% Slide
+%\begin{frame}{Numerical Results}
+%\begin{block}{Padding}
+%Larger padding yields:
+%\begin{itemize}
+%   \item Better accuracy to the global problem
+%   \item Larger composite grids
+%   \item More communication and computation
+%\end{itemize}
+%\end{block}
+%
+%\centering
+%\vspace{0.5 cm}
+%\includegraphics[height=0.3\textwidth]{figures/solveNumMessagesByLevel0}
+%\includegraphics[height=0.3\textwidth]{figures/solveNumMessagesByLevel2}
+%
+%\end{frame}
+%
+%% Slide
+%\begin{frame}{Numerical Results}
+%\begin{block}{Padding}
+%Larger padding yields:
+%\begin{itemize}
+%   \item Better accuracy to the global problem
+%   \item Larger composite grids
+%   \item More communication and computation
+%\end{itemize}
+%\end{block}
+%
+%\centering
+%\vspace{0.5 cm}
+%\includegraphics[height=0.3\textwidth]{figures/solveVolumeByLevel0}
+%\includegraphics[height=0.3\textwidth]{figures/solveVolumeByLevel2}
+%
+%\end{frame}
+
+% Slide
+\begin{frame}{Numerical Results}
+\begin{block}{Padding}
+Accuracy per cost:
+\begin{itemize}
+   \item Computation
+   \item Communication (number of messages and volume)
+\end{itemize}
+\end{block}
+
+\centering
+\vspace{0.5 cm}
+\includegraphics[height=0.3\textwidth]{figures/resConvByComputation0}
+\includegraphics[height=0.3\textwidth]{figures/resConvByComputation2}
+
+\end{frame}
+
+% Slide
+\begin{frame}{Numerical Results}
+\begin{block}{Padding}
+Accuracy per cost:
+\begin{itemize}
+   \item Computation
+   \item Communication (number of messages and volume)
+\end{itemize}
+\end{block}
+
+\centering
+\vspace{0.5 cm}
+\includegraphics[height=0.3\textwidth]{figures/resConvByNumMessages0}
+\includegraphics[height=0.3\textwidth]{figures/resConvByNumMessages2}
+
+\end{frame}
+
+% Slide
+\begin{frame}{Numerical Results}
+\begin{block}{Padding}
+Accuracy per cost:
+\begin{itemize}
+   \item Computation
+   \item Communication (number of messages and volume)
+\end{itemize}
+\end{block}
+
+\centering
+\vspace{0.5 cm}
+\includegraphics[height=0.3\textwidth]{figures/resConvByVolume0}
+\includegraphics[height=0.3\textwidth]{figures/resConvByVolume2}
+
+\end{frame}
+
+% Slide
+\begin{frame}{Numerical Results}
+\begin{block}{FAC cycles}
+More FAC cycles yield:
+\begin{itemize}
+   \item Better accuracy to the composite solution
+   \item More computation
+\end{itemize}
+\end{block}
+
+\centering
+\vspace{0.5 cm}
+\includegraphics[height=0.3\textwidth]{figures/resConvFACProb0}
+\includegraphics[height=0.3\textwidth]{figures/resConvFACProb2}
+
+\end{frame}
+
+% Slide
+\begin{frame}{Numerical Results}
+\begin{block}{FAC cycles}
+Accuracy per cost:
+\begin{itemize}
+   \item Computation
+   \item More FAC cycles incur no additional communication
+\end{itemize}
+\end{block}
+
+\centering
+\vspace{0.5 cm}
+\includegraphics[height=0.3\textwidth]{figures/resConvByComputationFAC0}
+\includegraphics[height=0.3\textwidth]{figures/resConvByComputationFAC2}
+
+\end{frame}
+
+% Slide
+\begin{frame}{Numerical Results}
+%\begin{block}{Additional considerations}
+%\begin{itemize}
+%\item Recall that communication is most expensive on coarser grids
+%\item Finer grids contribute most to storage and computation overhead
+%\item Can start AMG-DD on a coarser level:
+%\begin{itemize}
+%   \item Significantly reduces overhead 
+%   \item Retains most of the communication reduction
+%\end{itemize}
+%\end{itemize}
+%\end{block}
+
+
+\begin{block}{Hybrid AMG-DD}
+\begin{itemize}
+\item Recall that communication is most expensive on coarser grids
+\item Finer grids contribute most to storage and computation overhead
+\item Can start AMG-DD on a coarser level:
+\begin{itemize}
+   \item Significantly reduces overhead 
+   \item Retains most of the communication reduction
+\end{itemize}
+\end{itemize}
+\end{block}
+
+\begin{block}{Weak scaling}
+\begin{itemize}
+\item 42,000 of 30,500 degrees or freedom per processor up to 4,096 processors
+\item Padding 1
+\end{itemize}
+\end{block}
+
+\end{frame}
+
+% Slide
+\begin{frame}{Numerical Results}
+\begin{block}{Computation/storage overhead}
+\begin{itemize}
+\item Overhead grows slowly with number of processors
+\item Use of hybrid AMG-DD can limit overhead
+\end{itemize}
+\end{block}
+
+\centering
+\vspace{0.5 cm}
+\includegraphics[height=0.3\textwidth]{figures/gridSizeWeakProb0N40000}
+\includegraphics[height=0.3\textwidth]{figures/gridSizeWeakProb2N10000}
+
+\end{frame}
+
+% Slide
+\begin{frame}{Numerical Results}
+\begin{block}{Number of messages}
+\begin{itemize}
+\item Number of messages remains small compared to AMG 
+\item Hybrid AMG-DD retains most of the reduction in number of messages
+\end{itemize}
+\end{block}
+
+\centering
+\vspace{0.5 cm}
+\includegraphics[height=0.3\textwidth]{figures/solveNumMessagesWeakProb0N40000}
+\includegraphics[height=0.3\textwidth]{figures/solveNumMessagesWeakProb2N10000}
+
+\end{frame}
+
+% Slide
+\begin{frame}{Numerical Results}
+\begin{block}{Communication volume}
+\begin{itemize}
+\item Communication volume grows  slowly with number of processors
+\item Hybrid AMG-DD sends almost as much volume as AMG 
+\end{itemize}
+\end{block}
+
+\centering
+\vspace{0.5 cm}
+\includegraphics[height=0.3\textwidth]{figures/solveVolumeWeakProb0N40000}
+\includegraphics[height=0.3\textwidth]{figures/solveVolumeWeakProb2N10000}
+
+\end{frame}
+
+%% Slide
+%\begin{frame}{Numerical Results}
+%\begin{block}{Computing regime}
+%\begin{itemize}
+%\item AMG-DD has been tested up to 4,096 CPUs
+%\item Regime is compute-limited
+%\end{itemize}
+%\end{block}
+%
+%\centering
+%\vspace{0.5 cm}
+%\includegraphics[height=0.3\textwidth]{figures/AspmvTimeByLevelProb0N40000}
+%\includegraphics[height=0.3\textwidth]{figures/AspmvTimeByLevelProb2N10000}
+%
+%\end{frame}
+%
+%% Slide
+%\begin{frame}{Numerical Results}
+%\begin{block}{Computing regime}
+%\begin{itemize}
+%\item GPU clusters present a more communication-limited environment
+%\item AMG-DD can provide speedup even for small number of GPUs
+%\item 4 GPUs with 250,000 degrees of freedom per GPU
+%\end{itemize}
+%\end{block}
+%
+%\centering
+%\vspace{0.5 cm}
+%\includegraphics[height=0.3\textwidth]{figures/AspmvTimeByLevel_gpu_P4}
+%
+%\end{frame}
+
+% Slide
+\begin{frame}{Numerical Results}
+\begin{block}{Timing runs on CPUs}
+\begin{itemize}
+\item AMG-DD has been tested up to 4,096 CPUs
+\item Regime is compute-limited
+\item AMG-DD will not provide speedup in a compute-limited regime
+\end{itemize}
+\end{block}
+
+\begin{block}{Timing runs on GPUs}
+\begin{itemize}
+\item GPU clusters present a more communication-limited environment
+\item AMG-DD can provide speedup even for small number of GPUs
+\end{itemize}
+\end{block}
+
+\end{frame}
+
+% Slide
+\begin{frame}{Numerical Results}
+\begin{block}{Computing regime}
+\begin{itemize}
+\item 4 GPUs with 250,000 degrees of freedom per GPU
+   \item Computation is relatively much cheaper
+   \item AMG-DD with 2 FAC cycles provides greatest speedup
+\end{itemize}
+\end{block}
+
+\centering
+\vspace{0.5 cm}
+\includegraphics[height=0.3\textwidth]{figures/resConvByTime_gpu_N100}
+
+\end{frame}
+
+
+
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Conclusions}
+
+% Slide
+\begin{frame}{Conclusions}
+\begin{block}{Conclusions}
+\begin{itemize}
+\item The cost of communication is a significant bottleneck for future scalability of AMG
+\item AMG-DD is a promising low-communication alternative to AMG
+\item AMG-DD achieves:
+\begin{itemize}
+\item Small storage and computation overhead compared to AMG
+\item Similar or better convergence per iteration compared to AMG
+\item Large reduction in both number of messages and communication volume compared to AMG
+\item Better accuracy per communication cost than AMG
+\item Demonstrated speedup in the right computational regime
+\end{itemize}
+\end{itemize}
+\end{block}
+\end{frame}
+
+% Slide
+\begin{frame}{Conclusions}
+\begin{block}{Future work}
+\begin{itemize}
+\item Run timing runs on larger GPU clusters
+\item Use of stronger smoothers such as tridiagonal solvers
+\item Use of mixed precision
+\item Communication hiding and asynchronous AMG-DD
+\item AMG-DD for non-symmetric problems
+\item Application of a DD-like algorithm to multigrid reduction in time (MGRIT)
+\end{itemize}
+\end{block}
+
+\end{frame}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
