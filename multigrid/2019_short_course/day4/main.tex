@@ -412,6 +412,121 @@ where $\mathbf{\epsilon}_j$ is the $j^{th}$ canonical basis vector
 
 % Slide
 \begin{frame}{Non-symmetric problems}
+\begin{block}{Issues with non-symmetric problems}
+\bit
+\item Non-symmetric: $A\neq A^T$
+\item Many useful properties are no longer available:
+\bit
+\item There is no $A$-norm (or inner product)
+\item Eigenvalues of $A$ are no longer positive real numbers
+\item Eigenvectors are no longer an orthonormal basis
+\eit
+\eit
+\end{block}
+\end{frame}
+
+% Slide
+\begin{frame}{Non-symmetric problems}
+\begin{block}{PDE examples of non-symmetric problems}
+\bit
+\item Advection-diffusion-reaction:
+\eq{
+   -\nabla\cdot K \nabla u + \mathbf{b}\cdot\nabla u + \sigma u = f
+}
+\item Advection term, $\mathbf{b}\cdot\nabla u$, is non-symmetric
+\item Discretization yields non-symmetric matrices
+\eit
+\end{block}
+\end{frame}
+
+% Slide
+\begin{frame}{Non-symmetric problems}
+\begin{block}{Simple approach}
+\bit
+\item Simplest approach is to apply AMG as is
+\item Coarsen and build interpolation as usual, and set $R = P^T$, $A^c = P^TAP$
+\item Choice of $R = P^T$ is somewhat arbitrary in this case
+\bit
+\item No $A$-norm, so no notion of optimal $A$-norm correction
+\item $A$ is non-symmetric, so $P^TAP$ is also non-symmetric
+\eit
+\eit
+\end{block}
+\end{frame}
+
+% Slide
+\begin{frame}{Non-symmetric problems}
+\begin{block}{Simple approach}
+\bit
+\item TODO: Claim AMG works well for diffusion dominated problems
+\item TODO: Claim AMG works well for simple grid-aligned advection
+\item Strong connections (and thus coarsening) along characteristics
+\item More complex flows (recirculating flows) are problematic
+\eit
+\end{block}
+\end{frame}
+
+% Slide
+\begin{frame}{Non-symmetric problems}
+\begin{block}{Tailoring AMG to non-symmetric problems}
+\bit
+\item Southworth, Manteuffel, and Ruge. Nonsymmetric Algebraic Multigrid Based on Local Approximate Ideal Restriction ($l$AIR). SIAM J. Sci. Comp. 2018.
+\item Main ideas: 
+\bit
+\item Do not choose $R = P^T$
+\item Focus on building a good restriction operator (instead of interpolation)
+\item Coarse-grid correction tries to eliminate error at C-points
+\eit
+\eit
+\end{block}
+\end{frame}
+
+% Slide
+\begin{frame}{Non-symmetric problems}
+\begin{block}{Ideal interpolation and restriction}
+\bit
+\item Given matrix $A$ and a C/F splitting, consider the following block form of $A$:
+\eq{
+   A = \begin{bmatrix}
+   A_{ff} & A_{fc} \\
+   A_{cf} & A_{cc}
+   \end{bmatrix}
+}
+\item Entries in $A_{ff}$ are F-point to F-point connections 
+\item Entries in $A_{fc}$ are F-point to C-point connections 
+\item Entries in $A_{cf}$ are C-point to F-point connections 
+\item Entries in $A_{cc}$ are C-point to C-point connections 
+\eit
+\end{block}
+\end{frame}
+
+% Slide
+\begin{frame}{Non-symmetric problems}
+\begin{block}{Ideal interpolation and restriction}
+\bit
+\item Let interpolation and restriction take the following block forms:
+\eq{
+   P = \begin{bmatrix}
+   W \\
+   I
+   \end{bmatrix}
+   & &
+   R = \begin{bmatrix}
+   Z & I 
+   \end{bmatrix}  
+}
+\item Identity blocks, $I$, are over the C-points
+\eit
+\end{block}
+\end{frame}
+
+
+
+
+
+
+% Slide
+\begin{frame}{Non-symmetric problems}
 \begin{block}{}
 \bit
 \item 
@@ -427,6 +542,15 @@ where $\mathbf{\epsilon}_j$ is the $j^{th}$ canonical basis vector
 \eit
 \end{block}
 \end{frame}
+
+% Examples of non-symmetric problems from PDEs: convection diffusion, transport
+% Example (or in exercises) convection diffusion problem where I change the balance of diffusion and convection terms to show where AMG convergence breaks down
+% Sometimes can just apply AMG as is to non-symmetric (when?)
+% No A-norm
+% Use special R != P^T. No longer need to preserve symmetry of coarse grid op
+% Restriction based on A^T (column-space), interp based on A (row-space)
+% A*A norm
+% Brief discussion of Aff Afc Acf Acc ordering of A, def of ideal P, def of ideal R
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -519,7 +643,8 @@ where $\mathbf{\epsilon}_j$ is the $j^{th}$ canonical basis vector
 \begin{frame}{Graph problems}
 \begin{block}{LAMG coarsening}
 \bit
-\item 
+\item LAMG employs two different coarsening methods: low-degree elimination and aggregation
+\item Low-degree elimination:
 \eit
 \end{block}
 \end{frame}
