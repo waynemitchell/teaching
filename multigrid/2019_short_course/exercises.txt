@@ -60,6 +60,7 @@ Anisotropic diffusion
 Day 3:
 
 amgCoarsening:
+use PyAMG... use MY fork of PyAMG because it has standard interpolation???
 
 
 amg:
@@ -70,5 +71,15 @@ Day 4:
 
 Newton:
 Visualize Newton's method for nonlinear problems. Show case where you start outside basin of attraction.
+Can I code up a simple FAS scheme for a non-linear problem?
+
+Non-symmetric:
+Maybe switch to hypre/mfem for these examples... that way you can use AIR, have more control over problem, etc.
 
 
+Graphs:
+Check if LAMG is available somewhere? Or Aly's Julia code?
+
+
+Day 5:
+Also maybe want to go to hypre for examples here? PyAMG does have HMIS coarsening, etc...

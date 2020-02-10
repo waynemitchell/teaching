@@ -145,13 +145,12 @@
 \begin{frame}{Motivation}
 \begin{block}{Seminal papers}
 \bit
-\item TODO
+\item Brandt, McCormick, and Ruge. Algebraic Multigrid (AMG) for Sparse Matrix Equations. Sparsity and Its Applications. 1984.
+\item Brandt. Algebraic Multigrid Theory: The Symmetric Case. Applied Mathematics and Computation. 1986.
+\item Ruge and St\"uben. Algebraic Multigrid (AMG). Multigrid Methods. 1987.
 \eit
 \end{block}
 \end{frame}
-
-% Unstructured grids, etc. that are difficult for GMG
-% "Black box" but not really
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -190,7 +189,6 @@
 \item Low-frequency evecs are damped by coarse-grid correction
 \eit
 \end{block}
-TODO figure of high and low freq err
 \end{frame}
 
 % Slide
@@ -218,8 +216,6 @@ TODO figure of high and low freq err
 \eit
 \end{block}
 \end{frame}
-
-% TODO? Example where algebraicly smooth error is geometrically oscillatory. 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -313,7 +309,7 @@ TODO figure of high and low freq err
 \eit
 \end{block}
 \begin{center}
-\includegraphics[width=0.5\textwidth]{../figures/interpStencil} % TODO fix all figures
+\includegraphics[width=0.3\textwidth]{../figures/interpStencil}
 \end{center}
 \end{frame}
 
@@ -326,7 +322,7 @@ TODO figure of high and low freq err
 \eit
 \end{block}
 \begin{center}
-\includegraphics[width=0.5\textwidth]{../figures/interpStencilCpts}
+\includegraphics[width=0.3\textwidth]{../figures/interpStencilCpts}
 \end{center}
 \end{frame}
 
@@ -339,7 +335,7 @@ TODO figure of high and low freq err
 \eit
 \end{block}
 \begin{center}
-\includegraphics[width=0.5\textwidth]{../figures/interpStencilWeakF}
+\includegraphics[width=0.3\textwidth]{../figures/interpStencilWeakF}
 \end{center}
 \end{frame}
 
@@ -352,7 +348,7 @@ TODO figure of high and low freq err
 }
 \end{block}
 \begin{center}
-\includegraphics[width=0.5\textwidth]{../figures/interpStencilWeakF}
+\includegraphics[width=0.3\textwidth]{../figures/interpStencilWeakF}
 \end{center}
 \end{frame}
 
@@ -365,7 +361,7 @@ TODO figure of high and low freq err
 \eit
 \end{block}
 \begin{center}
-\includegraphics[width=0.5\textwidth]{../figures/interpStencilStrongF}
+\includegraphics[width=0.3\textwidth]{../figures/interpStencilStrongF}
 \end{center}
 \end{frame}
 
@@ -377,7 +373,7 @@ TODO figure of high and low freq err
 }
 \end{block}
 \begin{center}
-\includegraphics[width=0.5\textwidth]{../figures/interpStencilStrongF}
+\includegraphics[width=0.3\textwidth]{../figures/interpStencilStrongF}
 \end{center}
 \end{frame}
 
@@ -390,7 +386,7 @@ TODO figure of high and low freq err
 }
 \end{block}
 \begin{center}
-\includegraphics[width=0.5\textwidth]{../figures/interpStencilStrongF}
+\includegraphics[width=0.3\textwidth]{../figures/interpStencilStrongF}
 \end{center}
 \end{frame}
 
@@ -405,7 +401,7 @@ TODO figure of high and low freq err
 \eit
 \end{block}
 \begin{center}
-\includegraphics[width=0.5\textwidth]{../figures/interpStencilCpts}
+\includegraphics[width=0.3\textwidth]{../figures/interpStencilCpts}
 \end{center}
 \end{frame}
 
@@ -423,7 +419,7 @@ TODO figure of high and low freq err
 \eit
 \end{block}
 \begin{center}
-\includegraphics[width=0.5\textwidth]{../figures/interpStencilCpts}
+\includegraphics[width=0.3\textwidth]{../figures/interpStencilCpts}
 \end{center}
 \end{frame}
 
@@ -589,8 +585,6 @@ TODO figure of high and low freq err
 \end{block}
 \end{frame}
 
-% TODO (or in exercises) Show that you naturally get semicoarsening for grid-aligned anisotropy
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{Coarse grid operators}
@@ -654,10 +648,10 @@ TODO figure of high and low freq err
 \begin{frame}{Coarse grid operators}
 \begin{block}{Optimality in $A$-norm}
 \bit
-\item Can check that $\pi = (P(P^TAP)^{-1}P^TA)$ is an $A$-orthogonal projection
+\item Can check that $\pi_A = (P(P^TAP)^{-1}P^TA)$ is an $A$-orthogonal projection
 \bit
-\item \pi^2 = \pi
-\itme \langle \pi \mathbf{x}, A \mathbf{y} \rangle = \langle \mathbf{x}, A \pi\mathbf{y} \rangle
+\item $\pi_A^2 = \pi_A$
+\item $\langle \pi_A \mathbf{x}, A \mathbf{y} \rangle = \langle \mathbf{x}, A \pi_A\mathbf{y} \rangle$
 \eit
 \item Thus, the AMG coarse-grid correction is the best possible correction (in the $A$-norm) in the range of $P$
 \eq{
@@ -669,11 +663,11 @@ TODO figure of high and low freq err
 
 % Slide
 \begin{frame}{Coarse grid operators}
-\begin{block}{Coase grid operator complexity}
+\begin{block}{Coarse grid operator complexity}
 \bit
 \item Cost of GMG is straightforward to determine
 \item Cost of AMG is less predictable
-\item Coarse-grid operators tend to 
+\item Coarse-grid operators tend to fill in
 \eit
 \end{block}
 \end{frame}
