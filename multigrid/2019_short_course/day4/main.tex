@@ -412,6 +412,20 @@ where $\mathbf{\epsilon}_j$ is the $j^{th}$ canonical basis vector
 
 % Slide
 \begin{frame}{Non-symmetric problems}
+\begin{block}{PDE examples of non-symmetric problems}
+\bit
+\item Advection-diffusion-reaction:
+\eq{
+   -\nabla\cdot K \nabla u + \mathbf{b}\cdot\nabla u + \sigma u = f
+}
+\item Advection term, $\mathbf{b}\cdot\nabla u$, is non-symmetric
+\item Discretization yields non-symmetric matrices
+\eit
+\end{block}
+\end{frame}
+
+% Slide
+\begin{frame}{Non-symmetric problems}
 \begin{block}{Issues with non-symmetric problems}
 \bit
 \item Non-symmetric: $A\neq A^T$
@@ -427,14 +441,17 @@ where $\mathbf{\epsilon}_j$ is the $j^{th}$ canonical basis vector
 
 % Slide
 \begin{frame}{Non-symmetric problems}
-\begin{block}{PDE examples of non-symmetric problems}
+\begin{block}{Issues with non-symmetric problems}
 \bit
-\item Advection-diffusion-reaction:
+\item Recall the coarse-grid correction error propagation matrix:
 \eq{
-   -\nabla\cdot K \nabla u + \mathbf{b}\cdot\nabla u + \sigma u = f
+   \mathbf{e} \leftarrow (I - P(RAP)^{-1}RA)\mathbf{e} = \Pi\mathbf{e}
 }
-\item Advection term, $\mathbf{b}\cdot\nabla u$, is non-symmetric
-\item Discretization yields non-symmetric matrices
+\item In the symmetric case, $\Pi$ is an $A$-orthogonal projection, implying $||\Pi||_A=1$
+\item Coarse-grid correction can't "blow up" the error in the $A$-norm
+\item Not so in the non-symmetric case! 
+\item There is no $A$-norm, and generally $||\Pi||>1$ in any given norm
+\item Need to retain $||\Pi|| = O(1)$ independent of grid size to get a "stable" coarse-grid correction
 \eit
 \end{block}
 \end{frame}
@@ -458,10 +475,10 @@ where $\mathbf{\epsilon}_j$ is the $j^{th}$ canonical basis vector
 \begin{frame}{Non-symmetric problems}
 \begin{block}{Simple approach}
 \bit
-\item TODO: Claim AMG works well for diffusion dominated problems
-\item TODO: Claim AMG works well for simple grid-aligned advection
+\item Classical AMG works well for diffusion dominated problems and for simple grid-aligned advection
 \item Strong connections (and thus coarsening) along characteristics
 \item More complex flows (recirculating flows) are problematic
+\item Classical AMG is generally not robust for non-symmetric problems
 \eit
 \end{block}
 \end{frame}
@@ -492,18 +509,6 @@ where $\mathbf{\epsilon}_j$ is the $j^{th}$ canonical basis vector
    A_{cf} & A_{cc}
    \end{bmatrix}
 }
-\item Entries in $A_{ff}$ are F-point to F-point connections 
-\item Entries in $A_{fc}$ are F-point to C-point connections 
-\item Entries in $A_{cf}$ are C-point to F-point connections 
-\item Entries in $A_{cc}$ are C-point to C-point connections 
-\eit
-\end{block}
-\end{frame}
-
-% Slide
-\begin{frame}{Non-symmetric problems}
-\begin{block}{Ideal interpolation and restriction}
-\bit
 \item Let interpolation and restriction take the following block forms:
 \eq{
    P = \begin{bmatrix}
@@ -520,38 +525,44 @@ where $\mathbf{\epsilon}_j$ is the $j^{th}$ canonical basis vector
 \end{block}
 \end{frame}
 
-
-
-
-
-
 % Slide
 \begin{frame}{Non-symmetric problems}
-\begin{block}{}
+\begin{block}{Ideal interpolation and restriction}
 \bit
-\item 
+\item Basic multigrid principle: relaxation effectively reduces F-point residuals
+\eq{
+   \mathbf{r}_f = A_{ff}\mathbf{e}_f + A_{fc}\mathbf{e}_c \approx \mathbf{0} \\
+   \Rightarrow \mathbf{e}_f = -A_{ff}^{-1}A_{fc}\mathbf{e}_c
+}
+\item The "ideal" interpolation operator exactly represents such error (i.e. places it in the range of interpolation):
+\eq{
+   P_{\text{ideal}} = \begin{bmatrix}
+   -A_{ff}^{-1}A_{fc} \\
+   I
+   \end{bmatrix}
+}
+\item Ideal interpolation is never obtained in practice
+\item Guides development of AMG algorithms that somehow attempt sparse approximation of ideal interpolation
 \eit
 \end{block}
 \end{frame}
 
 % Slide
 \begin{frame}{Non-symmetric problems}
-\begin{block}{}
+\begin{block}{Ideal interpolation and restriction}
 \bit
-\item 
+\item Ideal interpolation focuses on eliminating residuals at F-points
+\item Ideal restriction focuses on eliminating error at C-points
+\eq{
+   R_{\text{ideal}} = \begin{bmatrix}
+   -A_{cf}A_{ff}^{-1} & I 
+   \end{bmatrix}  
+}
+\item Again, can design AMG algorithms based on sparse approximation of ideal restriction
+\item Very effective when combined with effective F-relaxation
 \eit
 \end{block}
 \end{frame}
-
-% Examples of non-symmetric problems from PDEs: convection diffusion, transport
-% Example (or in exercises) convection diffusion problem where I change the balance of diffusion and convection terms to show where AMG convergence breaks down
-% Sometimes can just apply AMG as is to non-symmetric (when?)
-% No A-norm
-% Use special R != P^T. No longer need to preserve symmetry of coarse grid op
-% Restriction based on A^T (column-space), interp based on A (row-space)
-% A*A norm
-% Brief discussion of Aff Afc Acf Acc ordering of A, def of ideal P, def of ideal R
-
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -576,7 +587,7 @@ where $\mathbf{\epsilon}_j$ is the $j^{th}$ canonical basis vector
 \begin{block}{Graph applications}
 \bit
 \item PDEs on graphs
-\item Electical networks/power grids
+\item Electrical networks/power grids
 \item Machine learning regression and classification problems
 \item Social networks
 \item Internet web page graphs and page rank
@@ -624,45 +635,129 @@ where $\mathbf{\epsilon}_j$ is the $j^{th}$ canonical basis vector
 \bit
 \item Livne and Brandt. Lean algebraic multigrid (LAMG): fast graph Laplacian linear solver. SIAM J. Sci. Comp. 2012.
 \item AMG algorithm tailored to solving graph Laplacians for undirected graphs
-\item ``Lean" because it utilizes simple components designed to optimize cycle efficiency
+\item "Lean" because it utilizes simple components designed to optimize cycle efficiency
 \bit
-\item Full rank $P$ with unit row sums
-\item Galerkin coarse-grid operators, $A^c = P^TAP$, are also graph Laplacians
 \item Gauss-Seidel relaxation
-\item Simpler, piecewise constant interpolation (limits complexity of constructing $P$ and fill-in of coarse operators) (similar to unsmoothed aggregation)
-\item Lean methodology
-\item Low-degree elimination
-\item Affinity
-\item Energy-corrected aggregation
-\eit
-\eit
-\end{block}
-\end{frame}
-
-% Slide
-\begin{frame}{Graph problems}
-\begin{block}{LAMG coarsening}
-\bit
-\item LAMG employs two different coarsening methods: low-degree elimination and aggregation
-\item Low-degree elimination:
-\eit
-\end{block}
-\end{frame}
-
-% Slide
-\begin{frame}{Graph problems}
-\begin{block}{}
-\bit
+\item Two different coarsening procedures: low-degree elimination and aggregation
+\item Piecewise constant interpolation
+\item Galerkin coarse-grid operators, $A^c = P^TAP$, are also graph Laplacians
 \item 
 \eit
+\eit
 \end{block}
 \end{frame}
 
-% Main emphasis: there's other stuff besides PDEs to solve and you can adapt AMG to such environments
-% Don't need too much detail on LAMG
-% Need to spend some time just explaining what graph laplacians are, why we care, similarities and differences to meshed and discretized PDEs
-% Would like to plug Aly's work: just mention her major contrubitions
+% Slide
+\begin{frame}{Graph problems}
+\begin{block}{LAMG coarsening: low-degree elimination}
+\bit
+\item Low-degree elimination attempts to remove many nodes while adding few edges
+\item Removed nodes form an independent set with degree $\leq 4$
+\item When a node is eliminated, its neighbors are connected
+\item Elimination can be repeated until there are no more (or few) low-degree nodes
+\eit
+\end{block}
+\begin{center}
+\includegraphics[width=0.4\textwidth]{../figures/lowDegreeElim}
+\end{center}
+\tiny{Figure credit: Livne and Brandt.}
+\end{frame}
 
+% Slide
+\begin{frame}{Graph problems}
+\begin{block}{LAMG coarsening: aggregation}
+\bit
+\item Aggregate nodes using "affinity," a modified strength of connection measure based on smoothed test vectors
+\item Generate test vectors via a few Gauss-Seidel iterations on $A\mathbf{u} = \mathbf{0}$ with random initial guess
+\item Two nodes $i$ and $j$ are highly correlated (and should be aggregated) if $u_i\approx u_j$ for all test vectors, $\mathbf{u}$
+\item Approach is similar to adaptive AMG techniques
+\eit
+\end{block}
+\end{frame}
+
+% Slide
+\begin{frame}{Graph problems}
+\begin{block}{LAMG interpolation}
+\bit
+\item Interpolation, $P$, is simply piecewise constant interpolation over aggregates
+\item This is basically an unsmoothed aggregation AMG approach
+\item Sparse $P$ limits fill in for Galerkin coarse-grid operators, $A^c = P^TAP$
+\item Reduced interpolation accuracy is overcome through "energy-corrected coarsening" (a modification of the restricted)
+\eit
+\end{block}
+\end{frame}
+
+% Slide
+\begin{frame}{Graph problems}
+\begin{block}{Extensions to LAMG: the signed case}
+\bit
+\item LAMG was designed for unsigned (all positive edge weights) and undirected (symmetric edges) graphs
+\item Signed undirected graphs may have negative edge weights
+\item Graph Laplacian has some positive off-diagonals 
+\item Diagonal of the graph Laplacian is the total weight, $a_{i,i} = \sum_k |w_{i,k}|$, so $A$ is still diagonally dominant
+\eit
+\end{block}
+\end{frame}
+
+% Slide
+\begin{frame}{Graph problems}
+\begin{block}{Extensions to LAMG: the signed case}
+\bit
+\item Fox, Manteuffel, and Sanders. Numerical Methods for Gremban's Expansion of Signed Graphs. SIAM J. Sci. Comp. 2017.
+\item Convert a signed graph Laplacian into an unsigned Laplacian and apply LAMG
+\item Gremban's expansion: If $S$ is diagonally dominant with positive diagonal, then $S$ may be decomposed as $S = M + P$, where $M$ is a diagonally dominant Z-matrix and $P$ has non-negative entries and zero diagonal. Then the Gremban expansion matrix, $G$, defined by
+\eq{
+   G = \begin{bmatrix}
+   M & -P \\
+   -P & M
+   \end{bmatrix}
+}
+is a diagonally dominant Z-matrix.
+\eit
+\end{block}
+\end{frame}
+
+% Slide
+\begin{frame}{Graph problems}
+\begin{block}{Extensions to LAMG: the signed case}
+\bit
+\item If $S$ is a signed graph Laplacian, then the resulting $G$ is an unsigned graph Laplacian
+\item Solution to $S\mathbf{x} = \mathbf{b}$ can be obtained from the solution to $G\mathbf{w} = \mathbf{z}$
+\eq{
+   G\mathbf{w} = \begin{bmatrix}
+   M & -P \\
+   -P & M
+   \end{bmatrix}\begin{bmatrix}
+   \mathbf{x} \\
+   \mathbf{x}
+   \end{bmatrix}
+   = \begin{bmatrix}
+   S\mathbf{x} \\
+   -S\mathbf{x}
+   \end{bmatrix}
+   = \begin{bmatrix}
+   \mathbf{b} \\
+   -\mathbf{b}
+   \end{bmatrix} = \mathbf{z}
+}
+\item Can also relate the eigenvectors and singular vectors of $S$ and $G$
+\item Can apply LAMG successfully to $G$ to solve signed graph problems!
+\eit
+\end{block}
+\end{frame}
+
+% Slide
+\begin{frame}{Graph problems}
+\begin{block}{Extensions to LAMG: the undirected case}
+\bit
+\item Fox and Manteuffel. Algebraic multigrid for directed graph Laplacian linear systems (NS-LAMG). Numer. Lin. Alg. Appl. 2018.
+\item Undirected graph Laplacians are no longer symmetric
+\item Modification of low-degree elimination for the non-symmetric case
+\item Modified algorithm to find appropriate test vectors for defining interpolation
+\item Coarse grid operators, $A_c = RAP$, where $R\neq P^T$
+\eit
+\end{block}
+\end{frame}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
