@@ -54,6 +54,7 @@
 \end{block}
 \end{frame}
 
+% Slide
 \begin{frame}
 \frametitle{\bf Outline:}
 \framesubtitle{~~}
@@ -64,6 +65,7 @@
 
 \section{Development of \emph{hypre}}
 
+% Slide
 \begin{frame}{Development of \emph{hypre}}
 \begin{block}{Parallel AMG}
 \bit
@@ -74,6 +76,7 @@
 \end{block}
 \end{frame}
 
+% Slide
 \begin{frame}{Development of \emph{hypre}}
 \begin{block}{Parallel AMG}
 \bit
@@ -83,6 +86,7 @@
 \end{block}
 \end{frame}
 
+% Slide
 \begin{frame}{Development of \emph{hypre}}
 \begin{block}{AMG coarsening in parallel}
 \bit
@@ -91,40 +95,342 @@
 \item First attempts at parallel coarsening:
 \bit
 \item Cleary-Luby-Jones-Plassman (CLJP) coarsening
-\item Parallel Ruge-St\"uben coarsening
 \item Falgout coarsening
 \eit
 \eit
 \end{block}
 \end{frame}
 
+% Slide
 \begin{frame}{Development of \emph{hypre}}
 \begin{block}{CLJP coarsening}
 \bit
 \item Based on parallel graph partitioning
+\item Entirely parallel, same coarse grids independent of number of processors
+\item Admits fine-grained parallelism
 \eit
 \end{block}
 \end{frame}
 
+% Slide
 \begin{frame}{Development of \emph{hypre}}
-\begin{block}{}
+\begin{block}{CLJP coarsening}
 \bit
+\item Recall strength of connection (SoC): $i$ strongly depends on $j$ if $-a_{i,j} \geq \theta\max_{k\neq i}(-a_{i,k})$
+\item Define the SoC matrix, $S$, by $s_{i,j} = 1$ if $i$ strongly depends on $j$
+\item Rows, $S_i$, of $S$ define the set of points that strongly influence $i$
+\item Columns, $S_i^T$, of $S$ define the set of points that $i$ strongly influences
+\eit
+\end{block}
+\end{frame}
+
+% Slide
+\begin{frame}{Development of \emph{hypre}}
+\begin{block}{CLJP coarsening}
+\bit
+\item Define a measure $w(i) = |S_i^T| + \sigma(i)$, where $\sigma(i)$ is a random number in $(0,1)$
+\item Select a set $D$, where $i\in D$ if $w(i)>w(j)$ for all $j\in S_i\cup S_i^T$
+\item Note that $D$ is an independent set that can be selected in parallel
+\item Consider the following heuristics:
+\bit
+\item C-points are not interpolated from neighbors, so neighbors are less valuable as potential C-points
+\item If C-point $i$ influences points $j$ and $k$, and $j$ influences $k$, then $j$ is less valuable as a C-point
+\eit
+\eit
+\end{block}
+\end{frame}
+
+% Slide
+\begin{frame}{Development of \emph{hypre}}
+\begin{algorithm}[H]
+\caption{CLJP coarsening}
+\begin{algorithmic}
+\State Select $D = \{i : w(i)>w(j) , \forall j\in S_i\cup S_i^T\}$
+\While{ $D\neq \emptyset$ }
+\State Mark points in $D$ as C-points
+\For{$i\in D$}
+   \State For each $j\in S_i$, decrement $w(j)$ and remove edge $S_{i,j}$
+   \For{$j\in S_i^T$}
+      \State Remove edge $S_{j,i}$
+      \For{$k\in S_j^T : S_{k,i}\neq 0$}
+         \State Decrement $w(j)$ and remove edge $S_{k,j}$
+      \EndFor
+   \EndFor
+\EndFor
+\State Select new $D$ (communicate weights at processor boundaries)
+\EndWhile
+\end{algorithmic}
+\end{algorithm}
+\end{frame}
+
+% Slide
+\begin{frame}{Development of \emph{hypre}}
+\only<1>{
+\begin{center}
+\includegraphics[width=0.5\textwidth]{../figures/cljpCoarsening1}
+\end{center}}
+\only<2>{
+\begin{center}
+\includegraphics[width=0.5\textwidth]{../figures/cljpCoarsening2}
+\end{center}}
+\only<3>{
+\begin{center}
+\includegraphics[width=0.5\textwidth]{../figures/cljpCoarsening3}
+\end{center}}
+\only<4>{
+\begin{center}
+\includegraphics[width=0.5\textwidth]{../figures/cljpCoarsening4}
+\end{center}}
+\only<5>{
+\begin{center}
+\includegraphics[width=0.5\textwidth]{../figures/cljpCoarsening5}
+\end{center}}
+\only<6>{
+\begin{center}
+\includegraphics[width=0.5\textwidth]{../figures/cljpCoarsening6}
+\end{center}}
+\only<7>{
+\begin{center}
+\includegraphics[width=0.5\textwidth]{../figures/cljpCoarsening7}
+\end{center}}
+\tiny{Slide credit: Rob Falgout, Copper Mountain 2019 Parallel Multigrid Tutorial}
+\end{frame}
+
+% Slide
+\begin{frame}{Development of \emph{hypre}}
+\begin{block}{CLJP coarsening}
+\bit
+\item Pros and cons of CLJP coarsening:
+\bit
+\item Entirely parallel
+\item No issues proceeding to arbitrarily coarse grids (some processor drop out)
+\item Tends to produce more C-points than classical coarsening 
+\item Higher computation and communication complexity on coarse grids
+\eit
+\eit
+\end{block}
+\end{frame}
+
+% Slide
+\begin{frame}{Development of \emph{hypre}}
+\begin{block}{Falgout coarsening}
+\bit
+\item A more natural extension of classical AMG coarsening in parallel is simply to allow each processor to independently run the Ruge-St\"uben coloring algorithm
+\item This yields conflicts at processor boundaries that need to be resolved
+\item Several strategies, for this, but the most successful method is to combine Ruge-St\"uben coarsening and CLJP coarsening
+\item Result is Falgout coarsening
+\eit
+\end{block}
+\end{frame}
+
+% Slide
+\begin{frame}{Development of \emph{hypre}}
+\begin{block}{Falgout coarsening}
+\bit
+\item Start by running both passes of Ruge-St\"uben coloring algorithm independently on each processor
+\item User resulting \emph{interior} C-points as initial set, $D$
+\item Run CLJP to finish assigning boundary points
+\item Results in much nicer coarsenings on processor interiors 
+\eit
+\end{block}
+\end{frame}
+
+% Slide
+\begin{frame}{Development of \emph{hypre}}
+\begin{block}{PMIS coarsening}
+\bit
+\item Especially for 3D problems coarse-grid complexity is an issue for Falgout coarsening
+\item Recall the heuristics used for classical AMG coarsening:
+\begin{enumerate}
+\item For each F-point, $i$, every point $j\in S_i$ is either in $C_i$ or strongly depends on at least one point in $C_i$
+\item The set of C-points is a maximal subset such that no C-point strongly depends on another C-point.
+\end{enumerate}
+\item Classical coarsening (as well as Falgout and CLJP) strongly enforce heuristic 1
 \item 
 \eit
 \end{block}
 \end{frame}
 
+% Slide
+\begin{frame}{Development of \emph{hypre}}
+\begin{block}{PMIS coarsening}
+\bit
+\item De Sterck, Yang, and Heys. Reducing complexity in parallel algebraic multigrid preconditioners. SIAM J. Mat. Anal. Appl. 2006.
+\item Proposed a variation on CLJP that enforces a relaxed version of heuristic 1:
+\begin{enumerate}
+\item Each F-point must strongly depend on at least one C-point
+\end{enumerate}
+\item Parallel modified independent set (PMIS) algorithm
+\eit
+\end{block}
+\end{frame}
 
-% References:
-% Henson and Yang. BoomerAMG: A parallel algebraic multigrid solver and preconditioner. Appl. Num. Math. 2002.
-% De Sterck, Yang, and Heys. Reducing complexity in parallel algebraic multigrid preconditioners. SIAM J. Mat. Anal. Appl. 2006.
-% De Sterck, Falgout, Nolting, and Yang. Distance-Two Interpolation for Parallel Algebraic Multigrid. Numer. Lin. Alg. Appl. 2007.
-% Baker, Falgout, Kolev, and Yang. Multigrid smoothers for ultra-parallel computing. SIAM J. Sci. Comp. 2011.
+% Slide
+\begin{frame}{Development of \emph{hypre}}
+\begin{algorithm}[H]
+\caption{CLJP coarsening}
+\begin{algorithmic}
+\State Select $D = \{i : w(i)>w(j) , \forall j\in S_i\cup S_i^T\}$
+\While{ $D\neq \emptyset$ }
+\State Mark points in $D$ as C-points
+\For{$i\in D$}
+   \State Mark points in $S_i^T$ as F-points (communication)
+\EndFor
+\State Select new $D$ from unmarked points
+\EndWhile
+\end{algorithmic}
+\end{algorithm}
+\end{frame}
 
+% Slide
+\begin{frame}{Development of \emph{hypre}}
+\only<1>{
+\begin{center}
+\includegraphics[width=0.5\textwidth]{../figures/pmisCoarsening1}
+\end{center}}
+\only<2>{
+\begin{center}
+\includegraphics[width=0.5\textwidth]{../figures/pmisCoarsening2}
+\end{center}}
+\only<3>{
+\begin{center}
+\includegraphics[width=0.5\textwidth]{../figures/pmisCoarsening3}
+\end{center}}
+\only<4>{
+\begin{center}
+\includegraphics[width=0.5\textwidth]{../figures/pmisCoarsening4}
+\end{center}}
+\only<5>{
+\begin{center}
+\includegraphics[width=0.5\textwidth]{../figures/pmisCoarsening5}
+\end{center}}
+\tiny{Slide credit: Rob Falgout, Copper Mountain 2019 Parallel Multigrid Tutorial}
+\end{frame}
 
-% Include stuff on AmgX? At least a mention...
+% Slide
+\begin{frame}{Development of \emph{hypre}}
+\begin{block}{PMIS coarsening}
+\bit
+\item Comparing PMIS to CLJP
+\bit
+\item Mark C-point neighbors immediately as F-points
+\item Initial weights are not updated
+\item Satisfies the relaxed heuristic 1, \emph{not} the original
+\eit
+\eit
+\end{block}
+\end{frame}
 
-% Briefly include other ideas for reducing complexity: additive variants, non-galerkin sparsification, etc.
+% Slide
+\begin{frame}{Development of \emph{hypre}}
+\begin{block}{HMIS coarsening}
+\bit
+\item Similar to Falgout coarsening, can do a hybrid of PMIS and classical coarsening: HMIS
+\item Only do first pass of classical coloring algorithm (don't enforce heuristic 1)
+\item Again, yields nicer coarsening over processors interiors
+\item HMIS is the current default in \emph{hypre}
+\eit
+\end{block}
+\end{frame}
+
+% Slide
+\begin{frame}{Development of \emph{hypre}}
+\begin{center}
+\includegraphics[width=0.5\textwidth]{../figures/parCoarsening}
+\end{center}
+\tiny{Figure credit: De Sterck, Yang, and Heys. Reducing complexity in parallel algebraic multigrid preconditioners. SIAM J. Mat. Anal. Appl. 2006.}
+\end{frame}
+
+% Slide
+\begin{frame}{Development of \emph{hypre}}
+\begin{block}{Long-distance interpolation}
+\bit
+\item PMIS and HMIS can lead to one-sided or no interpolation to some F-points
+\item Sparser coarse grids and poor interpolation can yield degraded convergence
+\item Need to modify interpolation to better suit sparser coarsenings: long-distance interpolation
+\eit
+\end{block}
+\end{frame}
+
+% Slide
+\begin{frame}{Development of \emph{hypre}}
+\begin{block}{Long-distance interpolation}
+\bit
+\item De Sterck, Falgout, Nolting, and Yang. Distance-Two Interpolation for Parallel Algebraic Multigrid. Numer. Lin. Alg. Appl. 2007.
+\item Interpolatory sets may include C-points that at distance 2
+\item Larger interpolation stencils again increases coarse-grid complexity
+\item Can truncate interpolation stencils
+\bit
+\item Points with one-sided or no interpolation still get the extended stencils
+\item Points with large interpolatory sets truncated to reasonable size
+\eit
+\eit
+\end{block}
+\end{frame}
+
+% Slide
+\begin{frame}{Development of \emph{hypre}}
+\begin{block}{Modern best practices AMG}
+\bit
+\item Overall improvement in time to solution
+\eit
+\begin{center}
+\includegraphics[width=0.5\textwidth]{../figures/hypreImprovements1}
+\includegraphics[width=0.45\textwidth]{../figures/hypreImprovements2}
+\end{center}
+\end{block}
+\tiny{Figure credit: De Sterck, Falgout, Nolting, and Yang. Distance-Two Interpolation for Parallel Algebraic Multigrid. Numer. Lin. Alg. Appl. 2007.}
+\end{frame}
+
+% Slide
+\begin{frame}{Development of \emph{hypre}}
+\begin{block}{Parallel AMG smoothers}
+\bit
+\item Baker, Falgout, Kolev, and Yang. Multigrid smoothers for ultra-parallel computing. SIAM J. Sci. Comp. 2011.
+\eit
+\end{block}
+\end{frame}
+
+% Slide
+\begin{frame}{Development of \emph{hypre}}
+\begin{block}{Parallel AMG takeaways}
+\bit
+\item Scaling AMG to very large problem sizes on parallel machines is non-trivial
+\item Major problem is controlling coarse-grid complexity while retaining good convergence
+\item Sparser coarse grids and interpolation stencils lead to lower complexity but can degrade convergence
+\item Always trying to optimize accuracy per cost
+\eit
+\end{block}
+\end{frame}
+
+% Slide
+\begin{frame}{Development of \emph{hypre}}
+\begin{block}{Fine-grained parallelism for AMG}
+\bit
+\item Naumov, Arsaev, Castonguay, Cohen, Demouth, Eaton, Layton, Markovskiy, Reguly, Sakharnykh, Sellappan, and Strzodka. AMGX: a library for GPU accelerated algebraic multigrid and preconditioned iterative methods.
+\item AMGX successfully demonstrated speedup over \emph{hypre}
+\item GPU implementation in \emph{hyrpe} is a work in progress
+\item Coarsening: CLJP, PMIS
+\item Smoothers: modified Jacobi, Chebyshev, colored Gauss-Seidel
+\item Everything else is mat-vecs or triple-matrix products
+\eit
+\end{block}
+\end{frame}
+
+% Slide
+\begin{frame}{Development of \emph{hypre}}
+\begin{block}{More radical approaches}
+\bit
+\item Ongoing research exploring novel ways to improve AMG's parallel performance:
+\bit
+\item Sparsification through non-Galerkin coarse grids
+\item Additive and asynchronous multigrid methods
+\item Algebraic multigrid domain decomposition (AMG-DD)
+\eit
+\eit
+\end{block}
+\end{frame}
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -636,10 +942,6 @@ Accuracy per cost:
 
 \end{frame}
 
-
-
-% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Conclusions}
 
 % Slide
 \begin{frame}{Conclusions}
