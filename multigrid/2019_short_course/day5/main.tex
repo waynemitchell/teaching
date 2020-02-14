@@ -409,7 +409,7 @@
 \bit
 \item Naumov, Arsaev, Castonguay, Cohen, Demouth, Eaton, Layton, Markovskiy, Reguly, Sakharnykh, Sellappan, and Strzodka. AMGX: a library for GPU accelerated algebraic multigrid and preconditioned iterative methods.
 \item AMGX successfully demonstrated speedup over \emph{hypre}
-\item GPU implementation in \emph{hyrpe} is a work in progress
+\item GPU implementation in \emph{hypre} is a work in progress
 \item Coarsening: CLJP, PMIS
 \item Smoothers: modified Jacobi, Chebyshev, colored Gauss-Seidel
 \item Everything else is mat-vecs or triple-matrix products
@@ -437,52 +437,59 @@
 \section{Algebraic multigrid domain decomposition (AMG-DD)}
 
 % Slide 
-\begin{frame}{MotivationAlgebraic multigrid domain decomposition (AMG-DD)}
+\begin{frame}{AMG-DD}
 \begin{block}{Communication-limited AMG}
-\begin{itemize}
-\item Even current best practices can still yield severely communication-limited AMG algorithms due to coarse-grid complexity
-\end{itemize}
+\bit
+\item Current best practices can still yield severely communication-limited AMG algorithms
+\eit
 \end{block}
-
 \begin{center}
 \includegraphics[width=0.7\textwidth]{../figures/nonGalerkinFigure}
 \end{center}
 \tiny{Figure credit: Bienz, Falgout, Gropp, Olson, and Schroder. Reducing parallel communication in algebraic multigrid through sparsification. SIAM J. Sci. Comp. 2016.}
-
 \end{frame}
 
 % Slide 
 % This is where AMG-DD comes in.
-\begin{frame}{Algebraic multigrid domain decomposition (AMG-DD)}
+\begin{frame}{AMG-DD}
 \begin{block}{Algebraic multigrid domain decomposition (AMG-DD)}
-\begin{itemize}
+\bit
 \item Rather than continue modifying components of AMG, design a new algorithm altogether
-\item Algebraic multigrid domain decomposition (AMG-DD) utilizes 
+\item Algebraic multigrid domain decomposition (AMG-DD) builds on top of an existing AMG hierarchy
 \item AMG-DD seeks to reduce communication cost by
-\begin{itemize}
+\bit
 \item Enabling more independent computation in between communications
 \item Trading moderately more computation for significantly less communication
-\end{itemize}
-\end{itemize}
+\eit
+\eit
 \end{block}
-
 \end{frame}
 
 % Slide
-\begin{frame}{Algebraic multigrid domain decomposition (AMG-DD)}
+\begin{frame}{AMG-DD}
 \begin{block}{Composite Grids}
-\begin{itemize}
-\item Each processor solves a representation of the global problem
+\bit
+\item Standard parallelization of AMG: each processor owns a subdomain on the fine grid and all coarse-grid points underneath
+\eit
+\end{block}
+\centering
+\includegraphics[width=\textwidth]{../figures/compGridCreation1D1}
+\end{frame}
+
+% Slide
+\begin{frame}{AMG-DD}
+\begin{block}{Composite Grids}
+\bit
+\item Each processor stores a composite representation of the global problem
 \item Composite grids resemble adaptively refined meshes but are built using an existing AMG hierarchy
-\end{itemize}
+\eit
 \end{block}
 \centering
 \includegraphics[width=\textwidth]{../figures/compGridCreation1D13}
 \end{frame}
 
 % Slide
-% Composite grids are constructed as follows. We first choose a value called the padding, for this example we'll use padding 2. Then starting on the fine grid, add all points withing distance 2 through the stencil of the matrix. Then coarsen that set and add those points on the next level to the composite grid. Now simply repeat this process all the way down.
-\begin{frame}{Algebraic multigrid domain decomposition (AMG-DD)}
+\begin{frame}{AMG-DD}
 \begin{block}{}
 Composite grid creation in 1D with padding 2
 \end{block}
@@ -501,97 +508,148 @@ Composite grid creation in 1D with padding 2
 \end{frame}
 
 % Slide
-\begin{frame}{Algebraic multigrid domain decomposition (AMG-DD)}
+\begin{frame}{AMG-DD}
 \begin{block}{Features of the composite grid}
-\begin{itemize}
+\bit
 \item Covers the entire computational domain
 \item Cycling requires no communication 
 \item Fine resolution in and near the processor subdomain
 \item Goal: composite solution is accurate to the full solution over the processor subdomain
-\end{itemize}
+\eit
 \end{block}
-
 \end{frame}
 
 % Slide
-\begin{frame}{Algebraic multigrid domain decomposition (AMG-DD)}
+\begin{frame}{AMG-DD}
 \begin{block}{AMG-DD pseudo code}
-\begin{itemize}
+\bit
 \item Setup:
-\begin{itemize}
+\bit
 \item Generate AMG hierarchy
 \item Form composite grids
-\end{itemize}
+\eit
 \item Iterate:
-\begin{itemize}
+\bit
 \item Update fine-grid residual and restrict to all levels (communication)
 \item Each processor obtains updated residual at all composite grid points (communication)
 \item Each processor cycles on the composite grid (no communication)
 \item The global solution is updated by patching together processor subdomains (no communication)
-\end{itemize}
-\end{itemize}
+\eit
+\eit
 \end{block}
-
-\end{frame}
-
-%% Slide
-%\begin{frame}{Algebraic multigrid domain decomposition (AMG-DD)}
-%\begin{block}{Brief details: residual communication}
-%\begin{itemize}
-%\item Proceeds from coarse to fine level
-%\item Communication patterns based on padding
-%\end{itemize}
-%\end{block}
-%
-%\centering
-%\includegraphics[width=0.7\textwidth]{../figures/resComm}
-%
-%\hspace{0.5 cm}
-%
-%\tiny{Figure taken from \emph{Algebraic multigrid domain and range decomposition (AMG-DD/AMG-RD)} by Bank, Falgout, Jones, Manteuffel, McCormick, and Ruge.}
-%
-%\end{frame}
-
-% Slide
-\begin{frame}{Algebraic multigrid domain decomposition (AMG-DD)}
-\begin{block}{Brief details: residual communication}
-\begin{itemize}
-\item Communication on each level moving from coarse to fine
-\item Communication stencils are based on padding
-\item With padding 1, same communication pattern as operator matrix-vector multiplies on each level 
-\end{itemize}
-\end{block}
-
 \end{frame}
 
 % Slide
-\begin{frame}{Algebraic multigrid domain decomposition (AMG-DD)}
-\begin{block}{Brief details: composite-grid solve}
-\begin{itemize}
-\item Fast adaptive composite (FAC) cycle
-\item Action is equivalent to global cycle with suppressed relaxation
-\end{itemize}
+\begin{frame}{AMG-DD}
+\begin{block}{Composite grid residual communication}
+\bit
+\item Proceeds from coarse to fine level
+\item Communication patterns based on padding
+\item Communicated data is halo data plus a corresponding sub-composite grid
+\eit
 \end{block}
+\begin{center}
+\includegraphics[width=0.7\textwidth]{../figures/resComm}
+\end{center}
+\tiny{Figure credit: Bank, Falgout, Jones, Manteuffel, McCormick, and Ruge. Algebraic multigrid domain and range decomposition (AMG-DD/AMG-RD). SIAM J. Sci. Comp. 2015.}
+\end{frame}
 
+% Slide
+\begin{frame}{AMG-DD}
+\begin{block}{Composite grid residual communication}
+\bit
+\item Communicating the full $\Psi \cup \Psi_c$ sets sends some redundant data
+\item Redundancy can be avoided in implementation
+\item Communication stencils determined by padding
+\item With padding 1, same communication pattern as mat-vec
+\item Communicate halo data (with depth equal to the padding) plus some coarser points
+\item With padding 1, slightly more data communicated vs. mat-vec
+\eit
+\end{block}
+\end{frame}
+
+% Slide
+\begin{frame}{AMG-DD}
+\begin{block}{Composite-grid solve: AlgFAC cycles}
+\bit
+\item Fast adaptive composite (FAC) cycle were developed for geometric multigrid with variable grid refinement
+\item Action is equivalent to cyclingd with suppressed relaxation
+\eit
+\end{block}
 \centering
 \includegraphics[width=\textwidth]{../figures/compGridCreation1D13}
-
 \end{frame}
 
 % Slide
-\begin{frame}{Algebraic multigrid domain decomposition (AMG-DD)}
-\begin{block}{Test problems}
+\begin{frame}{AMG-DD}
+\begin{block}{AlgFAC cycle relaxation}
+\bit
+\item Relaxation is simple
+\item Need one layer of "ghost" points
+\eit
+\end{block}
+\centering
+\includegraphics[width=0.8\textwidth]{../figures/D}
+\end{frame}
 
+% Slide
+\begin{frame}{AMG-DD}
+\begin{block}{AlgFAC cycle interpolation}
+\bit
+\item Interpolation requires some assumptions
+\item Need correct interpolation to real points plus the extra ghost layer required for relaxation
+\eit
+\end{block}
+\centering
+\includegraphics[width=0.8\textwidth]{../figures/PD}
+\end{frame}
+
+% Slide
+\begin{frame}{AMG-DD}
+\begin{block}{AlgFAC cycle restriction}
+\bit
+\item Restriction is complicated
+\item Can't do standard inter-grid transfer for restriction
+\eit
+\end{block}
+\centering
+\includegraphics[width=0.8\textwidth]{../figures/restrictionStencils}
+\end{frame}
+
+% Slide
+\begin{frame}{AMG-DD}
+\begin{block}{AlgFAC cycle restriction}
+\bit
+\item Observe that away from fine-grid relaxation, can replace restriction with residual recalculation
+\item Can rewrite restriction such that only the affect of relaxation is transfered between grids
+\eit
+\end{block}
+\centering
+\includegraphics[width=0.8\textwidth]{../figures/restrictionStencils}
+\end{frame}
+
+% Slide
+\begin{frame}{AMG-DD}
+\begin{block}{AlgFAC cycle}
+\bit
+\item In the end, AlgFAC requires only one layer of ghost points
+\item Need only solution values (no right-hand side) at ghost points
+\item No need to communicate any info at ghost points
+\eit
+\end{block}
+\end{frame}
+
+% Slide
+\begin{frame}{AMG-DD}
+\begin{block}{Test problems}
 \begin{align*}
 -\nabla \cdot K \nabla u &= \mathbf{1}\,, \hspace{1 cm} \Omega \\
 u &= 0\,, \hspace{1 cm} \partial \Omega
 \end{align*}
-
-\begin{itemize}
+\bit
 \item 3D Poisson: $K = I$ and $\Omega$ is the unit cube
 \item 2D rotated anisotropic diffusion: $\Omega$ is the unit square, $K = Q^TDQ$
-\end{itemize}
-
+\eit
 \begin{align*}
 Q &= \begin{bmatrix}
 \cos(\theta) & \sin(\theta) \\
@@ -605,377 +663,264 @@ D &= \begin{bmatrix}
 \end{align*}
 with $\theta=\pi/8$ and $\epsilon=0.001$
 \end{block}
-
-
 \end{frame}
 
 % Slide
-\begin{frame}{Algebraic multigrid domain decomposition (AMG-DD)}
+\begin{frame}{AMG-DD}
 \begin{block}{Parameters}
-\begin{itemize}
+\bit
 \item Implementation on top of BoomerAMG in hypre
 \item AMG best-practices parameters:
-\begin{itemize}
+\bit
    \item Coarsening: HMIS
    \item Interpolation: extended + i
-\end{itemize}
+\eit
 \item AMG-DD parameters:
-\begin{itemize}
+\bit
    \item Padding
    \item Number of FAC cycles
-\end{itemize}
+\eit
 \item Problem setup:
-\begin{itemize}
+\bit
    \item 256 processors
-   \item 12,000 or 18,000 degrees of freedom per processor
-\end{itemize}
-\end{itemize}
+   \item 100,000 degrees of freedom per processor
+\eit
+\eit
 \end{block}
-
 \end{frame}
 
 % Slide
-\begin{frame}{Algebraic multigrid domain decomposition (AMG-DD)}
+\begin{frame}{AMG-DD}
 \begin{block}{Padding}
 Larger padding yields:
-\begin{itemize}
+\bit
    \item Better accuracy to the global problem
    \item Larger composite grids
    \item More communication and computation
-\end{itemize}
+\eit
+\end{block}
+\centering
+\vspace{0.5 cm}
+\includegraphics[height=0.3\textwidth]{../figures/resConvPadByIterationProblem1}
+\includegraphics[height=0.3\textwidth]{../figures/resConvPadByIterationProblem2}
+\end{frame}
+
+% Slide
+\begin{frame}{AMG-DD}
+\begin{block}{Padding}
+Larger padding yields:
+\bit
+  \item Better accuracy to the global problem
+  \item Larger composite grids
+  \item More communication and computation
+\eit
+\end{block}
+\centering
+\vspace{0.5 cm}
+\includegraphics[height=0.3\textwidth]{../figures/gridSizePadProb0}
+\includegraphics[height=0.3\textwidth]{../figures/gridSizePadProb2}
+\end{frame}
+
+% Slide
+\begin{frame}{AMG-DD}
+\begin{block}{Padding}
+Larger padding yields:
+\bit
+  \item Better accuracy to the global problem
+  \item Larger composite grids
+  \item More communication and computation
+\eit
+\end{block}
+\centering
+\vspace{0.5 cm}
+% \includegraphics[height=0.3\textwidth]{../figures/solveNumMessagesByLevel0}
+% \includegraphics[height=0.3\textwidth]{../figures/solveNumMessagesByLevel2}
+\end{frame}
+
+% Slide
+\begin{frame}{AMG-DD}
+\begin{block}{Padding}
+Larger padding yields:
+\bit
+  \item Better accuracy to the global problem
+  \item Larger composite grids
+  \item More communication and computation
+\eit
 \end{block}
 
 \centering
 \vspace{0.5 cm}
-% \includegraphics[height=0.3\textwidth]{../figures/resConvPadProb0}
-% \includegraphics[height=0.3\textwidth]{../figures/resConvPadProb2}
+% \includegraphics[height=0.3\textwidth]{../figures/solveVolumeByLevel0}
+% \includegraphics[height=0.3\textwidth]{../figures/solveVolumeByLevel2}
 
 \end{frame}
 
-%% Slide
-%\begin{frame}{Algebraic multigrid domain decomposition (AMG-DD)}
-%\begin{block}{Padding}
-%Larger padding yields:
-%\begin{itemize}
-%   \item Better accuracy to the global problem
-%   \item Larger composite grids
-%   \item More communication and computation
-%\end{itemize}
-%\end{block}
-%
-%\centering
-%\vspace{0.5 cm}
-%\includegraphics[height=0.3\textwidth]{../figures/gridSizePadProb0}
-%\includegraphics[height=0.3\textwidth]{../figures/gridSizePadProb2}
-%
-%\end{frame}
-%
-%% Slide
-%\begin{frame}{Algebraic multigrid domain decomposition (AMG-DD)}
-%\begin{block}{Padding}
-%Larger padding yields:
-%\begin{itemize}
-%   \item Better accuracy to the global problem
-%   \item Larger composite grids
-%   \item More communication and computation
-%\end{itemize}
-%\end{block}
-%
-%\centering
-%\vspace{0.5 cm}
-%\includegraphics[height=0.3\textwidth]{../figures/solveNumMessagesByLevel0}
-%\includegraphics[height=0.3\textwidth]{../figures/solveNumMessagesByLevel2}
-%
-%\end{frame}
-%
-%% Slide
-%\begin{frame}{Algebraic multigrid domain decomposition (AMG-DD)}
-%\begin{block}{Padding}
-%Larger padding yields:
-%\begin{itemize}
-%   \item Better accuracy to the global problem
-%   \item Larger composite grids
-%   \item More communication and computation
-%\end{itemize}
-%\end{block}
-%
-%\centering
-%\vspace{0.5 cm}
-%\includegraphics[height=0.3\textwidth]{../figures/solveVolumeByLevel0}
-%\includegraphics[height=0.3\textwidth]{../figures/solveVolumeByLevel2}
-%
-%\end{frame}
-
 % Slide
-\begin{frame}{Algebraic multigrid domain decomposition (AMG-DD)}
+\begin{frame}{AMG-DD}
 \begin{block}{Padding}
 Accuracy per cost:
-\begin{itemize}
+\bit
    \item Computation
    \item Communication (number of messages and volume)
-\end{itemize}
+\eit
 \end{block}
-
 \centering
 \vspace{0.5 cm}
 % \includegraphics[height=0.3\textwidth]{../figures/resConvByComputation0}
 % \includegraphics[height=0.3\textwidth]{../figures/resConvByComputation2}
-
 \end{frame}
 
 % Slide
-\begin{frame}{Algebraic multigrid domain decomposition (AMG-DD)}
+\begin{frame}{AMG-DD}
 \begin{block}{Padding}
 Accuracy per cost:
-\begin{itemize}
+\bit
    \item Computation
    \item Communication (number of messages and volume)
-\end{itemize}
+\eit
 \end{block}
-
 \centering
 \vspace{0.5 cm}
 % \includegraphics[height=0.3\textwidth]{../figures/resConvByNumMessages0}
 % \includegraphics[height=0.3\textwidth]{../figures/resConvByNumMessages2}
-
 \end{frame}
 
 % Slide
-\begin{frame}{Algebraic multigrid domain decomposition (AMG-DD)}
+\begin{frame}{AMG-DD}
 \begin{block}{Padding}
 Accuracy per cost:
-\begin{itemize}
+\bit
    \item Computation
    \item Communication (number of messages and volume)
-\end{itemize}
+\eit
 \end{block}
-
 \centering
 \vspace{0.5 cm}
 % \includegraphics[height=0.3\textwidth]{../figures/resConvByVolume0}
 % \includegraphics[height=0.3\textwidth]{../figures/resConvByVolume2}
-
 \end{frame}
 
 % Slide
-\begin{frame}{Algebraic multigrid domain decomposition (AMG-DD)}
+\begin{frame}{AMG-DD}
 \begin{block}{FAC cycles}
 More FAC cycles yield:
-\begin{itemize}
+\bit
    \item Better accuracy to the composite solution
    \item More computation
-\end{itemize}
+\eit
 \end{block}
-
 \centering
 \vspace{0.5 cm}
 % \includegraphics[height=0.3\textwidth]{../figures/resConvFACProb0}
 % \includegraphics[height=0.3\textwidth]{../figures/resConvFACProb2}
-
 \end{frame}
 
 % Slide
-\begin{frame}{Algebraic multigrid domain decomposition (AMG-DD)}
+\begin{frame}{AMG-DD}
 \begin{block}{FAC cycles}
 Accuracy per cost:
-\begin{itemize}
+\bit
    \item Computation
    \item More FAC cycles incur no additional communication
-\end{itemize}
+\eit
 \end{block}
-
 \centering
 \vspace{0.5 cm}
 % \includegraphics[height=0.3\textwidth]{../figures/resConvByComputationFAC0}
 % \includegraphics[height=0.3\textwidth]{../figures/resConvByComputationFAC2}
-
 \end{frame}
 
 % Slide
-\begin{frame}{Algebraic multigrid domain decomposition (AMG-DD)}
-%\begin{block}{Additional considerations}
-%\begin{itemize}
-%\item Recall that communication is most expensive on coarser grids
-%\item Finer grids contribute most to storage and computation overhead
-%\item Can start AMG-DD on a coarser level:
-%\begin{itemize}
-%   \item Significantly reduces overhead 
-%   \item Retains most of the communication reduction
-%\end{itemize}
-%\end{itemize}
-%\end{block}
-
-
-\begin{block}{Hybrid AMG-DD}
-\begin{itemize}
-\item Recall that communication is most expensive on coarser grids
-\item Finer grids contribute most to storage and computation overhead
-\item Can start AMG-DD on a coarser level:
-\begin{itemize}
-   \item Significantly reduces overhead 
-   \item Retains most of the communication reduction
-\end{itemize}
-\end{itemize}
-\end{block}
-
-\begin{block}{Weak scaling}
-\begin{itemize}
-\item 42,000 of 30,500 degrees or freedom per processor up to 4,096 processors
-\item Padding 1
-\end{itemize}
-\end{block}
-
-\end{frame}
-
-% Slide
-\begin{frame}{Algebraic multigrid domain decomposition (AMG-DD)}
-\begin{block}{Computation/storage overhead}
-\begin{itemize}
-\item Overhead grows slowly with number of processors
-\item Use of hybrid AMG-DD can limit overhead
-\end{itemize}
-\end{block}
-
-\centering
-\vspace{0.5 cm}
-% \includegraphics[height=0.3\textwidth]{../figures/gridSizeWeakProb0N40000}
-% \includegraphics[height=0.3\textwidth]{../figures/gridSizeWeakProb2N10000}
-
-\end{frame}
-
-% Slide
-\begin{frame}{Algebraic multigrid domain decomposition (AMG-DD)}
+\begin{frame}{AMG-DD}
 \begin{block}{Number of messages}
-\begin{itemize}
+\bit
 \item Number of messages remains small compared to AMG 
 \item Hybrid AMG-DD retains most of the reduction in number of messages
-\end{itemize}
+\eit
 \end{block}
-
 \centering
 \vspace{0.5 cm}
 % \includegraphics[height=0.3\textwidth]{../figures/solveNumMessagesWeakProb0N40000}
 % \includegraphics[height=0.3\textwidth]{../figures/solveNumMessagesWeakProb2N10000}
-
 \end{frame}
 
 % Slide
-\begin{frame}{Algebraic multigrid domain decomposition (AMG-DD)}
+\begin{frame}{AMG-DD}
 \begin{block}{Communication volume}
-\begin{itemize}
+\bit
 \item Communication volume grows  slowly with number of processors
 \item Hybrid AMG-DD sends almost as much volume as AMG 
-\end{itemize}
+\eit
 \end{block}
-
 \centering
 \vspace{0.5 cm}
 % \includegraphics[height=0.3\textwidth]{../figures/solveVolumeWeakProb0N40000}
 % \includegraphics[height=0.3\textwidth]{../figures/solveVolumeWeakProb2N10000}
-
 \end{frame}
 
-%% Slide
-%\begin{frame}{Algebraic multigrid domain decomposition (AMG-DD)}
-%\begin{block}{Computing regime}
-%\begin{itemize}
-%\item AMG-DD has been tested up to 4,096 CPUs
-%\item Regime is compute-limited
-%\end{itemize}
-%\end{block}
-%
-%\centering
-%\vspace{0.5 cm}
-%\includegraphics[height=0.3\textwidth]{../figures/AspmvTimeByLevelProb0N40000}
-%\includegraphics[height=0.3\textwidth]{../figures/AspmvTimeByLevelProb2N10000}
-%
-%\end{frame}
-%
-%% Slide
-%\begin{frame}{Algebraic multigrid domain decomposition (AMG-DD)}
-%\begin{block}{Computing regime}
-%\begin{itemize}
-%\item GPU clusters present a more communication-limited environment
-%\item AMG-DD can provide speedup even for small number of GPUs
-%\item 4 GPUs with 250,000 degrees of freedom per GPU
-%\end{itemize}
-%\end{block}
-%
-%\centering
-%\vspace{0.5 cm}
-%\includegraphics[height=0.3\textwidth]{../figures/AspmvTimeByLevel_gpu_P4}
-%
-%\end{frame}
-
 % Slide
-\begin{frame}{Algebraic multigrid domain decomposition (AMG-DD)}
+\begin{frame}{AMG-DD}
 \begin{block}{Timing runs on CPUs}
-\begin{itemize}
+\bit
 \item AMG-DD has been tested up to 4,096 CPUs
 \item Regime is compute-limited
 \item AMG-DD will not provide speedup in a compute-limited regime
-\end{itemize}
+\eit
 \end{block}
-
 \begin{block}{Timing runs on GPUs}
-\begin{itemize}
+\bit
 \item GPU clusters present a more communication-limited environment
 \item AMG-DD can provide speedup even for small number of GPUs
-\end{itemize}
+\eit
 \end{block}
-
 \end{frame}
 
 % Slide
-\begin{frame}{Algebraic multigrid domain decomposition (AMG-DD)}
+\begin{frame}{AMG-DD}
 \begin{block}{Computing regime}
-\begin{itemize}
+\bit
 \item 4 GPUs with 250,000 degrees of freedom per GPU
    \item Computation is relatively much cheaper
    \item AMG-DD with 2 FAC cycles provides greatest speedup
-\end{itemize}
+\eit
 \end{block}
-
 \centering
 \vspace{0.5 cm}
 % \includegraphics[height=0.3\textwidth]{../figures/resConvByTime_gpu_N100}
-
 \end{frame}
 
 
 % Slide
 \begin{frame}{Conclusions}
 \begin{block}{Conclusions}
-\begin{itemize}
+\bit
 \item The cost of communication is a significant bottleneck for future scalability of AMG
 \item AMG-DD is a promising low-communication alternative to AMG
 \item AMG-DD achieves:
-\begin{itemize}
+\bit
 \item Small storage and computation overhead compared to AMG
 \item Similar or better convergence per iteration compared to AMG
 \item Large reduction in both number of messages and communication volume compared to AMG
 \item Better accuracy per communication cost than AMG
 \item Demonstrated speedup in the right computational regime
-\end{itemize}
-\end{itemize}
+\eit
+\eit
 \end{block}
 \end{frame}
 
 % Slide
 \begin{frame}{Conclusions}
 \begin{block}{Future work}
-\begin{itemize}
+\bit
 \item Run timing runs on larger GPU clusters
 \item Use of stronger smoothers such as tridiagonal solvers
 \item Use of mixed precision
 \item Communication hiding and asynchronous AMG-DD
 \item AMG-DD for non-symmetric problems
 \item Application of a DD-like algorithm to multigrid reduction in time (MGRIT)
-\end{itemize}
+\eit
 \end{block}
-
 \end{frame}
-
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
