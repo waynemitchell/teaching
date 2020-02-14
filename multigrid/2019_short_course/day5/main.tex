@@ -670,10 +670,11 @@ with $\theta=\pi/8$ and $\epsilon=0.001$
 \begin{block}{Parameters}
 \bit
 \item Implementation on top of BoomerAMG in hypre
-\item AMG best-practices parameters:
+\item AMG parameters:
 \bit
    \item Coarsening: HMIS
    \item Interpolation: extended + i
+   \item L1 CF Jacobi smoothing
 \eit
 \item AMG-DD parameters:
 \bit
@@ -733,8 +734,8 @@ Larger padding yields:
 \end{block}
 \centering
 \vspace{0.5 cm}
-% \includegraphics[height=0.3\textwidth]{../figures/solveNumMessagesByLevel0}
-% \includegraphics[height=0.3\textwidth]{../figures/solveNumMessagesByLevel2}
+\includegraphics[height=0.3\textwidth]{../figures/solveVolumePadByLevelProblem1}
+\includegraphics[height=0.3\textwidth]{../figures/solveVolumePadByLevelProblem2}
 \end{frame}
 
 % Slide
@@ -750,9 +751,8 @@ Larger padding yields:
 
 \centering
 \vspace{0.5 cm}
-% \includegraphics[height=0.3\textwidth]{../figures/solveVolumeByLevel0}
-% \includegraphics[height=0.3\textwidth]{../figures/solveVolumeByLevel2}
-
+\includegraphics[height=0.3\textwidth]{../figures/solveNumMessagesPadByLevelProblem1}
+\includegraphics[height=0.3\textwidth]{../figures/solveNumMessagesPadByLevelProblem2}
 \end{frame}
 
 % Slide
@@ -766,44 +766,24 @@ Accuracy per cost:
 \end{block}
 \centering
 \vspace{0.5 cm}
-% \includegraphics[height=0.3\textwidth]{../figures/resConvByComputation0}
-% \includegraphics[height=0.3\textwidth]{../figures/resConvByComputation2}
+\only<1>{
+\includegraphics[height=0.3\textwidth]{../figures/resConvPadByComputationProblem1}
+\includegraphics[height=0.3\textwidth]{../figures/resConvPadByComputationProblem2}
+}
+\only<2>{
+\includegraphics[height=0.3\textwidth]{../figures/resConvPadByLatencyProblem1}
+\includegraphics[height=0.3\textwidth]{../figures/resConvPadByLatencyProblem2}
+}
+\only<3>{
+\includegraphics[height=0.3\textwidth]{../figures/resConvPadByVolumeProblem1}
+\includegraphics[height=0.3\textwidth]{../figures/resConvPadByVolumeProblem2}
+}
 \end{frame}
 
 % Slide
 \begin{frame}{AMG-DD}
-\begin{block}{Padding}
-Accuracy per cost:
-\bit
-   \item Computation
-   \item Communication (number of messages and volume)
-\eit
-\end{block}
-\centering
-\vspace{0.5 cm}
-% \includegraphics[height=0.3\textwidth]{../figures/resConvByNumMessages0}
-% \includegraphics[height=0.3\textwidth]{../figures/resConvByNumMessages2}
-\end{frame}
-
-% Slide
-\begin{frame}{AMG-DD}
-\begin{block}{Padding}
-Accuracy per cost:
-\bit
-   \item Computation
-   \item Communication (number of messages and volume)
-\eit
-\end{block}
-\centering
-\vspace{0.5 cm}
-% \includegraphics[height=0.3\textwidth]{../figures/resConvByVolume0}
-% \includegraphics[height=0.3\textwidth]{../figures/resConvByVolume2}
-\end{frame}
-
-% Slide
-\begin{frame}{AMG-DD}
-\begin{block}{FAC cycles}
-More FAC cycles yield:
+\begin{block}{AlgFAC cycles}
+More AlgFAC cycles yield:
 \bit
    \item Better accuracy to the composite solution
    \item More computation
@@ -811,113 +791,105 @@ More FAC cycles yield:
 \end{block}
 \centering
 \vspace{0.5 cm}
-% \includegraphics[height=0.3\textwidth]{../figures/resConvFACProb0}
-% \includegraphics[height=0.3\textwidth]{../figures/resConvFACProb2}
+\includegraphics[height=0.3\textwidth]{../figures/resConvNumFACByIterationProblem1}
+\includegraphics[height=0.3\textwidth]{../figures/resConvNumFACByIterationProblem2}
 \end{frame}
 
 % Slide
 \begin{frame}{AMG-DD}
-\begin{block}{FAC cycles}
+\begin{block}{AlgFAC cycles}
 Accuracy per cost:
 \bit
    \item Computation
-   \item More FAC cycles incur no additional communication
+   \item More AlgFAC cycles incur no additional communication
 \eit
 \end{block}
 \centering
 \vspace{0.5 cm}
-% \includegraphics[height=0.3\textwidth]{../figures/resConvByComputationFAC0}
-% \includegraphics[height=0.3\textwidth]{../figures/resConvByComputationFAC2}
+\includegraphics[height=0.3\textwidth]{../figures/resConvNumFACByComputationProblem1}
+\includegraphics[height=0.3\textwidth]{../figures/resConvNumFACByComputationProblem2}
 \end{frame}
 
 % Slide
 \begin{frame}{AMG-DD}
-\begin{block}{Number of messages}
+\begin{block}{Composite-grid overhead}
 \bit
-\item Number of messages remains small compared to AMG 
-\item Hybrid AMG-DD retains most of the reduction in number of messages
+\item Manageable growth of composite-grid overhead
+\item Measured by relative number of matrix non-zeros
 \eit
 \end{block}
 \centering
 \vspace{0.5 cm}
-% \includegraphics[height=0.3\textwidth]{../figures/solveNumMessagesWeakProb0N40000}
-% \includegraphics[height=0.3\textwidth]{../figures/solveNumMessagesWeakProb2N10000}
+\includegraphics[height=0.3\textwidth]{../figures/gridSizeProblem1}
+\includegraphics[height=0.3\textwidth]{../figures/gridSizeProblem2}
 \end{frame}
 
 % Slide
 \begin{frame}{AMG-DD}
-\begin{block}{Communication volume}
+\begin{block}{Communication reduction}
 \bit
-\item Communication volume grows  slowly with number of processors
-\item Hybrid AMG-DD sends almost as much volume as AMG 
+\item Significant reduction in latency and bandwidth cost
+\item Steady as processor count grows
 \eit
 \end{block}
 \centering
 \vspace{0.5 cm}
-% \includegraphics[height=0.3\textwidth]{../figures/solveVolumeWeakProb0N40000}
-% \includegraphics[height=0.3\textwidth]{../figures/solveVolumeWeakProb2N10000}
+\includegraphics[height=0.3\textwidth]{../figures/solveCommCostProblem1}
+\includegraphics[height=0.3\textwidth]{../figures/solveCommCostProblem2}
 \end{frame}
 
 % Slide
 \begin{frame}{AMG-DD}
-\begin{block}{Timing runs on CPUs}
+\begin{block}{Solve time}
 \bit
-\item AMG-DD has been tested up to 4,096 CPUs
-\item Regime is compute-limited
-\item AMG-DD will not provide speedup in a compute-limited regime
-\eit
-\end{block}
-\begin{block}{Timing runs on GPUs}
-\bit
-\item GPU clusters present a more communication-limited environment
-\item AMG-DD can provide speedup even for small number of GPUs
-\eit
-\end{block}
-\end{frame}
-
-% Slide
-\begin{frame}{AMG-DD}
-\begin{block}{Computing regime}
-\bit
-\item 4 GPUs with 250,000 degrees of freedom per GPU
-   \item Computation is relatively much cheaper
-   \item AMG-DD with 2 FAC cycles provides greatest speedup
+\item Reduction in per-iteration solve time
+\item Faster despite doing more than twice the computation
 \eit
 \end{block}
 \centering
 \vspace{0.5 cm}
-% \includegraphics[height=0.3\textwidth]{../figures/resConvByTime_gpu_N100}
+\includegraphics[height=0.3\textwidth]{../figures/solveTimeProblem1}
+\includegraphics[height=0.3\textwidth]{../figures/solveTimeProblem2}
 \end{frame}
 
-
 % Slide
-\begin{frame}{Conclusions}
-\begin{block}{Conclusions}
+\begin{frame}{AMG-DD}
+\begin{block}{Accuracy per time}
 \bit
-\item The cost of communication is a significant bottleneck for future scalability of AMG
-\item AMG-DD is a promising low-communication alternative to AMG
-\item AMG-DD achieves:
-\bit
-\item Small storage and computation overhead compared to AMG
-\item Similar or better convergence per iteration compared to AMG
-\item Large reduction in both number of messages and communication volume compared to AMG
-\item Better accuracy per communication cost than AMG
-\item Demonstrated speedup in the right computational regime
-\eit
+\item Similar or better per iteration convergence 
+\item Effective convergence factor scaled by run time 
 \eit
 \end{block}
+\centering
+\vspace{0.5 cm}
+\includegraphics[height=0.3\textwidth]{../figures/resConvFactProblem1}
+\includegraphics[height=0.3\textwidth]{../figures/resConvFactProblem2}
 \end{frame}
 
 % Slide
-\begin{frame}{Conclusions}
+\begin{frame}{AMG-DD}
+\begin{block}{Decreased time to solution}
+\bit
+\item Clear benefit at large processor counts in accuracy per time
+\eit
+\end{block}
+\centering
+\vspace{0.5 cm}
+\includegraphics[height=0.3\textwidth]{../figures/resConvByTimeProblem1}
+\includegraphics[height=0.3\textwidth]{../figures/resConvByTimeProblem2}
+\end{frame}
+
+% Slide
+\begin{frame}{AMG-DD}
 \begin{block}{Future work}
 \bit
-\item Run timing runs on larger GPU clusters
-\item Use of stronger smoothers such as tridiagonal solvers
+\item AMG-DD performs smoothing independently on each processor
+\bit
+\item Stronger smoothers (block solves, ILU, etc.) are normally communication-limited
+\item AMG-DD could enable much more efficient use of such smoothers
+\eit
+\item Develop corresponding coarsening/interpolation strategies 
 \item Use of mixed precision
-\item Communication hiding and asynchronous AMG-DD
-\item AMG-DD for non-symmetric problems
-\item Application of a DD-like algorithm to multigrid reduction in time (MGRIT)
 \eit
 \end{block}
 \end{frame}
