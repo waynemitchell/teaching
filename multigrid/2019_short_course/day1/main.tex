@@ -130,7 +130,7 @@
 \eit
 \item Problem specific direct methods:
 \bit
-\item Fast Fourier transfrom, cyclic reduction, fast multipole
+\item Fast Fourier transform, cyclic reduction, fast multipole, nested dissection, elimination trees
 \item More scalabe: $O(N\log N)$ or even $O(N)$ computational cost
 \eit
 \eit
@@ -220,9 +220,10 @@ $O(N^3)$ alg & $O(N^2)$ alg & $O(N)$ alg & N & Comp speed \\
 \eq{
    \langle \mathbf{x}, \mathbf{y} \rangle = \prod_i x_iy_i
 }
-\item Norms: 
+\item Vector and matrix norms: 
 \eq{
-   ||\mathbf{x}|| = \sqrt{\langle \mathbf{x}, \mathbf{x} \rangle}
+   ||\mathbf{x}|| = \sqrt{\langle \mathbf{x}, \mathbf{x} \rangle} \\
+   ||A|| = \sup_{||\mathbf{x}||=1} ||A\mathbf{x}||
 }
 \item Condition number:
 \eq{
@@ -488,6 +489,7 @@ M\mathbf{u} &= \mathbf{f} + N\mathbf{u} \\
 \item Krylov methods minimize an objective over a Krylov subspace
 \item Grow the subspace (i.e. increase $r$) on each iteration
 \item Subsequent iterates belong to ever richer subspaces and are thus more accurate
+\item If $\mathcal{K}_n(A,\mathbf{f}) = \mathcal{R}^n$, minimization yields exact solution
 \eit
 \end{block}
 \end{frame}
@@ -685,6 +687,8 @@ M\mathbf{u} &= \mathbf{f} + N\mathbf{u} \\
 \item $A \rightarrow$ $\kappa(M^{-1}A) = \kappa(I) = 1$, but cannot invert $M$
 \item $I \rightarrow$ Easily invertible, but no effect
 \item $D = diag(A) \rightarrow$ Still easily invertible, can be work for very diagonally dominant systems
+\item Block diagonal preconditioners
+\item Tridiagonal preconditioners
 \item Incomplete factorization methods (ILU)
 \item Multigrid methods! Cost $O(N)$ to apply and $\kappa(M^{-1}A) = O(1)$.
 \eit
