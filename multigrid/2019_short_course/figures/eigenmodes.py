@@ -5,11 +5,8 @@ savePlots = 1
 showPlots = 1
 
 
-N = 16
-k = 4
+N = 128
 j = np.arange(1,N)
-
-v = np.sin(k*j*np.pi/N)
 
 
 
@@ -21,33 +18,19 @@ font = {'size' : 16}
 plt.rc('font',**font)
 plt.grid(linestyle='dotted')
 
-plt.title('Smooth Mode')
+plt.title('Eigenvectors')
 plt.xlabel('$j$')
-plt.xlim((0,16))
-plt.xticks(np.arange(0, 16.1, step=2))
 plt.ylabel('$v_j$')
-p1 = plt.plot(j, v, '-x')
-plt.legend(['$k = 4, N = 16$'], bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
+
+for k in [1,2,5]:
+   v = np.sin(k*j*np.pi/N)
+   plt.plot(j, v)
+
+plt.legend(['$k = 1$','$k = 2$','$k = 5$'], bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
 
 if savePlots:
-   filename = 'smoothMode.png'
+   filename = 'eigenmodes.png'
    plt.savefig(filename, bbox_inches="tight")
-
-N = 8
-k = 4
-j = np.arange(1,N)
-
-v = np.sin(k*j*np.pi/N)
-
-
-p1 = plt.plot(2*j, v, '-or')
-plt.legend(['$k = 4, N = 16$','$k = 4, N = 8$'], bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
-
-if savePlots:
-   filename = 'modeCoarse.png'
-   plt.savefig(filename, bbox_inches="tight")
-
-
 
 ######### Show the plots #########
 

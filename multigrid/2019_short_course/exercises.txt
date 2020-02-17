@@ -4,9 +4,9 @@ Exercises:
 colab.research.google.com
 Search for waynemitchell on GitHub
 
+--------------------------------------------------------------------------------
 
 Day 1:
-
 
 iterativeMethods:
 
@@ -16,21 +16,18 @@ Show Jacobi oscillating back and forth. Motivate weighted Jacobi.
 Show that on the model problem, weighted Jacobi and Gauss-Seidel smooth the error.
 Show that even for a non-smooth solution, the error is smooth.
 
-
 Random matrix:
 Show divergence of methods, then restored convergence when you enforce diagonal dominance
 
-
-
 krylovMethods:
 
+Show level curves
+Show gradient descent vs. CG
+Show CG vs. PCG
 
-
-
-
+--------------------------------------------------------------------------------
 
 Day 2:
-
 
 towardsMultigrid:
 
@@ -48,6 +45,7 @@ Quick initial convergence followed by stagnation
 Smooth error despite oscillatory solution
 
 
+
 geometricMultigrid:
 
 1D Poisson
@@ -56,6 +54,7 @@ geometricMultigrid:
 
 Anisotropic diffusion
 
+--------------------------------------------------------------------------------
 
 Day 3:
 
@@ -67,6 +66,8 @@ amg:
 
 
 
+--------------------------------------------------------------------------------
+
 Day 4:
 
 Newton:
@@ -76,10 +77,10 @@ Can I code up a simple FAS scheme for a non-linear problem?
 Non-symmetric:
 Maybe switch to hypre/mfem for these examples... that way you can use AIR, have more control over problem, etc.
 
-
 Graphs:
 Check if LAMG is available somewhere? Or Aly's Julia code?
 
+--------------------------------------------------------------------------------
 
 Day 5:
 Also maybe want to go to hypre for examples here? PyAMG does have HMIS coarsening, etc...

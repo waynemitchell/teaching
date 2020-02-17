@@ -5,7 +5,7 @@ savePlots = 1
 showPlots = 1
 
 
-N = 100 # Note: N = (N+1) from the slides
+N = 16 # Note: N = (N+1) from the slides
 k = np.arange(1,N)
 
 omega = 1.0

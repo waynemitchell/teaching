@@ -147,13 +147,80 @@ f_{N-1} \\
 
 % Slide
 \begin{frame}{Basic iterative methods on a model problem}
+\begin{block}{Behavior of Gauss-Seidel}
+\bit
+\item Gauss-Seidel as a stand-alone solver convergese very slowly
+\item With a random initial guess, convergence is swift for a couple of iterations, then stalls
+\eit
+\end{block}
+\begin{center}
+\includegraphics[width=0.5\textwidth]{../figures/gaussSeidelConvRand}
+\end{center}
+\end{frame}
+
+% Slide
+\begin{frame}{Basic iterative methods on a model problem}
+\begin{block}{Behavior of Gauss-Seidel}
+\bit
+\item Gauss-Seidel seems to "smooth out" the error
+\eit
+\end{block}
+\begin{center}
+\includegraphics[width=0.45\textwidth]{../figures/gaussSeidelInitialErrRand}
+\includegraphics[width=0.45\textwidth]{../figures/gaussSeidelRemainingErrRand}
+\end{center}
+\end{frame}
+
+% Slide
+\begin{frame}{Basic iterative methods on a model problem}
+\begin{block}{Behavior of Gauss-Seidel}
+\bit
+\item Smooth initial guess, no swift initial convergence...
+\eit
+\end{block}
+\begin{center}
+\includegraphics[width=0.5\textwidth]{../figures/gaussSeidelConvSmooth}
+\end{center}
+\end{frame}
+
+% Slide
+\begin{frame}{Basic iterative methods on a model problem}
+\begin{block}{Behavior of Gauss-Seidel}
+\bit
+\item The starting smooth error is slow to change
+\eit
+\end{block}
+\begin{center}
+\includegraphics[width=0.45\textwidth]{../figures/gaussSeidelInitialErrSmooth}
+\includegraphics[width=0.45\textwidth]{../figures/gaussSeidelRemainingErrSmooth}
+\end{center}
+\end{frame}
+
+% Slide
+\begin{frame}{Basic iterative methods on a model problem}
+\begin{block}{Behavior of Gauss-Seidel}
+\bit
+\item Observations:
+\bit
+\item Given a random initial guess, Gauss-Seidel reduces the error significantly on the first iteration
+\item Convergence then stalls
+\item Remaining error is smooth
+\item Given a smooth initial guess, Gauss-Seidel is very slow
+\eit
+\item Seems that Gauss-Seidel is more effective at damping oscillatory error compared to smooth error
+\eit
+\end{block}
+\end{frame}
+
+% Slide
+\begin{frame}{Basic iterative methods on a model problem}
 \begin{block}{Review of eigenvalues and eigenvectors}
 \bit
 \item Eigenvalues, $\lambda_k$, and eigenvectors, $\mathbf{v}_k$, of a matrix, $A$, are defined by
 \eq{
    A\mathbf{v}_k = \lambda_k \mathbf{v}_k
 }
-\item Evals and evecs can be a way to think about ``action" of an operator: rotation and scaling
+\item Evals and evecs can be a way to think about "action" of an operator: rotation and scaling
 \item Important in many applications from physics and engineering
 \eit
 \end{block}
@@ -177,13 +244,29 @@ f_{N-1} \\
 \begin{frame}{Basic iterative methods on a model problem}
 \begin{block}{Evals and evecs of the model problem}
 \bit
-\item $A = tridiag(-1,2,-1)$, then
+\item $A = tridiag(-1,2,-1)$, then the eigenvalues, $\lambda_k$, are
 \eq{
    \lambda_k &= 4\sin^2\left(\frac{k\pi}{2N}\right), &k = 1,...,N-1 \\
-   v_k,j &= \sin\left(\frac{jk\pi}{N}\right), &j,k = 1,...,N-1 
+}
+\item The eigenvectors, $\mathbf{v}_k$, are defined componentwise as
+\eq{
+   v_{k,j} &= \sin\left(\frac{jk\pi}{N}\right), &j,k = 1,...,N-1 
 }
 \eit
 \end{block}
+\end{frame}
+
+% Slide
+\begin{frame}{Basic iterative methods on a model problem}
+\begin{block}{Evals and evecs of the model problem}
+\bit
+\item Eigenvectors are the Fourier modes
+\item Can study algorithm convergence by decomposing error into modes
+\eit
+\end{block}
+\begin{center}
+\includegraphics[width=0.6\textwidth]{../figures/eigenmodes}
+\end{center}
 \end{frame}
 
 % Slide
@@ -208,7 +291,12 @@ f_{N-1} \\
 \begin{block}{Jacobi on the model problem}
 \bit
 \item $E$ and $A$ have the same evecs, $\mathbf{v}_k$
-\item The evals, $\tilde\lambda_k$, of $E$ are related to those of $A$ (recall $D = 2I$)
+\eq{
+   E\mathbf{v}_k &= (I - D^{-1}A)\mathbf{v}_k \\
+   &= \mathbf{v}_k - D^{-1}(\lambda_k\mathbf{v}_k) & \text{(recall $D = 2I$)} \\
+   &= (1 - \frac{1}{2}\lambda_k)\mathbf{v}_k
+}
+\item The evals, $\tilde\lambda_k$, of $E$ are related to those of $A$ 
 \eq{
    \tilde\lambda_k &= 1 - \frac{1}{2}\lambda_k \\
    &= 1 - 2\sin^2\left(\frac{k\pi}{2N}\right)
@@ -228,7 +316,7 @@ f_{N-1} \\
    &= E^i\left(\sum_{k=1}^{N-1} \langle \mathbf{e}^{(0)}, \mathbf{v}_k \rangle \mathbf{v}_k\right) \\
    &= \sum_{k=1}^{N-1} \tilde\lambda_k^i \langle \mathbf{e}^{(0)}, \mathbf{v}_k \rangle \mathbf{v}_k
 }
-\item So the $k^{th}$ ``error mode" is reduced by $\tilde\lambda_k$ on each iteration
+\item So the $k^{th}$ "error mode" is reduced by $\tilde\lambda_k$ on each iteration
 \eit
 \end{block}
 \end{frame}
@@ -245,6 +333,46 @@ f_{N-1} \\
 \end{block}
 \begin{center}
 \includegraphics[width=0.5\textwidth]{../figures/jacobiModeDamping}
+\end{center}
+\end{frame}
+
+% Slide
+\begin{frame}{Basic iterative methods on a model problem}
+\begin{block}{Error reduction for Jacobi}
+\bit
+\item For small $k$ (i.e. low "wave number"), Jacobi convergence is slow
+\eit
+\end{block}
+\begin{center}
+\includegraphics[width=0.45\textwidth]{../figures/jacobiInitialErrLowK}
+\includegraphics[width=0.45\textwidth]{../figures/jacobiRemainingErrLowK}
+\end{center}
+\end{frame}
+
+% Slide
+\begin{frame}{Basic iterative methods on a model problem}
+\begin{block}{Error reduction for Jacobi}
+\bit
+\item Likewise for large $k$ (i.e. high wave number), Jacobi convergence is slow
+\eit
+\end{block}
+\begin{center}
+\includegraphics[width=0.45\textwidth]{../figures/jacobiInitialErrHighK}
+\includegraphics[width=0.45\textwidth]{../figures/jacobiRemainingErrHighK}
+\end{center}
+\end{frame}
+
+% Slide
+\begin{frame}{Basic iterative methods on a model problem}
+\begin{block}{Error reduction for Jacobi}
+\bit
+\item Modes in the middle converge fast
+\item If $N$ even, $k = N/2$, then $\tilde\lambda_k = 1 - 2\sin^2\left(\frac{k\pi}{2N}\right) = 0$
+\eit
+\end{block}
+\begin{center}
+\includegraphics[width=0.45\textwidth]{../figures/jacobiInitialErrMiddleK}
+\includegraphics[width=0.45\textwidth]{../figures/jacobiRemainingErrMiddleK}
 \end{center}
 \end{frame}
 
@@ -304,8 +432,8 @@ f_{N-1} \\
 \bit
 \item Weighted Jacobi and Gauss-Seidel are not good solvers on their own
 \item They do a good job at damping certain error modes for the model problem
-\item Specifically, they remove ``high-frequency" error (they damp the oscillatory evecs of $A$)
-\item Call these ``smoothers" or ``relaxation methods"
+\item Specifically, they remove "high-frequency" error (they damp the oscillatory evecs of $A$)
+\item Call these "smoothers" or "relaxation methods"
 \eit
 \end{block}
 \end{frame}
@@ -339,9 +467,57 @@ f_{N-1} \\
 \eq{
    A\mathbf{e} = \mathbf{r}
 }
-\item Idea: can use relaxation on a coarse grid to effectively solve the residual equation! 
+\item Solve on a coarse grid to obtain an approximation to error after relaxation
 \eit
 \end{block}
+\end{frame}
+
+% Slide
+\begin{frame}{Towards multigrid}
+\begin{block}{Coarse-grid correction}
+\bit
+\item After some Gauss-Seidel iterations, convergence stalls...
+\eit
+\end{block}
+\begin{center}
+\includegraphics[width=0.7\textwidth]{../figures/solnPostRelax}
+\end{center}
+\end{frame}
+
+% Slide
+\begin{frame}{Towards multigrid}
+\begin{block}{Coarse-grid correction}
+\bit
+\item ... but the error is smooth
+\eit
+\end{block}
+\begin{center}
+\includegraphics[width=0.7\textwidth]{../figures/errPostRelax}
+\end{center}
+\end{frame}
+
+% Slide
+\begin{frame}{Towards multigrid}
+\begin{block}{Coarse-grid correction}
+\bit
+\item Solving for the error on a coarse-grid yields a good approximation
+\eit
+\end{block}
+\begin{center}
+\includegraphics[width=0.7\textwidth]{../figures/coarseGridErr}
+\end{center}
+\end{frame}
+
+% Slide
+\begin{frame}{Towards multigrid}
+\begin{block}{Coarse-grid correction}
+\bit
+\item Adding the coarse-grid correction yields a much better fine-grid solution
+\eit
+\end{block}
+\begin{center}
+\includegraphics[width=0.7\textwidth]{../figures/solnCoarseCorrect}
+\end{center}
 \end{frame}
 
 % Slide
@@ -351,8 +527,20 @@ f_{N-1} \\
 \item Relax on $A^f\mathbf{u}^f = \mathbf{f}^f$ to obtain approximate fine-grid solution
 \item Error, $\mathbf{e}^f = \mathbf{\tilde u} - \mathbf{u}^f$, is smooth
 \item Calculate the residual $\mathbf{r}^f = \mathbf{f}^f - A^f\mathbf{u}^f$
-\item Relax on $A^c\mathbf{e}^c = \mathbf{r}^c$ to obtain a coarse-grid correction
+\item Solve $A^c\mathbf{e}^c = \mathbf{r}^c$ to obtain a coarse-grid correction
 \item Correct on the fine grid $\mathbf{u}^f \leftarrow \mathbf{u}^f + \mathbf{e}^f$
+\eit
+\end{block}
+\end{frame}
+
+% Slide
+\begin{frame}{Towards multigrid}
+\begin{block}{Coarse-grid correction}
+\bit
+\item The coarse-grid system, $A^c\mathbf{e}^c = \mathbf{r}^c$, is smaller
+\item Recall that smooth modes look more oscillatory there
+\item Relaxation is effective again!
+\item To solve for even smoother error modes, can go to further coarse grids
 \eit
 \end{block}
 \end{frame}
@@ -684,7 +872,7 @@ f_{N-1} \\
 \begin{block}{V-cycle cost}
 \bit
 \item Recall the claim that multigrid has optimal, $O(N)$ computational cost
-\item Define a ``work unit" (WU) as the cost of one mat-vec on the fine grid, $A\mathbf{u}$
+\item Define a "work unit" (WU) as the cost of one mat-vec on the fine grid, $A\mathbf{u}$
 \item If $A$ is sparse, then one WU has $O(N)$ cost
 \item Point-wise relaxation (e.g. Gauss-Seidel) costs one WU
 \eit
@@ -791,7 +979,6 @@ f_{N-1} \\
 \eit
 \end{block}
 \end{frame}
-
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
