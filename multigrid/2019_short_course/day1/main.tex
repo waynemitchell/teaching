@@ -218,7 +218,7 @@ $O(N^3)$ alg & $O(N^2)$ alg & $O(N)$ alg & N & Comp speed \\
 \bit
 \item Inner products: 
 \eq{
-   \langle \mathbf{x}, \mathbf{y} \rangle = \prod_i x_iy_i
+   \langle \mathbf{x}, \mathbf{y} \rangle = \sum_i x_iy_i
 }
 \item Vector and matrix norms: 
 \eq{
@@ -580,7 +580,7 @@ M\mathbf{u} &= \mathbf{f} + N\mathbf{u} \\
 \If{k = 0}
 \State $\mathbf{p}_k = \mathbf{r}$
 \Else
-\State $\mathbf{p}_k = \min||\mathbf{p}_k - \mathbf{r}||$ subject to $p_k\in\text{span}\{Ap_0,...,Ap_{k-1}\}^\perp$
+\State $\mathbf{p}_k = \min||\mathbf{p}_k - \mathbf{r}||$ subject to $\mathbf{p}_k\in\text{span}\{A\mathbf{p}_0,...,A\mathbf{p}_{k-1}\}^\perp$
 \EndIf
 \State $\alpha \leftarrow \langle \mathbf{p}_k, \mathbf{r} \rangle / \langle \mathbf{p}_k, A\mathbf{p}_k \rangle$
 \State $\mathbf{u} \leftarrow \mathbf{u} + \alpha\mathbf{p}_k$
