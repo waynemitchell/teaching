@@ -59,11 +59,11 @@ Anisotropic diffusion
 Day 3:
 
 amgCoarsening:
-use PyAMG... use MY fork of PyAMG because it has standard interpolation???
-
+show isotropic and anisotropic, FD and FE
 
 amg:
-
+can print operators on different levels
+show semicoarsening for a few levels followed by standard coarsening once anisotropy is overcome
 
 
 --------------------------------------------------------------------------------
