@@ -854,7 +854,7 @@ f_{N-1} \\
 \State Call recursive V-cycle$(\mathbf{e}^c, \mathbf{r}^c)$
 \EndIf
 \State Interpolate coarse-grid correction $\mathbf{u} = \mathbf{u} + P\mathbf{e}^c$
-\State Relax again on $A\mathbf{u} = \mathbf{f}^f$
+\State Relax again on $A\mathbf{u} = \mathbf{f}$
 \end{algorithmic}
 \end{algorithm}
 \end{frame}
@@ -923,7 +923,7 @@ f_{N-1} \\
 \State Call recursive W-cycle$(\mathbf{e}^c, \mathbf{r}^c)$ again
 \EndIf
 \State Interpolate coarse-grid correction $\mathbf{u} = \mathbf{u} + P\mathbf{e}^c$
-\State Relax again on $A\mathbf{u} = \mathbf{f}^f$
+\State Relax again on $A\mathbf{u} = \mathbf{f}$
 \end{algorithmic}
 \end{algorithm}
 \end{frame}
@@ -972,7 +972,7 @@ f_{N-1} \\
 \begin{block}{Cycle cost and convergence}
 \bit
 \item Can show that W-cycles and FMG also have $O(N)$ cost
-\item V-cycles often achieve convergence factors that are independent of $N$
+\item V-cycles achieve convergence factors that are independent of $N$
 \item Thus V-cycles achieve fixed error reduction with $O(N)$ cost
 \item W-cycles similarly achieve fixed error reduction with $O(N)$ cost and can be more robust than V-cycles
 \item FMG achieves \emph{discretization accuracy} with $O(N)$ cost!
