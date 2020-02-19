@@ -105,7 +105,7 @@
 \item Consider a non-linear equation in 1D, $A(\tilde{u}) = 0$
 \item Given initial guess, $u$, and error, $e = \tilde{u} - u$, consider the Taylor expansion about $u$:
 \eq{
-   0 = A(\tilde{u}) = A(u + e) = A(u) + eA'(u) + \frac{s^2}{2}A''(\xi)
+   0 = A(\tilde{u}) = A(u + e) = A(u) + eA'(u) + \frac{e^2}{2}A''(\xi)
 }
 for $\xi$ between $u$ and $\tilde{u}$
 \eit
@@ -118,8 +118,8 @@ for $\xi$ between $u$ and $\tilde{u}$
 \bit
 \item Neglecting higher-order terms, solve for the correction, $e$:
 \eq{
-   0 &= A(u) + eA'(u) \\
-   e &= -\frac{A(u)}{A'(u)}
+   0 &\approx A(u) + eA'(u) \\
+   e &\approx -\frac{A(u)}{A'(u)}
 }
 \item Use approximate error to iteratively update the guess
 \eq{
@@ -134,6 +134,24 @@ for $\xi$ between $u$ and $\tilde{u}$
 \begin{frame}{Non-linear problems}
 \begin{block}{Newton's method}
 \bit
+\item Newton's method neglects $O(e^2)$ and higher-order terms
+\item Therefore expect quadratic convergence from Newton's method
+\item Can only guarantee quadratic convergence under assumptions:
+\bit
+\item $A'(u) \neq 0$ for $u\in I = [\tilde{u} - r, \tilde{u} + r]$, where $r\geq|\tilde{u} - u^{(0)}|$
+\item $A''(u)$ is continuous for $u\in I$
+\item $u^{(0)}$ is sufficiently close to $\tilde{u}$
+\eit
+\item There may be multiple roots, need to start in the "basin of attraction" for the desired root
+\eit
+\end{block}
+\end{frame}
+
+% Slide
+\begin{frame}{Non-linear problems}
+\begin{block}{Newton's method}
+\bit
+\item Can also use Newton to solve systems of non-linear equations
 \item Consider the $N$-dimensional non-linear system:
 \eq{
    A(\mathbf{\tilde{u}}) 
@@ -198,9 +216,29 @@ where $J(\mathbf{u})$ is the Jacobian matrix $J$ evaluated at $\mathbf{u}$
 \begin{frame}{Non-linear problems}
 \begin{block}{Newton-Multigrid}
 \bit
-\item Obvious application of multigrid: solve $(J(u))^{-1}A(u)$ with multigrid
+\item Obvious application of multigrid: solve $(J(\mathbf{u}))^{-1}A(\mathbf{u})$ with multigrid
 \item This approach is called Newton-Multigrid and can work well
+\item In practice, often use just a few V-cycles to solve $(J(\mathbf{u}))^{-1}A(\mathbf{u})$
+\item Leads to the inexact Newton method
+\bit
+\item Inexact Newton requires more iterations to converge compared to exact
+\item Cost saved by avoiding exact solve usually means faster time to solution
+\eit
+\eit
+\end{block}
+\end{frame}
+
+% Slide
+\begin{frame}{Non-linear problems}
+\begin{block}{Multigrid approach to non-linear problems}
+\bit
 \item We would like to apply multigrid principles directly to the non-linear problem
+\item Assume a geometric multigrid context: 
+\bit 
+\item Geometric interpolation, restriction
+\item Access to redisretization on coarse grids
+\eit
+\item Still need to define a relaxation method and non-linear coarse-grid correction
 \eit
 \end{block}
 \end{frame}
@@ -230,8 +268,8 @@ where $\mathbf{\epsilon}_j$ is the $j^{th}$ canonical basis vector
 \begin{block}{Non-linear coarse-grid correction}
 \bit
 \item Coarse-grid correction is based on solving the residual equation
-\item In the linear case, $A\mathbf{e} = A(\mathbf{\tilde{u}} - \mathbf{u}) = \mathbf{f} - A\mathbf{u}$
-\item Not so in the non-linear case!
+\item In the linear case, $A\mathbf{e} = A(\mathbf{\tilde{u}} - \mathbf{u}) = \mathbf{f} - A\mathbf{u} = \mathbf{r}$
+\item Not so in the non-linear case! $A(\mathbf{e}) \neq  \mathbf{r} = \mathbf{f} - A(\mathbf{u})$
 \eit
 \end{block}
 \end{frame}
@@ -245,10 +283,7 @@ where $\mathbf{\epsilon}_j$ is the $j^{th}$ canonical basis vector
    \mathbf{f} - A(\mathbf{u}) = \mathbf{r} \\
    A(\mathbf{u} + \mathbf{e}) - A(\mathbf{u}) = \mathbf{r}
 }
-\item Furthermore, want to solve for the correction on a coarse grid:
-\eq{
-   A^c(\mathbf{u}^c + \mathbf{e}^c) - A^c(\mathbf{u})^c = \mathbf{r}^c 
-}
+\item Still want to solve the residual equation on a coarse grid
 \eit
 \end{block}
 \end{frame}
@@ -269,16 +304,25 @@ where $\mathbf{\epsilon}_j$ is the $j^{th}$ canonical basis vector
 \end{block}
 \end{frame}
 
-
 % Slide
 \begin{frame}{Non-linear problems}
 \begin{block}{Non-linear coarse-grid correction}
 \bit
 \item Substitute these into the coarse-grid residual equation:
 \eq{
+   A^c(\mathbf{u}^c + \mathbf{e}^c) - A^c(\mathbf{u}^c) = \mathbf{r}^c \\
    A^c(R\mathbf{u} + \mathbf{e}^c) - A^c(R\mathbf{u}) = R\mathbf{r} \\
    A^c(\mathbf{\tilde{u}^c}) = A^c(R\mathbf{u}) + R\mathbf{r} 
 }
+\item Note we've defined $\mathbf{\tilde{u}^c} = R\mathbf{u} + \mathbf{e}^c$
+\eit
+\end{block}
+\end{frame}
+
+% Slide
+\begin{frame}{Non-linear problems}
+\begin{block}{Non-linear coarse-grid correction}
+\bit
 \item Coarse-grid correction:
 \bit
 \item Solve for $\mathbf{\tilde{u}^c}$: 
@@ -295,17 +339,6 @@ where $\mathbf{\epsilon}_j$ is the $j^{th}$ canonical basis vector
 }
 \eit
 \eit
-\end{block}
-\end{frame}
-
-% Slide
-\begin{frame}{Non-linear problems}
-\begin{block}{Interpolation, restriction, and coarse-grid operator}
-\bit
-\item Often the same linear interpolation and full-weighting restriction used in the linear case are sufficient (can also use higher-order geometric interpolation)
-\item Coarse-grid operator is usually obtained through rediscretization on the coarse grid
-\item Can also sometimes form $A^c(\mathbf{u}^c) = RA(\mathbf{u})P$
-\eit 
 \end{block}
 \end{frame}
 
@@ -354,7 +387,7 @@ where $\mathbf{\epsilon}_j$ is the $j^{th}$ canonical basis vector
    A^c(\mathbf{\tilde{u}}^c) &= A^c(R\mathbf{u}) + R(\mathbf{f} - A(\mathbf{u})) \\
    A^c(\mathbf{\tilde{u}}^c) &= R\mathbf{f} + (A^c(R\mathbf{u}) - RA(\mathbf{u})) 
 }
-\item Let $R\mathbf{f} = \mathbf{f}^cc$ and $\tau = A^c(R\mathbf{u}) - RA(\mathbf{u})$
+\item Let $R\mathbf{f} = \mathbf{f}^c$ and $\tau = A^c(R\mathbf{u}) - RA(\mathbf{u})$
 \item Then the coare-grid equation is:
 \eq{
    A^c(\mathbf{\tilde{u}}^c) = \mathbf{f}^c + \tau
@@ -479,7 +512,7 @@ where $\mathbf{\epsilon}_j$ is the $j^{th}$ canonical basis vector
 
 % Slide
 \begin{frame}{Non-symmetric problems}
-\begin{block}{Ideal interpolation and restriction}
+\begin{block}{Ideal interpolation}
 \bit
 \item Given matrix $A$ and a C/F splitting, consider the following block form of $A$:
 \eq{
@@ -506,7 +539,7 @@ where $\mathbf{\epsilon}_j$ is the $j^{th}$ canonical basis vector
 
 % Slide
 \begin{frame}{Non-symmetric problems}
-\begin{block}{Ideal interpolation and restriction}
+\begin{block}{Ideal interpolation}
 \bit
 \item Basic multigrid principle: relaxation effectively reduces F-point residuals
 \eq{
@@ -528,17 +561,108 @@ where $\mathbf{\epsilon}_j$ is the $j^{th}$ canonical basis vector
 
 % Slide
 \begin{frame}{Non-symmetric problems}
-\begin{block}{Ideal interpolation and restriction}
+\begin{block}{Ideal interpolation vs. ideal restriction}
 \bit
 \item Ideal interpolation focuses on eliminating residuals at F-points
 \item Ideal restriction focuses on eliminating error at C-points
+\item Consider decomposing the error into error in the range of $P$ and error outside the range of $P$
+\eq{
+   \mathbf{e} = \begin{bmatrix}
+   \mathbf{e}_f \\
+   \mathbf{e}_c
+   \end{bmatrix} = P\mathbf{e}^c + \begin{bmatrix}
+   \delta\mathbf{e}_f \\
+   \mathbf{0}
+   \end{bmatrix} = \begin{bmatrix}
+   W\mathbf{e}_c \\
+   \mathbf{e}_c
+   \end{bmatrix} + \begin{bmatrix}
+   \delta\mathbf{e}_f \\
+   \mathbf{0}
+   \end{bmatrix}
+}
+\item Want to build coarse-grid correction to set $\mathbf{e}_c = \mathbf{0}$
+\eit
+\end{block}
+\end{frame}
+
+% Slide
+\begin{frame}{Non-symmetric problems}
+\begin{block}{Ideal restriction}
+\bit
+\item Consider coarse-grid correction error propagation
+\eq{
+   &(I - P(RAP)^{-1}RA)\mathbf{e} \\
+   &\begin{bmatrix}\mathbf{e}_f \\ \mathbf{e}_c\end{bmatrix} - P(RAP)^{-1}RA\left( P\mathbf{e}^c + \begin{bmatrix}\delta\mathbf{e}_f \\ \mathbf{0}\end{bmatrix} \right) \\
+   &\begin{bmatrix}\mathbf{e}_f \\ \mathbf{e}_c\end{bmatrix} - P\mathbf{e}^c - P(RAP)^{-1}RA\begin{bmatrix}\delta\mathbf{e}_f \\ \mathbf{0}\end{bmatrix} \\
+   &\begin{bmatrix}\mathbf{e}_f \\ \mathbf{e}_c\end{bmatrix} - \begin{bmatrix}W\mathbf{e}_c \\ \mathbf{e}_c\end{bmatrix} - P(RAP)^{-1}RA\begin{bmatrix}\delta\mathbf{e}_f \\ \mathbf{0}\end{bmatrix} \\
+   &\begin{bmatrix}\mathbf{e}_f - W\mathbf{e}_c \\ \mathbf{e}_c\end{bmatrix} - P(RAP)^{-1}RA\begin{bmatrix}\delta\mathbf{e}_f \\ \mathbf{0}\end{bmatrix}
+}
+\eit
+\end{block}
+\end{frame}
+
+% Slide
+\begin{frame}{Non-symmetric problems}
+\begin{block}{Ideal restriction}
+\bit
+\item So to get an exact correction at C-points, want to set
+\eq{
+   P(RAP)^{-1}RA\begin{bmatrix}\delta\mathbf{e}_f \\ \mathbf{0}\end{bmatrix} = \mathbf{0}
+}
+\item Equivalently, set 
+\eq{
+   RA\begin{bmatrix}\delta\mathbf{e}_f \\ \mathbf{0}\end{bmatrix} = \mathbf{0}
+}
+\eit
+\end{block}
+\end{frame}
+
+% Slide
+\begin{frame}{Non-symmetric problems}
+\begin{block}{Ideal restriction}
+\bit
+\item Again looking at the operators in block form
+\eq{
+   \mathbf{0} = \begin{bmatrix}
+   Z & I 
+   \end{bmatrix}
+   \begin{bmatrix}
+   A_{ff} & A_{fc} \\
+   A_{cf} & A_{cc}
+   \end{bmatrix}
+   \begin{bmatrix}\delta\mathbf{e}_f \\ \mathbf{0}\end{bmatrix}
+   =
+   (ZA_{ff} + A_{cf}) \delta\mathbf{e}_f
+}
+\item Thus, ideal restriction is defined as
 \eq{
    R_{\text{ideal}} = \begin{bmatrix}
    -A_{cf}A_{ff}^{-1} & I 
    \end{bmatrix}  
 }
+\eit
+\end{block}
+\end{frame}
+
+% Slide
+\begin{frame}{Non-symmetric problems}
+\begin{block}{Ideal restriction}
+\bit
 \item Again, can design AMG algorithms based on sparse approximation of ideal restriction
 \item Very effective when combined with effective F-relaxation
+\eit
+\end{block}
+\end{frame}
+
+% Slide
+\begin{frame}{Non-symmetric problems}
+\begin{block}{Local approximate ideal restriction (LAIR)}
+\bit
+\item Recall $R = \begin{bmatrix}Z & I \end{bmatrix}$, so want to set entries in $Z$
+\item Approximate ideal restriction given a fixed sparsity pattern for $Z$
+\item Set $(ZA_{ff} + A_{cf})_{i,k} = 0$ where $(i,k)$ is in the prescribed sparsity pattern
+\item Solve small linear system for each row of $Z$ where the size of the linear system is the size of the sparsity pattern
 \eit
 \end{block}
 \end{frame}
@@ -619,8 +743,7 @@ where $\mathbf{\epsilon}_j$ is the $j^{th}$ canonical basis vector
 \item Gauss-Seidel relaxation
 \item Two different coarsening procedures: low-degree elimination and aggregation
 \item Piecewise constant interpolation
-\item Galerkin coarse-grid operators, $A^c = P^TAP$, are also graph Laplacians
-\item 
+\item Galerkin coarse-grid operators, $A^c = P^TAP$, are also graph Laplacians 
 \eit
 \eit
 \end{block}
@@ -661,7 +784,7 @@ where $\mathbf{\epsilon}_j$ is the $j^{th}$ canonical basis vector
 \item Interpolation, $P$, is simply piecewise constant interpolation over aggregates
 \item This is basically an unsmoothed aggregation AMG approach
 \item Sparse $P$ limits fill in for Galerkin coarse-grid operators, $A^c = P^TAP$
-\item Reduced interpolation accuracy is overcome through "energy-corrected coarsening" (a modification of the restricted)
+\item Reduced interpolation accuracy is overcome through "energy-corrected coarsening" (a modification of the restricted residual)
 \eit
 \end{block}
 \end{frame}
@@ -711,8 +834,8 @@ is a diagonally dominant Z-matrix.
    \mathbf{x}
    \end{bmatrix}
    = \begin{bmatrix}
-   S\mathbf{x} \\
-   -S\mathbf{x}
+   \mathbf{x} \\
+   -\mathbf{x}
    \end{bmatrix}
    = \begin{bmatrix}
    \mathbf{b} \\

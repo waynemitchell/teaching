@@ -71,7 +71,12 @@ show semicoarsening for a few levels followed by standard coarsening once anisot
 Day 4:
 
 Newton:
-Visualize Newton's method for nonlinear problems. Show case where you start outside basin of attraction.
+Visualize Newton's method for nonlinear problems. 
+Show case where you start outside basin of attraction.
+Show case where derivative is zero.
+Show case of starting point leading to a cycle: wikipedia: f(x) = x^3 - 2x + 2 start at 0
+
+FAS:
 Can I code up a simple FAS scheme for a non-linear problem?
 
 Non-symmetric:
