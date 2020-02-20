@@ -596,7 +596,7 @@ where $\mathbf{\epsilon}_j$ is the $j^{th}$ canonical basis vector
    &\begin{bmatrix}\mathbf{e}_f \\ \mathbf{e}_c\end{bmatrix} - P(RAP)^{-1}RA\left( P\mathbf{e}^c + \begin{bmatrix}\delta\mathbf{e}_f \\ \mathbf{0}\end{bmatrix} \right) \\
    &\begin{bmatrix}\mathbf{e}_f \\ \mathbf{e}_c\end{bmatrix} - P\mathbf{e}^c - P(RAP)^{-1}RA\begin{bmatrix}\delta\mathbf{e}_f \\ \mathbf{0}\end{bmatrix} \\
    &\begin{bmatrix}\mathbf{e}_f \\ \mathbf{e}_c\end{bmatrix} - \begin{bmatrix}W\mathbf{e}_c \\ \mathbf{e}_c\end{bmatrix} - P(RAP)^{-1}RA\begin{bmatrix}\delta\mathbf{e}_f \\ \mathbf{0}\end{bmatrix} \\
-   &\begin{bmatrix}\mathbf{e}_f - W\mathbf{e}_c \\ \mathbf{e}_c\end{bmatrix} - P(RAP)^{-1}RA\begin{bmatrix}\delta\mathbf{e}_f \\ \mathbf{0}\end{bmatrix}
+   &\begin{bmatrix}\mathbf{e}_f - W\mathbf{e}_c \\ \mathbf{0}\end{bmatrix} - P(RAP)^{-1}RA\begin{bmatrix}\delta\mathbf{e}_f \\ \mathbf{0}\end{bmatrix}
 }
 \eit
 \end{block}
@@ -830,10 +830,6 @@ is a diagonally dominant Z-matrix.
    M & -P \\
    -P & M
    \end{bmatrix}\begin{bmatrix}
-   \mathbf{x} \\
-   \mathbf{x}
-   \end{bmatrix}
-   = \begin{bmatrix}
    \mathbf{x} \\
    -\mathbf{x}
    \end{bmatrix}
