@@ -88,4 +88,14 @@ Check if LAMG is available somewhere? Or Aly's Julia code?
 --------------------------------------------------------------------------------
 
 Day 5:
-Also maybe want to go to hypre for examples here? PyAMG does have HMIS coarsening, etc...
+
+Just use your AMG-DD driver to show some behavior of hypre and AMG-DD:
+Show falgout with standard interp in 2D vs. 3D
+Show:
+   falgout coarsening vs. HMIS 
+   with/without extended+i interpolation 
+   with/without p-max.
+
+Large AMG-DD composite grids for falgout coarsening
+
+Large AMG-DD composite grids when padding is large (tie back to importance of minimizing ghost dofs)

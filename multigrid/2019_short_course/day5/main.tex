@@ -80,6 +80,7 @@
 \begin{frame}{Development of \emph{hypre}}
 \begin{block}{Parallel AMG}
 \bit
+\item Much of AMG parallelizes naturally: mostly matrix-vector multiplication
 \item AMG setup: need parallel coarsening algorithms and corresponding interpolation strategies
 \item AMG solve: need parallel smoothers
 \eit
@@ -239,14 +240,14 @@
 \begin{frame}{Development of \emph{hypre}}
 \begin{block}{PMIS coarsening}
 \bit
-\item Especially for 3D problems coarse-grid complexity is an issue for Falgout coarsening
+\item Especially for 3D problems coarse-grid complexity is an issue for Falgout coarsening with classical interpolation
 \item Recall the heuristics used for classical AMG coarsening:
 \begin{enumerate}
 \item For each F-point, $i$, every point $j\in S_i$ is either in $C_i$ or strongly depends on at least one point in $C_i$
 \item The set of C-points is a maximal subset such that no C-point strongly depends on another C-point.
 \end{enumerate}
 \item Classical coarsening (as well as Falgout and CLJP) strongly enforce heuristic 1
-\item 
+\item What if we relax this enforcement?
 \eit
 \end{block}
 \end{frame}
@@ -268,7 +269,7 @@
 % Slide
 \begin{frame}{Development of \emph{hypre}}
 \begin{algorithm}[H]
-\caption{CLJP coarsening}
+\caption{PMIS coarsening}
 \begin{algorithmic}
 \State Select $D = \{i : w(i)>w(j) , \forall j\in S_i\cup S_i^T\}$
 \While{ $D\neq \emptyset$ }
@@ -373,6 +374,10 @@
 \begin{block}{Modern best practices AMG}
 \bit
 \item Overall improvement in time to solution
+\bit
+\item Unstructured 3D diffusion with discontinuous coefficients
+\item Unstructured 3D elasticity 
+\eit
 \eit
 \begin{center}
 \includegraphics[width=0.5\textwidth]{../figures/hypreImprovements1}
@@ -387,6 +392,21 @@
 \begin{block}{Parallel AMG smoothers}
 \bit
 \item Baker, Falgout, Kolev, and Yang. Multigrid smoothers for ultra-parallel computing. SIAM J. Sci. Comp. 2011.
+\item Gauss-Seidel is the classical method of choice... does not parallelize!
+\item Simple hybrid Gauss-Seidel does not have scalable convergence as processor count grows
+\eit
+\end{block}
+\end{frame}
+
+% Slide
+\begin{frame}{Development of \emph{hypre}}
+\begin{block}{Parallel AMG smoothers}
+\bit
+\item Weighted Jacobi: need to determine problem-dependent optimal weighting parameter
+\item Colored Gauss-Seidel: can have many colors in practice, especially on coarse grids
+\item C-F smoothers: use the C/F splitting as a coloring for Jacobi-like smoothers
+\item Polynomial smoothers: application only involves mat-vec, but requires eigenvalue estimates
+\item $l_1$-weighted smoothers: restore robustness for Jacobi and hybrid Gauss-Seidel
 \eit
 \end{block}
 \end{frame}
@@ -396,6 +416,7 @@
 \begin{block}{Parallel AMG takeaways}
 \bit
 \item Scaling AMG to very large problem sizes on parallel machines is non-trivial
+\item Smoothers need to be not only parallel but also convergent independent of the parallelism
 \item Major problem is controlling coarse-grid complexity while retaining good convergence
 \item Sparser coarse grids and interpolation stencils lead to lower complexity but can degrade convergence
 \item Always trying to optimize accuracy per cost
@@ -411,7 +432,7 @@
 \item AMGX successfully demonstrated speedup over \emph{hypre}
 \item GPU implementation in \emph{hypre} is a work in progress
 \item Coarsening: CLJP, PMIS
-\item Smoothers: modified Jacobi, Chebyshev, colored Gauss-Seidel
+\item Smoothers: C/F $l_1$ Jacobi, Chebyshev
 \item Everything else is mat-vecs or triple-matrix products
 \eit
 \end{block}
@@ -473,7 +494,7 @@
 \eit
 \end{block}
 \centering
-\includegraphics[width=\textwidth]{../figures/compGridCreation1D1}
+\includegraphics[width=\textwidth]{../figures/compGridCreation1D2}
 \end{frame}
 
 % Slide
@@ -808,6 +829,17 @@ Accuracy per cost:
 \vspace{0.5 cm}
 \includegraphics[height=0.3\textwidth]{../figures/resConvNumFACByComputationProblem1}
 \includegraphics[height=0.3\textwidth]{../figures/resConvNumFACByComputationProblem2}
+\end{frame}
+
+% Slide
+\begin{frame}{AMG-DD}
+\begin{block}{Weak scaling results}
+\bit
+\item Weak scaling results for 16 up to 1024 processors
+\item Run on Piz Daint on GPU accelerated nodes
+\item 250,000 degrees of freedom per processor
+\eit
+\end{block}
 \end{frame}
 
 % Slide
